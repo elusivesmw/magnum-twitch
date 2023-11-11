@@ -8,6 +8,14 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      colors: {
+        'twitchbg': '#181a1b',
+        'twitchborder': '#dfdcd7',
+        'twitchtext': '#d3cfca'
+      },
+      fontSize: {
+        'xs': '0.8125rem'
+      },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic':

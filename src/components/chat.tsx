@@ -1,8 +1,8 @@
-const Chat = ({ channel }: { channel: string }) => {
+const Chat = ({ channel, visible }: { channel: string; visible: boolean }) => {
   return (
-    <div className="h-[100vh] w-[350px]">
+    <div className={`${visible ? "block" : "hidden"}`}>
       <iframe
-        className="absolute top-0 bottom-0 h-full"
+        className="relative h-full"
         id={`twitch-chat-embed-${channel}`}
         src={`https://www.twitch.tv/embed/${channel}/chat?parent=localhost`}
         height="1200"
