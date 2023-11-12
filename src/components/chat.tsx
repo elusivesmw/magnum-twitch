@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { LeftArrow, RightArrow } from "@/components/icons";
+import { useState } from 'react';
+import { LeftArrow, RightArrow } from '@/components/icons';
 
 const MultiChat = ({ channels }: { channels: string[] }) => {
   const [visibleIndex, setVisibleIndex] = useState(0);
 
   const next = () => {
-    console.log("next");
+    console.log('next');
     var i = visibleIndex + 1;
     if (i > channels.length - 1) i = 0;
     setVisibleIndex(i);
   };
 
   const prev = () => {
-    console.log("prev");
+    console.log('prev');
     var i = visibleIndex - 1;
     if (i < 0) i = channels.length - 1;
     setVisibleIndex(i);
@@ -50,7 +50,7 @@ const MultiChat = ({ channels }: { channels: string[] }) => {
 
 const Chat = ({ channel, visible }: { channel: string; visible: boolean }) => {
   return (
-    <div className={`${visible ? "block" : "hidden"}`}>
+    <div className={`${visible ? 'block' : 'hidden'}`}>
       <iframe
         className="relative h-full"
         id={`twitch-chat-embed-${channel}`}

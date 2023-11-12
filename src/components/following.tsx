@@ -1,14 +1,15 @@
-"use client";
+'use client';
 
-import React from "react";
+import React from 'react';
 
 const channels = [
-  "katun24",
-  "barbarousking",
-  "dawildgrim",
-  "dunkorslam",
-  "yourboyrudy",
-  "caioskii",
+  'katun24',
+  'barbarousking',
+  'dawildgrim',
+  'dunkorslam',
+  'yourboyrudy',
+  'caioskii',
+  'stucat_',
 ];
 const Following = ({
   addWatching,

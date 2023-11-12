@@ -1,4 +1,4 @@
-export const LeftArrow = ({ className = "" }: { className?: string }) => {
+export const LeftArrow = ({ className = '' }: { className?: string }) => {
   return (
     <svg
       width="100%"
@@ -17,7 +17,7 @@ export const LeftArrow = ({ className = "" }: { className?: string }) => {
   );
 };
 
-export const RightArrow = ({ className = "" }: { className?: string }) => {
+export const RightArrow = ({ className = '' }: { className?: string }) => {
   return (
     <svg
       width="100%"
@@ -36,7 +36,7 @@ export const RightArrow = ({ className = "" }: { className?: string }) => {
   );
 };
 
-export const CloseX = ({ className = "" }: { className?: string }) => {
+export const CloseX = ({ className = '' }: { className?: string }) => {
   return (
     <svg
       width="100%"

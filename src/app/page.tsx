@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import Following from "@/components/following";
-import Player from "@/components/player";
-import MultiChat from "@/components/chat";
-import { useState } from "react";
+import Following from '@/components/following';
+import Player from '@/components/player';
+import MultiChat from '@/components/chat';
+import { useState } from 'react';
 
 export default function Home() {
-  const [watching, setWatching] = useState(["katun24"]);
+  const [watching, setWatching] = useState(['katun24']);
   const addWatching = (channel: string) => {
     if (watching.includes(channel)) return;
     setWatching([...watching, channel]);

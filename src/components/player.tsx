@@ -1,4 +1,4 @@
-import { CloseX } from "./icons";
+import { CloseX } from './icons';
 
 const Player = ({
   channel,
