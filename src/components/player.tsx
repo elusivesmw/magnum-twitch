@@ -9,7 +9,7 @@ const Player = ({ channel }: { channel: string }) => {
           src={`https://player.twitch.tv/?channel=${channel}&parent=localhost`}
           height="720"
           width="1280"
-          allowfullscreen
+          allowFullScreen
         ></iframe>
       </div>
     </>
