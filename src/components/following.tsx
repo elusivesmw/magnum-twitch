@@ -11,9 +11,9 @@ const channels = [
   "caioskii",
 ];
 const Following = ({
-  setWatching,
+  addWatching,
 }: {
-  setWatching: (channel: string) => void;
+  addWatching: (channel: string) => void;
 }) => {
   return (
     <div className="flex flex-col flex-wrap bg-twitchbg w-[240px]">
@@ -21,7 +21,10 @@ const Following = ({
         <span className="uppercase font-bold text-xs">Followed Channels</span>
       </div>
       {channels.map((e, i) => (
-        <div className="px-[10px] py-[5px]" onClick={() => setWatching(e)}>
+        <div
+          className="px-[10px] py-[5px] cursor-pointer hover:bg-twitchbghover"
+          onClick={() => addWatching(e)}
+        >
           <span className="h-[42px]" key={i}>
             {e}
           </span>

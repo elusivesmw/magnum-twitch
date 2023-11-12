@@ -1,9 +1,24 @@
-import Script from "next/script";
+import { CloseX } from "./icons";
 
-const Player = ({ channel }: { channel: string }) => {
+const Player = ({
+  channel,
+  removeWatching,
+}: {
+  channel: string;
+  removeWatching: (channel: string) => void;
+}) => {
   return (
     <>
-      <div id={`twitch-embed-${channel}`} className="h-full w-full">
+      <div
+        id={`twitch-embed-${channel}`}
+        className="relative h-full w-full select-none"
+      >
+        <div
+          className="absolute h-[20px] top-1 right-1 cursor-pointer"
+          onClick={() => removeWatching(channel)}
+        >
+          <CloseX />
+        </div>
         <iframe
           className="max-w-full w-full h-full"
           src={`https://player.twitch.tv/?channel=${channel}&parent=localhost`}

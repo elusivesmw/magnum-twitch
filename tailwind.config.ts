@@ -10,6 +10,7 @@ const config: Config = {
     extend: {
       colors: {
         'twitchbg': '#181a1b',
+        'twitchbghover': '#26262c',
         'twitchborder': '#dfdcd7',
         'twitchtext': '#d3cfca'
       },

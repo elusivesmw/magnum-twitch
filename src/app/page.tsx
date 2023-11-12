@@ -11,13 +11,16 @@ export default function Home() {
     if (watching.includes(channel)) return;
     setWatching([...watching, channel]);
   };
+  const removeWatching = (channel: string) => {
+    setWatching(watching.filter((e) => e !== channel));
+  };
 
   return (
     <main className="flex max-h-screen justify-between">
-      <Following setWatching={addWatching} />
+      <Following addWatching={addWatching} />
       <div className="flex flex-col h-screen basis-auto grow shrink">
         {watching.map((e, i) => (
-          <Player channel={e} key={i} />
+          <Player channel={e} removeWatching={removeWatching} key={i} />
         ))}
       </div>
       <MultiChat channels={watching} />
