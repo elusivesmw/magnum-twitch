@@ -1,16 +1,29 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { LeftArrow, RightArrow } from '@/components/icons';
 
-const MultiChat = ({ channels }: { channels: string[] }) => {
+const MultiChat = ({
+  channels,
+  activeChat,
+  updateActiveChat,
+}: {
+  channels: string[];
+  activeChat: number;
+  updateActiveChat: (chat: number) => void;
+}) => {
   const [visibleIndex, setVisibleIndex] = useState(0);
+
+  useEffect(() => {
+    setVisibleIndex(activeChat);
+  });
 
   const next = () => {
     console.log('next');
     var i = visibleIndex + 1;
     if (i > channels.length - 1) i = 0;
     setVisibleIndex(i);
+    updateActiveChat(i);
   };
 
   const prev = () => {
@@ -18,6 +31,7 @@ const MultiChat = ({ channels }: { channels: string[] }) => {
     var i = visibleIndex - 1;
     if (i < 0) i = channels.length - 1;
     setVisibleIndex(i);
+    updateActiveChat(i);
   };
 
   return (

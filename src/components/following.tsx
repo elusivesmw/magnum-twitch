@@ -10,6 +10,9 @@ const channels = [
   'yourboyrudy',
   'caioskii',
   'stucat_',
+  'stew_',
+  'zapplex',
+  'thabeast721',
 ];
 const Following = ({
   addWatching,

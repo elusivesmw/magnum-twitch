@@ -11,10 +11,10 @@ const Player = ({
     <>
       <div
         id={`twitch-embed-${channel}`}
-        className="relative h-full w-full select-none"
+        className="relative h-full w-full select-none group"
       >
         <div
-          className="absolute h-[20px] top-1 right-1 cursor-pointer"
+          className="absolute h-[20px] top-1 right-1 cursor-pointer hidden group-hover:block"
           onClick={() => removeWatching(channel)}
         >
           <CloseX />
