@@ -3,7 +3,7 @@
 import Following from '@/components/following';
 import Player from '@/components/player';
 import MultiChat from '@/components/chat';
-import { use, useState } from 'react';
+import { useState } from 'react';
 
 export default function Home() {
   const [watching, setWatching] = useState(['katun24']);
