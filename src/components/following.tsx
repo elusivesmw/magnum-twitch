@@ -5,12 +5,24 @@ import React, { useEffect, useState } from 'react';
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
 const USER_ID = 9214095;
 
-interface Channel {
-  broadcaster_id: string;
-  broadcaster_login: string;
-  broadcaster_name: string;
-  followed_at: Date;
+interface Stream {
+  game_id: string;
+  game_name: string;
+  id: string;
+  is_mature: boolean;
+  language: string;
+  started_at: Date;
+  tag_ids: string[];
+  tags: string[];
+  thumbnail_url: string;
+  title: string;
+  type: string;
+  user_id: string;
+  user_login: string;
+  user_name: string;
+  viewer_count: number;
 }
+
 
 const Following = ({
   addWatching,
@@ -25,7 +37,7 @@ const Following = ({
     setAccessToken(token);
   }, []);
 
-  let [channels, setChannels] = useState<Channel[]>([]);
+  let [channels, setChannels] = useState<Stream[]>([]);
   useEffect(() => {
     if (!access_token) return;
     GetFollowedChannels(access_token).then((res) => {
@@ -37,23 +49,25 @@ const Following = ({
     <div className="flex flex-col flex-wrap bg-twitchbg w-[240px]">
       <div className="flex h-[50px] text-center items-center justify-center">
         <span className="uppercase font-bold text-xs">Followed Channels</span>
-        <a
-          href={`https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=${TWITCH_CLIENT_ID}&redirect_uri=http://localhost:3000&scope=user:read:follows`}
-        >
-          Login
-        </a>
       </div>
+      {!access_token &&
+        <span className="px-[10px] py-[5px]">
+          <a href={`https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=${TWITCH_CLIENT_ID}&redirect_uri=http://localhost:3000&scope=user:read:follows`}>
+            Login
+          </a>
+        </span>
+      }
       {channels.map((e, i) => {
-        console.log('we made it here');
         console.log(e);
         return (
           <div
             className="px-[10px] py-[5px] cursor-pointer hover:bg-twitchbghover"
-            onClick={() => addWatching(e.broadcaster_login)}
+            onClick={() => addWatching(e.user_login)}
           >
             <span className="h-[42px]" key={i}>
-              {e.broadcaster_name}
+              {e.user_name}
             </span>
+            <span className="block text-xs text-twitchfadedtext">{e.game_name}</span>
           </div>
         );
       })}
@@ -72,7 +86,7 @@ const HashValues = () => {
   return params;
 };
 
-const GetFollowedChannels = (access_token: string): Promise<Channel[]> => {
+const GetFollowedChannels = (access_token: string): Promise<Stream[]> => {
   const httpOptions: Object = {
     headers: {
       Authorization: `Bearer ${access_token}`,
@@ -80,14 +94,15 @@ const GetFollowedChannels = (access_token: string): Promise<Channel[]> => {
     },
   };
   let data = fetch(
-    `https://api.twitch.tv/helix/channels/followed?user_id=${USER_ID}`,
+    `https://api.twitch.tv/helix/streams/followed?user_id=${USER_ID}&first=100`,
     httpOptions
   )
     .then((res) => res.json())
     .then((json) => {
-      return json.data as Channel[];
+      return json.data as Stream[];
     });
   return data;
 };
 
 export default Following;
+
