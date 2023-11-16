@@ -27,7 +27,7 @@ export default function Home() {
     <main className="flex max-h-screen justify-between">
       <span className="p-3">{activeChat}</span>
       <Following addWatching={addWatching} />
-      <div className="flex flex-col h-screen basis-auto grow shrink">
+      <div className="flex flex-col h-screen basis-auto grow shrink bg-noplayer">
         {watching.map((e, i) => (
           <Player channel={e} removeWatching={removeWatching} key={i} />
         ))}

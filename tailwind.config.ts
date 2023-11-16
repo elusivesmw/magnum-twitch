@@ -7,21 +7,22 @@ const config: Config = {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
+    fontSize: {
+      'xs': '1.2rem',
+      sm: '1.3rem',
+      base: '1.4rem',
+      lg: '1.6rem',
+      xl: '1.8.rem',
+    },
     extend: {
       colors: {
-        'twitchbg': '#181a1b',
-        'twitchbghover': '#26262c',
-        'twitchborder': '#dfdcd7',
-        'twitchtext': '#d3cfca',
-        'twitchfadedtext': '#adadb8'
-      },
-      fontSize: {
-        'xs': '0.8125rem'
-      },
-      backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic':
-          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+        'noplayer': 'var(--background-rgb)',
+        'sidepanel': 'rgb(31,31,35)',
+        'sidepanelhover': 'rgb(38,38,44)',
+        'chatpanel': 'rgb(24,24,27)',
+        'twborder': 'rgba(83, 83, 95, 0.48)',
+        'twtext': 'var(--foreground-rgb)',
+        'twfadedtext': '#adadb8'
       },
     },
   },

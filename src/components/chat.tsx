@@ -36,14 +36,14 @@ const MultiChat = ({
 
   return (
     <div className="flex flex-col h-screen w-[350px]">
-      <div className="flex h-[50px] flex-wrap bg-twitchbg border-b border-twitchborder text-twitchtext items-center justify-between">
+      <div className="flex h-[50px] flex-wrap bg-chatpanel border-b border-twborder text-twtext items-center justify-between">
         <div
           onClick={prev}
           className="h-[20px] px-1 cursor-pointer select-none"
         >
           <LeftArrow />
         </div>
-        <span className="uppercase font-bold text-xs text-center">
+        <span className="uppercase font-bold text-sm text-center">
           {channels[visibleIndex]}
         </span>
         <div

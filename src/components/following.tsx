@@ -66,9 +66,9 @@ const Following = ({
   }, [channels]);
 
   return (
-    <div className="flex flex-col flex-wrap bg-twitchbg w-[240px]">
+    <div className="flex flex-col flex-wrap bg-sidepanel w-[240px]">
       <div className="flex h-[50px] max-w-full text-center items-center justify-center">
-        <span className="uppercase font-bold text-xs">Followed Channels</span>
+        <span className="uppercase font-bold text-sm">Followed Channels</span>
       </div>
       {!access_token && (
         <span className="px-[10px] py-[5px]">
@@ -84,32 +84,32 @@ const Following = ({
 
         return (
           <div
-            className="flex max-w-full px-[10px] py-[5px] cursor-pointer hover:bg-twitchbghover"
+            className="flex max-w-full px-4 py-2 cursor-pointer hover:bg-sidepanelhover"
             onClick={() => addWatching(channel.user_login)}
             key={i}
           >
-            <div className="basis-[30px] grow-0 shrink-0 -center">
+            <div className="basis-[30px] grow-0 shrink-0 self-center">
               {user && (
                 <img
                   src={user.profile_image_url}
                   alt={`${channel.user_name} profile`}
-                  className="w-full max-w-full rounded-2xl object-cover"
+                  className="w-full max-w-full rounded-full object-cover"
                 />
               )}
             </div>
-            <div className="flex justify-between content-center ml-[10px] grow min-w-0">
+            <div className="flex justify-between content-center ml-2 grow min-w-0">
               <div className="flex flex-col shrink overflow-hidden">
-                <p className="text-[#dedee3] text-sm font-semibold truncate">
+                <p className="text-[#dedee3] text-base font-semibold truncate">
                   {channel.user_name}
                 </p>
-                <p className="text-xs text-twitchfadedtext truncate">
+                <p className="text-sm text-twfadedtext truncate">
                   {channel.game_name}
                 </p>
               </div>
-              <div className="inline-block min-w-[40px] ml-[5px]">
+              <div className="inline-block min-w-[40px] ml-2">
                 <div className="flex items-center">
-                  <div className="inline-block bg-[#eb0400] h-[8px] w-[8px] rounded rl-[5px]"></div>
-                  <div className="text-xs ml-[5px]">
+                  <div className="inline-block bg-[#eb0400] h-[8px] w-[8px] rounded-full rl-2"></div>
+                  <div className="text-sm ml-2">
                     {ViewerCountDisplay(channel.viewer_count)}
                   </div>
                 </div>
