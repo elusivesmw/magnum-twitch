@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
 const USER_ID = 9214095;
+const POLL_INTERVAL = 60 * 1000;
 
 interface Stream {
   game_id: string;
@@ -51,10 +52,21 @@ const Following = ({
 
   let [channels, setChannels] = useState<Stream[]>([]);
   useEffect(() => {
+    // refactor this out
     if (!access_token) return;
     GetFollowedChannels(access_token).then((res) => {
       setChannels(res);
     });
+
+    // probably should use event sub eventually
+    const intervalId = setInterval(() => {
+      if (!access_token) return;
+      GetFollowedChannels(access_token).then((res) => {
+        setChannels(res);
+      });
+    }, POLL_INTERVAL);
+
+    return () => clearInterval(intervalId);
   }, [access_token]);
 
   let [users, setUsers] = useState<User[]>([]);
