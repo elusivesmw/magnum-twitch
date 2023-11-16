@@ -67,7 +67,7 @@ const Following = ({
 
   return (
     <div className="flex flex-col flex-wrap bg-twitchbg w-[240px]">
-      <div className="flex h-[50px] text-center items-center justify-center">
+      <div className="flex h-[50px] max-w-full text-center items-center justify-center">
         <span className="uppercase font-bold text-xs">Followed Channels</span>
       </div>
       {!access_token && (
@@ -84,11 +84,11 @@ const Following = ({
 
         return (
           <div
-            className="flex px-[10px] py-[5px] cursor-pointer hover:bg-twitchbghover"
+            className="flex max-w-full px-[10px] py-[5px] cursor-pointer hover:bg-twitchbghover"
             onClick={() => addWatching(channel.user_login)}
             key={i}
           >
-            <div className="h-[30px] max-w-[30px]">
+            <div className="basis-[30px] grow-0 shrink-0 -center">
               {user && (
                 <img
                   src={user.profile_image_url}
@@ -97,22 +97,21 @@ const Following = ({
                 />
               )}
             </div>
-            <div className="flex justify-between content-center ml-[10px] grow">
-              <div className="">
-                <span
-                  className="block text-[#dedee3] text-sm font-semibold"
-                  key={i}
-                >
+            <div className="flex justify-between content-center ml-[10px] grow min-w-0">
+              <div className="flex flex-col shrink overflow-hidden">
+                <p className="text-[#dedee3] text-sm font-semibold truncate">
                   {channel.user_name}
-                </span>
-                <span className="inline-block text-xs text-twitchfadedtext">
+                </p>
+                <p className="text-xs text-twitchfadedtext truncate">
                   {channel.game_name}
-                </span>
+                </p>
               </div>
-              <div className="inline-block ml-[5px]">
+              <div className="inline-block min-w-[40px] ml-[5px]">
                 <div className="flex items-center">
                   <div className="inline-block bg-[#eb0400] h-[8px] w-[8px] rounded rl-[5px]"></div>
-                  <div className="text-xs ml-[5px]">{channel.viewer_count}</div>
+                  <div className="text-xs ml-[5px]">
+                    {ViewerCountDisplay(channel.viewer_count)}
+                  </div>
                 </div>
               </div>
             </div>
@@ -174,6 +173,14 @@ const GetUsers = (
       return json.data as User[];
     });
   return data;
+};
+
+const ViewerCountDisplay = (viewerCount: number) => {
+  if (viewerCount > 1000) {
+    let rounded = Number.parseFloat((viewerCount / 1000).toFixed(1)).toString();
+    return `${rounded}K`;
+  }
+  return viewerCount;
 };
 
 export default Following;
