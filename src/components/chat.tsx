@@ -68,7 +68,7 @@ const Chat = ({ channel, visible }: { channel: string; visible: boolean }) => {
       <iframe
         className="relative h-full"
         id={`twitch-chat-embed-${channel}`}
-        src={`https://www.twitch.tv/embed/${channel}/chat?parent=localhost`}
+        src={`https://www.twitch.tv/embed/${channel}/chat?parent=localhost&darkpopout`}
         height="1200"
         width="350"
       ></iframe>

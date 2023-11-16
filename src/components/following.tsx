@@ -23,7 +23,6 @@ interface Stream {
   viewer_count: number;
 }
 
-
 const Following = ({
   addWatching,
 }: {
@@ -50,13 +49,15 @@ const Following = ({
       <div className="flex h-[50px] text-center items-center justify-center">
         <span className="uppercase font-bold text-xs">Followed Channels</span>
       </div>
-      {!access_token &&
+      {!access_token && (
         <span className="px-[10px] py-[5px]">
-          <a href={`https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=${TWITCH_CLIENT_ID}&redirect_uri=http://localhost:3000&scope=user:read:follows`}>
+          <a
+            href={`https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=${TWITCH_CLIENT_ID}&redirect_uri=http://localhost:3000&scope=user:read:follows`}
+          >
             Login
           </a>
         </span>
-      }
+      )}
       {channels.map((e, i) => {
         console.log(e);
         return (
@@ -64,10 +65,25 @@ const Following = ({
             className="px-[10px] py-[5px] cursor-pointer hover:bg-twitchbghover"
             onClick={() => addWatching(e.user_login)}
           >
-            <span className="h-[42px]" key={i}>
-              {e.user_name}
-            </span>
-            <span className="block text-xs text-twitchfadedtext">{e.game_name}</span>
+            <div className="flex justify-between content-center">
+              <div className="">
+                <span
+                  className="line-block text-[#dedee3] text-sm font-semibold h-[42px]"
+                  key={i}
+                >
+                  {e.user_name}
+                </span>
+                <span className="block text-xs text-twitchfadedtext">
+                  {e.game_name}
+                </span>
+              </div>
+              <div className="inline-block">
+                <div className="flex items-center">
+                  <div className="inline-block bg-[#eb0400] h-[8px] w-[8px] rounded rl-[5px]"></div>
+                  <div className="text-xs ml-[5px]">{e.viewer_count}</div>
+                </div>
+              </div>
+            </div>
           </div>
         );
       })}
@@ -105,4 +121,3 @@ const GetFollowedChannels = (access_token: string): Promise<Stream[]> => {
 };
 
 export default Following;
-
