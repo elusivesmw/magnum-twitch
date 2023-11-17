@@ -12,7 +12,7 @@ const config: Config = {
       sm: '1.3rem',
       base: '1.4rem',
       lg: '1.6rem',
-      xl: '1.8.rem',
+      xl: '1.8rem',
     },
     extend: {
       colors: {
