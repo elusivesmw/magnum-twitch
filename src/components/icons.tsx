@@ -49,3 +49,21 @@ export const CloseX = ({ className = '' }: { className?: string }) => {
     </svg>
   );
 };
+
+export const Spotlight = ({ className = '' }: { className?: string }) => {
+  return (
+    <svg
+      width="100%"
+      height="100%"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      className={className}
+    >
+      <path
+        fill-rule="evenodd"
+        d="M13.192 14.606a7 7 0 1 1 1.414-1.414l3.101 3.1-1.414 1.415-3.1-3.1zM14 9A5 5 0 1 1 4 9a5 5 0 0 1 10 0z"
+        clip-rule="evenodd"
+      ></path>
+    </svg>
+  );
+};
