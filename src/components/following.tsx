@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
 const USER_ID = 9214095;
+const GAME_ID= 1229;
 const POLL_INTERVAL = 60 * 1000;
 
 interface Stream {
@@ -76,6 +77,7 @@ const Following = ({
       },
     };
     fetch(
+      //`https://api.twitch.tv/helix/streams/?game_id=${GAME_ID}&first=100`,
       `https://api.twitch.tv/helix/streams/followed?user_id=${USER_ID}&first=100`,
       httpOptions
     )
@@ -107,7 +109,7 @@ const Following = ({
 
   return (
     <div className="flex flex-col bg-sidepanel basis-[240px] shrink-0 grow-0 overflow-y-scroll scrollbar">
-      <div className="flex h-[50px] max-w-full text-center items-center justify-center">
+      <div className="flex basis-20 shrink-0 grow-0  max-w-full text-center items-center justify-center">
         <span className="uppercase font-bold text-sm">Followed Channels</span>
       </div>
       {!accessToken && (

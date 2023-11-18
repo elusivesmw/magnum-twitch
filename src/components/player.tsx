@@ -13,7 +13,7 @@ const Player = ({
     <>
       <div
         id={`twitch-embed-${channel}`}
-        className="relative h-full w-full select-none group"
+        className="relative aspect-video select-none group"
       >
         <div className="absolute top-1 right-1 hidden group-hover:block">
           <div className="flex">
