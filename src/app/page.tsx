@@ -34,28 +34,32 @@ export default function Home() {
   };
 
   return (
-    <main className="flex flex-col h-screen justify-between">
+    <main className="flex flex-col h-screen">
       <header className="flex h-20 grow-0 shrink-0 bg-chatpanel z-10 header-shadow">
         <span className="flex self-center p-4 text-xl font-bold">T</span>
         <span className="p-4">active chat: {activeChat}</span>
       </header>
-      <div className="flex h-full">
-        <Following addWatching={addWatching} />
-        <div className="flex flex-col basis-auto grow shrink bg-noplayer">
-          {watching.map((e, i) => (
-            <Player
-              channel={e}
-              reorderWatching={reorderWatching}
-              removeWatching={removeWatching}
-              key={i}
+      <div className="relative h-full">
+        <div className="absolute w-full h-full">
+          <div className="flex h-full">
+            <Following addWatching={addWatching} />
+            <div className="flex flex-col basis-auto grow shrink bg-noplayer">
+              {watching.map((e, i) => (
+                <Player
+                  channel={e}
+                  reorderWatching={reorderWatching}
+                  removeWatching={removeWatching}
+                  key={i}
+                />
+              ))}
+            </div>
+            <MultiChat
+              channels={watching}
+              activeChat={activeChat}
+              updateActiveChat={setActiveChat}
             />
-          ))}
+          </div>
         </div>
-        <MultiChat
-          channels={watching}
-          activeChat={activeChat}
-          updateActiveChat={setActiveChat}
-        />
       </div>
     </main>
   );

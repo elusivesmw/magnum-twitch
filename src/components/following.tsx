@@ -106,7 +106,7 @@ const Following = ({
   };
 
   return (
-    <div className="flex flex-col flex-wrap bg-sidepanel w-[240px]">
+    <div className="flex flex-col bg-sidepanel basis-[240px] shrink-0 grow-0 overflow-y-scroll scrollbar">
       <div className="flex h-[50px] max-w-full text-center items-center justify-center">
         <span className="uppercase font-bold text-sm">Followed Channels</span>
       </div>
