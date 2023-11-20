@@ -8,29 +8,33 @@ import { useState } from 'react';
 export default function Home() {
   const [watching, setWatching] = useState([] as string[]);
   const [activeChat, setActiveChat] = useState(0);
+  const [order, setOrder] = useState([] as string[]);
 
   const addWatching = (channel: string) => {
     if (watching.includes(channel)) return;
     setWatching([...watching, channel]);
-    setActiveChat(watching.length);
+    setOrder([...order, channel]);
+    //setActiveChat(watching.length);
   };
 
   const removeWatching = (channel: string) => {
-    let foundIndex = watching.findIndex((c) => c == channel);
-    if (foundIndex < 0) return;
-    setWatching(watching.filter((_, i) => i != foundIndex));
+    let watchingIndex = watching.findIndex((c) => c == channel);
+    if (watchingIndex < 0) return;
+    setWatching(watching.filter((_, i) => i != watchingIndex));
     // set active chat
-    if (foundIndex > watching.length) foundIndex = watching.length;
-    setActiveChat(foundIndex);
+    if (watchingIndex > watching.length) watchingIndex = watching.length;
+    setActiveChat(watchingIndex);
+    setOrder(order.filter((o) => o != channel));
   };
 
-  const reorderWatching = (channel: string) => {
-    let foundIndex = watching.findIndex((c) => c == channel);
-    if (foundIndex < 0) return;
+  const reorderWatching = (channel: string, rel: number) => {
+    let fromOrder = order.findIndex((o) => o == channel);
+    let toOrder = fromOrder + rel;
+    if (toOrder < 0 || toOrder > watching.length + 1) return;
     // move channel to index 0
-    let newOrder = [...watching];
-    move(newOrder, foundIndex, 0);
-    setWatching(newOrder);
+    let newOrder = [...order];
+    move(newOrder, fromOrder, toOrder);
+    setOrder(newOrder);
   };
 
   return (
@@ -47,6 +51,7 @@ export default function Home() {
               {watching.map((e, i) => (
                 <Player
                   channel={e}
+                  order={order.findIndex((o) => o == e)}
                   reorderWatching={reorderWatching}
                   removeWatching={removeWatching}
                   key={i}
@@ -65,6 +70,6 @@ export default function Home() {
   );
 }
 
-function move(a: string[], from: number, to: number) {
-  a.splice(to, 0, a.splice(from, 1)[0]);
+function move(order: string[], from: number, to: number) {
+  order.splice(to, 0, order.splice(from, 1)[0]);
 }
