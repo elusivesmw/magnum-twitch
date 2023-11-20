@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
 const USER_ID = 9214095;
@@ -43,6 +44,8 @@ const Following = ({
 }: {
   addWatching: (stream: string) => void;
 }) => {
+  const router = useRouter();
+
   let [accessToken, setAccessToken] = useState(null);
   useEffect(() => {
     let hash = getHashValues();
@@ -53,8 +56,12 @@ const Following = ({
 
   let [streams, setStreams] = useState<Stream[]>([]);
   useEffect(() => {
-    updateStreams();
+    if (accessToken) {
+      // remove token from url
+      router.replace('/');
+    }
 
+    updateStreams();
     // probably should use event sub eventually
     const intervalId = setInterval(() => {
       updateStreams();
