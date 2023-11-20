@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
 const USER_ID = 9214095;
-const GAME_ID= 1229;
+const GAME_ID = 1229;
 const POLL_INTERVAL = 60 * 1000;
 
 interface Stream {

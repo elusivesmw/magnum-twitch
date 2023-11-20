@@ -1,4 +1,4 @@
-import { CloseX, Spotlight } from './icons';
+import { CloseX, DownArrow, UpArrow } from './icons';
 
 const Player = ({
   channel,
@@ -16,7 +16,7 @@ const Player = ({
       <div
         id={`twitch-embed-${channel}`}
         className="relative aspect-video select-none group"
-        style={{order: order}}
+        style={{ order: order }}
       >
         <div className="absolute top-1 right-1 hidden group-hover:block">
           <div className="flex">
@@ -24,13 +24,13 @@ const Player = ({
               className="h-[20px] cursor-pointer"
               onClick={() => reorderWatching(channel, -1)}
             >
-              Up
+              <UpArrow />
             </div>
             <div
               className="h-[20px] cursor-pointer"
               onClick={() => reorderWatching(channel, 1)}
             >
-              Down
+              <DownArrow />
             </div>
 
             <div

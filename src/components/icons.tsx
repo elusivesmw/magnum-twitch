@@ -36,6 +36,34 @@ export const RightArrow = ({ className = '' }: { className?: string }) => {
   );
 };
 
+export const UpArrow = ({ className = '' }: { className?: string }) => {
+  return (
+    <svg
+      width="2rem"
+      height="2rem"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      className={className}
+    >
+      <path d="M7.5 12.5 10 10l2.5 2.5L14 11l-4-4-4 4 1.5 1.5z"></path>
+    </svg>
+  );
+};
+
+export const DownArrow = ({ className = '' }: { className?: string }) => {
+  return (
+    <svg
+      width="2rem"
+      height="2rem"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      className={className}
+    >
+      <path d="M12.5 7.5 10 10 7.5 7.5 6 9l4 4 4-4-1.5-1.5z"></path>
+    </svg>
+  );
+};
+
 export const CloseX = ({ className = '' }: { className?: string }) => {
   return (
     <svg
