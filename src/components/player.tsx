@@ -19,22 +19,22 @@ const Player = ({
         style={{ order: order }}
       >
         <div className="absolute top-1 right-1 hidden group-hover:block">
-          <div className="flex">
+          <div className="flex gap-1">
             <div
-              className="h-[20px] cursor-pointer"
+              className="h-[20px] cursor-pointer rounded bg-black bg-opacity-50"
               onClick={() => reorderWatching(channel, -1)}
             >
               <UpArrow />
             </div>
             <div
-              className="h-[20px] cursor-pointer"
+              className="h-[20px] cursor-pointer rounded bg-black bg-opacity-50"
               onClick={() => reorderWatching(channel, 1)}
             >
               <DownArrow />
             </div>
 
             <div
-              className="h-[20px] cursor-pointer ml-2"
+              className="h-[20px] cursor-pointer rounded bg-black bg-opacity-50"
               onClick={() => removeWatching(channel)}
             >
               <CloseX />
