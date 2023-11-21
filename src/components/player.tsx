@@ -1,5 +1,7 @@
 import { CloseX, DownArrow, UpArrow } from './icons';
 
+const EMBED_PARENT = process.env.NEXT_PUBLIC_TWITCH_EMBED_PARENT;
+
 const Player = ({
   channel,
   order,
@@ -43,7 +45,7 @@ const Player = ({
         </div>
         <iframe
           className="max-w-full w-full h-full"
-          src={`https://player.twitch.tv/?channel=${channel}&parent=localhost`}
+          src={`https://player.twitch.tv/?channel=${channel}&parent=${EMBED_PARENT}`}
           height="720"
           width="1280"
           allowFullScreen

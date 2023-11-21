@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 const USER_ID = 9214095;
 const GAME_ID = 1229;
 const POLL_INTERVAL = 60 * 1000;
@@ -122,7 +124,7 @@ const Following = ({
       {!accessToken && (
         <span className="px-[10px] py-[5px]">
           <a
-            href={`https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=${TWITCH_CLIENT_ID}&redirect_uri=http://localhost:3000&scope=user:read:follows`}
+            href={`https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=${TWITCH_CLIENT_ID}&redirect_uri=${BASE_URL}&scope=user:read:follows`}
           >
             Login
           </a>

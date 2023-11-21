@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { LeftArrow, RightArrow } from '@/components/icons';
 
+const EMBED_PARENT = process.env.NEXT_PUBLIC_TWITCH_EMBED_PARENT;
+
 const MultiChat = ({
   channels,
   activeChat,
@@ -68,7 +70,7 @@ const Chat = ({ channel, visible }: { channel: string; visible: boolean }) => {
       <iframe
         className="relative h-full"
         id={`twitch-chat-embed-${channel}`}
-        src={`https://www.twitch.tv/embed/${channel}/chat?parent=localhost&darkpopout`}
+        src={`https://www.twitch.tv/embed/${channel}/chat?parent=${EMBED_PARENT}&darkpopout`}
         height="1200"
         width="350"
       ></iframe>
