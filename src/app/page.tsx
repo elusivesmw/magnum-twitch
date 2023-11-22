@@ -12,7 +12,7 @@ export default function Home() {
   const [watching, setWatching] = useState([] as string[]);
   const [activeChat, setActiveChat] = useState(0);
   const [order, setOrder] = useState([] as string[]);
-  
+
   const [accessToken, setAccessToken] = useState(null);
   useEffect(() => {
     let hash = getHashValues();
@@ -21,7 +21,7 @@ export default function Home() {
     setAccessToken(token);
   }, []);
 
-  const [user, setUser] = useState<User>({});
+  const [user, setUser] = useState<User>({} as User);
   useEffect(() => {
     updateUser();
   }, [accessToken]);
@@ -36,11 +36,16 @@ export default function Home() {
   const removeWatching = (channel: string) => {
     let watchingIndex = watching.findIndex((c) => c == channel);
     if (watchingIndex < 0) return;
+    // remove player
     setWatching(watching.filter((_, i) => i != watchingIndex));
-    // set active chat
-    if (watchingIndex > watching.length) watchingIndex = watching.length;
-    setActiveChat(watchingIndex);
+    // update order
     setOrder(order.filter((o) => o != channel));
+
+    // set active chat
+    if (watchingIndex >= watching.length - 1) {
+      watchingIndex--;
+    }
+    setActiveChat(watchingIndex);
   };
 
   const reorderWatching = (channel: string, rel: number) => {
