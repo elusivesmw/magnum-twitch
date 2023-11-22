@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Stream, User } from '@/types/twitch';
 
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -10,51 +11,14 @@ const USER_ID = 9214095;
 const GAME_ID = 1229;
 const POLL_INTERVAL = 60 * 1000;
 
-interface Stream {
-  game_id: string;
-  game_name: string;
-  id: string;
-  is_mature: boolean;
-  language: string;
-  started_at: Date;
-  tag_ids: string[];
-  tags: string[];
-  thumbnail_url: string;
-  title: string;
-  type: string;
-  user_id: string;
-  user_login: string;
-  user_name: string;
-  viewer_count: number;
-}
-
-interface User {
-  id: string;
-  login: string;
-  display_name: string;
-  type: string;
-  broadcaster_type: string;
-  description: string;
-  profile_image_url: string;
-  offline_image_url: string;
-  view_count: number;
-  created_at: string;
-}
-
 const Following = ({
+  accessToken,
   addWatching,
 }: {
+  accessToken: string | null;
   addWatching: (stream: string) => void;
 }) => {
   const router = useRouter();
-
-  let [accessToken, setAccessToken] = useState(null);
-  useEffect(() => {
-    let hash = getHashValues();
-    let token = hash.access_token;
-    if (!token) return;
-    setAccessToken(token);
-  }, []);
 
   let [streams, setStreams] = useState<Stream[]>([]);
   useEffect(() => {
@@ -171,17 +135,6 @@ const Following = ({
       })}
     </div>
   );
-};
-
-const getHashValues = () => {
-  let hash = document.location.hash.substr(1);
-  var params: any = {};
-  hash.split('&').map((hashkey) => {
-    let temp = hashkey.split('=');
-    params[temp[0]] = temp[1];
-  });
-  console.log(params);
-  return params;
 };
 
 const displayViewerCount = (viewerCount: number) => {
