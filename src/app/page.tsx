@@ -39,7 +39,7 @@ export default function Home() {
 
   return (
     <main className="flex flex-col h-screen">
-      <header className="flex h-20 grow-0 shrink-0 bg-chatpanel z-10 header-shadow">
+      <header className="flex h-20 grow-0 shrink-0 bg-chatpanel z-20 header-shadow">
         <span className="flex self-center p-4 text-xl font-bold">T</span>
         <span className="p-4">active chat: {activeChat}</span>
       </header>
