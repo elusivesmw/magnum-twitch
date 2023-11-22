@@ -22,7 +22,9 @@ const config: Config = {
         'chatpanel': 'rgb(24,24,27)',
         'twborder': 'rgba(83, 83, 95, 0.48)',
         'twtext': 'var(--foreground-rgb)',
-        'twfadedtext': '#adadb8'
+        'twfadedtext': '#adadb8',
+        'twbuttonbg':'rgb(83,83,95)',
+        'twbuttontext': 'rgb(239,239,241)'
       },
     },
   },

@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { Stream, User } from '@/types/twitch';
 
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 const USER_ID = 9214095;
 const GAME_ID = 1229;
@@ -85,15 +84,6 @@ const Following = ({
       <div className="flex basis-20 shrink-0 grow-0  max-w-full text-center items-center justify-center">
         <span className="uppercase font-bold text-sm">Followed Channels</span>
       </div>
-      {!accessToken && (
-        <span className="px-[10px] py-[5px]">
-          <a
-            href={`https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=${TWITCH_CLIENT_ID}&redirect_uri=${BASE_URL}&scope=user:read:follows`}
-          >
-            Login
-          </a>
-        </span>
-      )}
       {streams.map((stream, i) => {
         let user = users.find((u) => u.id == stream.user_id);
 

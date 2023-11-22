@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { User } from '@/types/twitch';
 
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export default function Home() {
   const [watching, setWatching] = useState([] as string[]);
@@ -21,7 +22,7 @@ export default function Home() {
     setAccessToken(token);
   }, []);
 
-  const [user, setUser] = useState<User>({} as User);
+  const [user, setUser] = useState<User | null>(null);
   useEffect(() => {
     updateUser();
   }, [accessToken]);
@@ -81,15 +82,25 @@ export default function Home() {
   return (
     <main className="flex flex-col h-screen">
       <header className="flex h-20 grow-0 shrink-0 bg-chatpanel z-20 header-shadow justify-between">
-        <div className="flex">
+        <div className="flex p-4">
           <span className="flex self-center p-4 text-xl font-bold">T</span>
-          <span className="p-4">active chat: {activeChat}</span>
+          <span className="">active chat: {activeChat}</span>
         </div>
-        {user &&
-            <div className="basis-[30px] grow-0 shrink-0 self-center mr-2">
-              <img src={user.profile_image_url} className="w-full max-w-full rounded-full object-cover" />
-            </div>
-        }
+        <div className="flex p-4">
+        {user && (
+          <div className="w-[30px]">
+            <img src={user.profile_image_url} className="w-full max-w-full rounded-full object-cover" />
+          </div>
+        )}
+        {!accessToken && (
+          <a
+            href={`https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=${TWITCH_CLIENT_ID}&redirect_uri=${BASE_URL}&scope=user:read:follows`}
+            className="inline-flex items-center text-sm font-semibold px-4 text-twbuttontext bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] rounded-[4px]"
+          >
+            Log In
+          </a>
+        )}
+        </div>
       </header>
       <div className="relative h-full">
         <div className="absolute w-full h-full">
