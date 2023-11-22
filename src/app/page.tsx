@@ -30,7 +30,10 @@ export default function Home() {
     if (watching.includes(channel)) return;
     setWatching([...watching, channel]);
     setOrder([...order, channel]);
-    //setActiveChat(watching.length);
+
+    if (watching.length < 1) {
+      setActiveChat(0);
+    }
   };
 
   const removeWatching = (channel: string) => {
