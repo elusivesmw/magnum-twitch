@@ -1,4 +1,4 @@
-export const LeftArrow = ({ className = '' }: { className?: string }) => {
+export const ArrowLeft = ({ className = '' }: { className?: string }) => {
   return (
     <svg
       width="100%"
@@ -17,7 +17,7 @@ export const LeftArrow = ({ className = '' }: { className?: string }) => {
   );
 };
 
-export const RightArrow = ({ className = '' }: { className?: string }) => {
+export const ArrowRight = ({ className = '' }: { className?: string }) => {
   return (
     <svg
       width="100%"
@@ -36,7 +36,7 @@ export const RightArrow = ({ className = '' }: { className?: string }) => {
   );
 };
 
-export const UpArrow = ({ className = '' }: { className?: string }) => {
+export const ArrowUp = ({ className = '' }: { className?: string }) => {
   return (
     <svg
       width="2rem"
@@ -50,7 +50,7 @@ export const UpArrow = ({ className = '' }: { className?: string }) => {
   );
 };
 
-export const DownArrow = ({ className = '' }: { className?: string }) => {
+export const ArrowDown = ({ className = '' }: { className?: string }) => {
   return (
     <svg
       width="2rem"
@@ -74,6 +74,38 @@ export const CloseX = ({ className = '' }: { className?: string }) => {
       className={className}
     >
       <path d="M8.5 10 4 5.5 5.5 4 10 8.5 14.5 4 16 5.5 11.5 10l4.5 4.5-1.5 1.5-4.5-4.5L5.5 16 4 14.5 8.5 10z"></path>
+    </svg>
+  );
+};
+
+export const CollapseLeft = ({ className = '' }: { className?: string }) => {
+  return (
+    <svg
+      width="100%"
+      height="100%"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      className={className}
+    >
+      <g>
+        <path d="M16 16V4h2v12h-2zM6 9l2.501-2.5-1.5-1.5-5 5 5 5 1.5-1.5-2.5-2.5h8V9H6z"></path>
+      </g>
+    </svg>
+  );
+};
+
+export const CollapseRight = ({ className = '' }: { className?: string }) => {
+  return (
+    <svg
+      width="100%"
+      height="100%"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      className={className}
+    >
+      <g>
+        <path d="M4 16V4H2v12h2zM13 15l-1.5-1.5L14 11H6V9h8l-2.5-2.5L13 5l5 5-5 5z"></path>
+      </g>
     </svg>
   );
 };

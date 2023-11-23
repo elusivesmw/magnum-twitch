@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { LeftArrow, RightArrow } from '@/components/icons';
+import { ArrowLeft, ArrowRight } from '@/components/icons';
 
 const EMBED_PARENT = process.env.NEXT_PUBLIC_TWITCH_EMBED_PARENT;
 
@@ -43,7 +43,7 @@ const MultiChat = ({
           onClick={prev}
           className="h-[20px] px-1 cursor-pointer select-none"
         >
-          <LeftArrow />
+          <ArrowLeft />
         </div>
         <span className="uppercase font-bold text-sm text-center">
           {channels[visibleIndex]}
@@ -52,7 +52,7 @@ const MultiChat = ({
           onClick={next}
           className="h-[20px] px-1 cursor-pointer select-none"
         >
-          <RightArrow />
+          <ArrowRight />
         </div>
       </div>
       <div className="flex grow h-auto">

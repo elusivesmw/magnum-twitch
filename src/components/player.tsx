@@ -1,4 +1,4 @@
-import { CloseX, DownArrow, UpArrow } from './icons';
+import { CloseX, ArrowDown, ArrowUp } from './icons';
 
 const EMBED_PARENT = process.env.NEXT_PUBLIC_TWITCH_EMBED_PARENT;
 
@@ -29,13 +29,13 @@ const Player = ({
               className="h-[20px] cursor-pointer rounded bg-black bg-opacity-50"
               onClick={() => reorderWatching(channel, -1)}
             >
-              <UpArrow />
+              <ArrowUp />
             </div>
             <div
               className="h-[20px] cursor-pointer rounded bg-black bg-opacity-50"
               onClick={() => reorderWatching(channel, 1)}
             >
-              <DownArrow />
+              <ArrowDown />
             </div>
 
             <div
