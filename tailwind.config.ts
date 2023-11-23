@@ -24,8 +24,13 @@ const config: Config = {
         'twtext': 'var(--foreground-rgb)',
         'twfadedtext': '#adadb8',
         'twbuttonbg':'rgb(83,83,95)',
-        'twbuttontext': 'rgb(239,239,241)'
+        'twbuttontext': 'rgb(239,239,241)',
       },
+      maxHeight: {
+        '1/2': '50%',
+        '1/3': '33%',
+        '2/3': '67%',
+      }
     },
   },
   plugins: [],

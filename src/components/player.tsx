@@ -5,11 +5,13 @@ const EMBED_PARENT = process.env.NEXT_PUBLIC_TWITCH_EMBED_PARENT;
 const Player = ({
   channel,
   order,
+  total,
   removeWatching,
   reorderWatching,
 }: {
   channel: string;
   order: number;
+  total: number;
   removeWatching: (channel: string) => void;
   reorderWatching: (channel: string, rel: number) => void;
 }) => {
@@ -17,7 +19,8 @@ const Player = ({
     <>
       <div
         id={`twitch-embed-${channel}`}
-        className="relative aspect-video select-none group"
+        className="twitch-player relative aspect-video select-none group"
+        data-pos={`${order+1}/${total}`}
         style={{ order: order }}
       >
         <div className="absolute top-1 right-1 hidden group-hover:block">
