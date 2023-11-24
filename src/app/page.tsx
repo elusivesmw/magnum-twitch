@@ -36,6 +36,12 @@ export default function Home() {
       return;
     };
 
+    if (watching.length >= 9) {
+      // do this better :]
+      alert('That\'s enough, dude.');
+      return;
+    }
+
     setWatching([...watching, channel]);
     setOrder([...order, channel]);
 
