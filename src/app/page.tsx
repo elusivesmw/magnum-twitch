@@ -113,7 +113,7 @@ export default function Home() {
         <div className="absolute w-full h-full">
           <div className="flex h-full">
             <Following accessToken={accessToken} addWatching={addWatching} />
-            <div className="flex flex-row basis-auto grow shrink bg-noplayer flex-wrap">
+            <div className="flex flex-row basis-auto grow shrink bg-noplayer flex-wrap mt-[1px] mb-[2px]">
               {watching.map((e, i) => (
                 <Player
                   channel={e}

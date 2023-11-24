@@ -14,14 +14,17 @@ const config: Config = {
       lg: '1.6rem',
       xl: '1.8rem',
     },
+    lineHeight: {
+      'tight': '1.2'
+    },
     extend: {
       animation: {
         'highlight': 'highlight 3s ease-in-out'
       },
       keyframes: {
         highlight: {
-          '0%': { border: '2px solid var(--twpurple)' },
-          '100%': { border: '2px solid black' },
+          '0%': { borderColor: 'var(--twpurple)' },
+          '100%': { borderColor: 'black' },
         }
       }, 
       colors: {

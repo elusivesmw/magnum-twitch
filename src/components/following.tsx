@@ -92,7 +92,7 @@ const Following = ({
         <span className={`${open ? "" : "hidden"} font-semibold text-xl`}>For You</span>
         <button
           onClick={toggleOpen}
-          className="inline-flex h-[30px] p-2 bg-twbuttonbg hover:bg-opacity-[0.48] rounded-[4px]">
+          className="inline-flex h-[30px] p-2 hover:bg-twbuttonbg hover:bg-opacity-[0.48] rounded-[4px]">
           {open ?
             <CollapseLeft />
             :
@@ -133,7 +133,7 @@ const StreamRow = ({
 }) => {
   return (
     <div
-      className="flex max-w-full px-4 py-2 cursor-pointer hover:bg-sidepanelhover"
+      className="flex max-w-full h-[4.2rem] px-4 py-2 cursor-pointer hover:bg-sidepanelhover"
       onClick={() => addWatching(stream.user_login)}
     >
       <div className="basis-[30px] grow-0 shrink-0 self-center">
@@ -147,10 +147,10 @@ const StreamRow = ({
       </div>
       <div className={`${!open ? "hidden" : ""} flex justify-between content-center ml-2 grow min-w-0`}>
         <div className="flex flex-col shrink overflow-hidden">
-          <p className="text-[#dedee3] text-base font-semibold truncate">
+          <p className="text-[#dedee3] text-base font-semibold leading-tight truncate">
             {stream.user_name}
           </p>
-          <p className="text-sm text-twfadedtext truncate">
+          <p className="text-sm text-twfadedtext leading-tight truncate">
             {stream.game_name}
           </p>
         </div>
