@@ -1,4 +1,5 @@
 import { CloseX, ArrowDown, ArrowUp } from './icons';
+import { AnimationEvent } from 'react';
 
 const EMBED_PARENT = process.env.NEXT_PUBLIC_TWITCH_EMBED_PARENT;
 
@@ -19,7 +20,8 @@ const Player = ({
     <>
       <div
         id={`twitch-embed-${channel}`}
-        className="twitch-player relative aspect-video select-none group"
+        className="twitch-player relative aspect-video select-none group animate-highlight"
+        onAnimationEnd={stopAnimation}
         data-pos={`${order+1}/${total}`}
         style={{ order: order }}
       >
@@ -57,5 +59,10 @@ const Player = ({
     </>
   );
 };
+
+function stopAnimation(e: AnimationEvent) {
+  let target = e.target as HTMLElement;
+  target.classList.remove('animate-highlight');
+}
 
 export default Player;

@@ -15,11 +15,21 @@ const config: Config = {
       xl: '1.8rem',
     },
     extend: {
+      animation: {
+        'highlight': 'highlight 3s ease-in-out'
+      },
+      keyframes: {
+        highlight: {
+          '0%': { border: '2px solid var(--twpurple)' },
+          '100%': { border: '2px solid black' },
+        }
+      }, 
       colors: {
         'noplayer': 'var(--background-rgb)',
         'sidepanel': 'rgb(31,31,35)',
         'sidepanelhover': 'rgb(38,38,44)',
         'chatpanel': 'rgb(24,24,27)',
+        'twpurple': 'var(--twpurple)',
         'twborder': 'rgba(83, 83, 95, 0.48)',
         'twtext': 'var(--foreground-rgb)',
         'twfadedtext': '#adadb8',

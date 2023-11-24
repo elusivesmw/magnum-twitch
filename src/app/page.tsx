@@ -28,7 +28,14 @@ export default function Home() {
   }, [accessToken]);
 
   const addWatching = (channel: string) => {
-    if (watching.includes(channel)) return;
+    if (watching.includes(channel)) {
+      // add highlight animation
+      let channelDiv = document.getElementById(`twitch-embed-${channel}`);
+      if (!channelDiv) return;
+      channelDiv.classList.add('animate-highlight');
+      return;
+    };
+
     setWatching([...watching, channel]);
     setOrder([...order, channel]);
 
