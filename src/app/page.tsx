@@ -8,17 +8,18 @@ import { User } from '@/types/twitch';
 
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+const LS_ACCESS_TOKEN = "ACCESS_TOKEN";
 
 export default function Home() {
-  const [watching, setWatching] = useState([] as string[]);
+  const [watching, setWatching] = useState<string[]>([]);
   const [activeChat, setActiveChat] = useState(0);
-  const [order, setOrder] = useState([] as string[]);
+  const [order, setOrder] = useState<string[]>([]);
 
-  const [accessToken, setAccessToken] = useState(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
   useEffect(() => {
-    let hash = getHashValues();
-    let token = hash.access_token;
+    let token = getToken();
     if (!token) return;
+
     setAccessToken(token);
   }, []);
 
@@ -146,6 +147,23 @@ export default function Home() {
 function move(order: string[], from: number, to: number) {
   order.splice(to, 0, order.splice(from, 1)[0]);
 }
+
+const getToken = () => {
+  // try get from storage
+  let token = localStorage.getItem(LS_ACCESS_TOKEN);
+  if (token) return token;
+
+  // else get from hash
+  let hash = getHashValues();
+  token = hash.access_token;
+  if (!token) return;
+
+  // save token
+  // TODO: handle expiry
+  localStorage.setItem(LS_ACCESS_TOKEN, token);
+
+  return token;
+} 
 
 const getHashValues = () => {
   let hash = document.location.hash.substr(1);
