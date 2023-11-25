@@ -66,9 +66,9 @@ export default function Home() {
     setActiveChat(watchingIndex);
   };
 
-  const reorderWatching = (channel: string, rel: number) => {
+  const reorderWatching = (channel: string, index: number, relative: boolean) => {
     let fromOrder = order.findIndex((o) => o == channel);
-    let toOrder = fromOrder + rel;
+    let toOrder = relative ? fromOrder + index: index;
     if (toOrder < 0 || toOrder > watching.length + 1) return;
     // move channel to index 0
     let newOrder = [...order];

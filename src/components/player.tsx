@@ -1,4 +1,4 @@
-import { CloseX, ArrowDown, ArrowUp } from './icons';
+import { CloseX, ArrowDown, ArrowUp, Spotlight } from './icons';
 import { AnimationEvent } from 'react';
 
 const EMBED_PARENT = process.env.NEXT_PUBLIC_TWITCH_EMBED_PARENT;
@@ -14,7 +14,7 @@ const Player = ({
   order: number;
   total: number;
   removeWatching: (channel: string) => void;
-  reorderWatching: (channel: string, rel: number) => void;
+  reorderWatching: (channel: string, index: number, relative: boolean) => void;
 }) => {
   return (
     <>
@@ -29,13 +29,19 @@ const Player = ({
           <div className="flex gap-1">
             <div
               className="h-[20px] cursor-pointer rounded bg-black bg-opacity-50"
-              onClick={() => reorderWatching(channel, -1)}
+              onClick={() => reorderWatching(channel, 0, false)}
+            >
+              <Spotlight />
+            </div>
+            <div
+              className="h-[20px] cursor-pointer rounded bg-black bg-opacity-50"
+              onClick={() => reorderWatching(channel, -1, true)}
             >
               <ArrowUp />
             </div>
             <div
               className="h-[20px] cursor-pointer rounded bg-black bg-opacity-50"
-              onClick={() => reorderWatching(channel, 1)}
+              onClick={() => reorderWatching(channel, 1, true)}
             >
               <ArrowDown />
             </div>
