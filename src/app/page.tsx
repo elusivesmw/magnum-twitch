@@ -70,6 +70,13 @@ export default function Home() {
     let fromOrder = order.findIndex((o) => o == channel);
     let toOrder = relative ? fromOrder + index: index;
     if (toOrder < 0 || toOrder > watching.length + 1) return;
+
+    // set active chat on goto first
+    if (!relative && toOrder == 0) {
+      let chatIndex = watching.findIndex((o) => o == channel);
+      setActiveChat(chatIndex);
+    }
+
     // move channel to index 0
     let newOrder = [...order];
     move(newOrder, fromOrder, toOrder);
