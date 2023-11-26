@@ -67,6 +67,14 @@ export default function Home() {
     setActiveChat(watchingIndex);
   };
 
+  const addAnyChannel = () => {
+    const e = document.getElementById('header-search') as HTMLInputElement;
+    let channel = e.value;
+    e.value = '';
+    if (channel.length <= 0) return;
+    addWatching(channel);
+  }
+
   const reorderWatching = (channel: string, index: number, relative: boolean) => {
     let fromOrder = order.findIndex((o) => o == channel);
     let toOrder = relative ? fromOrder + index: index;
@@ -108,8 +116,11 @@ export default function Home() {
           <span className="flex self-center p-4 text-xl font-bold">T</span>
         </div>
         <div className="flex w-[40rem] h-[3.6rem] self-center">
-          <input type="text" className='w-full h-full rounded-tl-[6px] rounded-bl-[6px]' />
-          <button className='h-full px-2 bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] active:bg-opacity-[0.55] rounded-tr-[6px] rounded-br-[6px]'>
+          <input type="text" id="header-search" className='w-full h-full rounded-tl-[6px] rounded-bl-[6px]' />
+          <button
+            onClick={addAnyChannel}
+            className='h-full px-2 bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] active:bg-opacity-[0.55] rounded-tr-[6px] rounded-br-[6px]'
+          >
             <div className='h-[30px]'>
               <Plus />
             </div>
