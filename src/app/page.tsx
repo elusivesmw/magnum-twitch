@@ -5,6 +5,7 @@ import Player from '@/components/player';
 import MultiChat from '@/components/chat';
 import { useEffect, useState } from 'react';
 import { User } from '@/types/twitch';
+import { Plus } from '@/components/icons';
 
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -105,7 +106,14 @@ export default function Home() {
       <header className="flex h-20 grow-0 shrink-0 bg-chatpanel z-20 header-shadow justify-between">
         <div className="flex p-4">
           <span className="flex self-center p-4 text-xl font-bold">T</span>
-          <span className="">active chat: {activeChat}</span>
+        </div>
+        <div className="flex w-[40rem] h-[3.6rem] self-center">
+          <input type="text" className='w-full h-full rounded-tl-[6px] rounded-bl-[6px]' />
+          <button className='h-full px-2 bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] active:bg-opacity-[0.55] rounded-tr-[6px] rounded-br-[6px]'>
+            <div className='h-[30px]'>
+              <Plus />
+            </div>
+          </button>
         </div>
         <div className="flex p-4">
         {user && (

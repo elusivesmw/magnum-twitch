@@ -128,6 +128,20 @@ export const Heart = ({ className = '' }: { className?: string }) => {
   );
 };
 
+export const Plus = ({ className = '' }: { className?: string }) => {
+  return (
+    <svg
+      width="100%"
+      height="100%"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      className={className}
+    >
+      <path fill-rule="evenodd" d="M9 11v5h2v-5h5V9h-5V4H9v5H4v2h5z" clip-rule="evenodd"></path>
+    </svg>
+  )
+}
+
 export const Spotlight = ({ className = '' }: { className?: string }) => {
   return (
     <svg

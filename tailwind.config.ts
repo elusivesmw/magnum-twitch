@@ -44,6 +44,9 @@ const config: Config = {
         '1/3': '33%',
         '2/3': '67%',
         '1/4': '25%',
+      },
+      boxShadow: {
+        'textbox': 'rgba(222, 222, 227, 0.4) 0 0 0 1px inset'
       }
     },
   },
