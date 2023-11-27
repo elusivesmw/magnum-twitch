@@ -120,9 +120,9 @@ export const Heart = ({ className = '' }: { className?: string }) => {
       className={className}
     >
       <path
-        fill-rule="evenodd"
+        fillRule="evenodd"
         d="M9.171 4.171A4 4 0 0 0 6.343 3H6a4 4 0 0 0-4 4v.343a4 4 0 0 0 1.172 2.829L10 17l6.828-6.828A4 4 0 0 0 18 7.343V7a4 4 0 0 0-4-4h-.343a4 4 0 0 0-2.829 1.172L10 5l-.829-.829zm.829 10 5.414-5.414A2 2 0 0 0 16 7.343V7a2 2 0 0 0-2-2h-.343a2 2 0 0 0-1.414.586L10 7.828 7.757 5.586A2 2 0 0 0 6.343 5H6a2 2 0 0 0-2 2v.343a2 2 0 0 0 .586 1.414L10 14.172z"
-        clip-rule="evenodd"
+        clipRule="evenodd"
       ></path>
     </svg>
   );
@@ -137,7 +137,7 @@ export const Plus = ({ className = '' }: { className?: string }) => {
       fill="currentColor"
       className={className}
     >
-      <path fill-rule="evenodd" d="M9 11v5h2v-5h5V9h-5V4H9v5H4v2h5z" clip-rule="evenodd"></path>
+      <path fillRule="evenodd" d="M9 11v5h2v-5h5V9h-5V4H9v5H4v2h5z" clipRule="evenodd"></path>
     </svg>
   )
 }
@@ -152,9 +152,9 @@ export const Spotlight = ({ className = '' }: { className?: string }) => {
       className={className}
     >
       <path
-        fill-rule="evenodd"
+        fillRule="evenodd"
         d="M13.192 14.606a7 7 0 1 1 1.414-1.414l3.101 3.1-1.414 1.415-3.1-3.1zM14 9A5 5 0 1 1 4 9a5 5 0 0 1 10 0z"
-        clip-rule="evenodd"
+        clipRule="evenodd"
       ></path>
     </svg>
   );
