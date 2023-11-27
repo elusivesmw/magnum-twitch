@@ -4,13 +4,13 @@ import Following from '@/components/following';
 import Player from '@/components/player';
 import MultiChat from '@/components/chat';
 import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation';
 import { User } from '@/types/twitch';
 import { Plus } from '@/components/icons';
 
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
-const LS_ACCESS_TOKEN = "ACCESS_TOKEN";
+const LS_ACCESS_TOKEN = 'ACCESS_TOKEN';
 
 export default function Home() {
   const router = useRouter();
@@ -42,11 +42,11 @@ export default function Home() {
       if (!channelDiv) return;
       channelDiv.classList.add('animate-highlight');
       return;
-    };
+    }
 
     if (watching.length >= 9) {
       // do this better :]
-      alert('That\'s enough, dude.');
+      alert("That's enough, dude.");
       return;
     }
 
@@ -79,11 +79,15 @@ export default function Home() {
     e.value = '';
     if (channel.length <= 0) return;
     addWatching(channel);
-  }
+  };
 
-  const reorderWatching = (channel: string, index: number, relative: boolean) => {
+  const reorderWatching = (
+    channel: string,
+    index: number,
+    relative: boolean
+  ) => {
     let fromOrder = order.findIndex((o) => o == channel);
-    let toOrder = relative ? fromOrder + index: index;
+    let toOrder = relative ? fromOrder + index : index;
     if (toOrder < 0 || toOrder > watching.length + 1) return;
 
     // set active chat on goto first
@@ -122,30 +126,37 @@ export default function Home() {
           <span className="flex self-center p-4 text-xl font-bold">T</span>
         </div>
         <div className="flex w-[40rem] h-[3.6rem] self-center">
-          <input type="text" id="header-search" className='w-full h-full rounded-tl-[6px] rounded-bl-[6px]' />
+          <input
+            type="text"
+            id="header-search"
+            className="w-full h-full rounded-tl-[6px] rounded-bl-[6px]"
+          />
           <button
             onClick={addAnyChannel}
-            className='h-full px-2 bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] active:bg-opacity-[0.55] rounded-tr-[6px] rounded-br-[6px]'
+            className="h-full px-2 bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] active:bg-opacity-[0.55] rounded-tr-[6px] rounded-br-[6px]"
           >
-            <div className='h-[30px]'>
+            <div className="h-[30px]">
               <Plus />
             </div>
           </button>
         </div>
         <div className="flex p-4">
-        {user && (
-          <div className="w-[30px]">
-            <img src={user.profile_image_url} className="w-full max-w-full rounded-full object-cover" />
-          </div>
-        )}
-        {!accessToken && (
-          <a
-            href={`https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=${TWITCH_CLIENT_ID}&redirect_uri=${BASE_URL}&scope=user:read:follows`}
-            className="inline-flex items-center text-sm font-semibold px-4 text-twbuttontext bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] rounded-[4px]"
-          >
-            Log In
-          </a>
-        )}
+          {user && (
+            <div className="w-[30px]">
+              <img
+                src={user.profile_image_url}
+                className="w-full max-w-full rounded-full object-cover"
+              />
+            </div>
+          )}
+          {!accessToken && (
+            <a
+              href={`https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=${TWITCH_CLIENT_ID}&redirect_uri=${BASE_URL}&scope=user:read:follows`}
+              className="inline-flex items-center text-sm font-semibold px-4 text-twbuttontext bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] rounded-[4px]"
+            >
+              Log In
+            </a>
+          )}
         </div>
       </header>
       <div className="relative h-full">
@@ -195,7 +206,7 @@ function getToken() {
   localStorage.setItem(LS_ACCESS_TOKEN, token);
 
   return token;
-} 
+}
 
 function getHashValues() {
   let hash = document.location.hash.substr(1);
@@ -206,7 +217,7 @@ function getHashValues() {
   });
   console.log(params);
   return params;
-};
+}
 
 function getError(searchParams: URLSearchParams) {
   if (!searchParams) return false;

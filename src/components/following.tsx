@@ -80,29 +80,41 @@ const Following = ({
       });
   };
 
-
   let [open, setOpen] = useState<boolean>(true);
   const toggleOpen = () => {
     setOpen(!open);
-  }
+  };
 
   return (
-    <div className={`flex flex-col bg-sidepanel ${open ? "basis-[240px]" : "basis-[50px]"} shrink-0 grow-0 overflow-y-scroll scrollbar`}>
+    <div
+      className={`flex flex-col bg-sidepanel ${
+        open ? 'basis-[240px]' : 'basis-[50px]'
+      } shrink-0 grow-0 overflow-y-scroll scrollbar`}
+    >
       <div className="flex shrink-0 grow-0 max-w-full text-center items-center justify-between mt-4 pl-4 pr-2">
-        <span className={`${open ? "" : "hidden"} font-semibold text-xl`}>For You</span>
+        <span className={`${open ? '' : 'hidden'} font-semibold text-xl`}>
+          For You
+        </span>
         <button
           onClick={toggleOpen}
-          className="inline-flex h-[30px] p-2 hover:bg-twbuttonbg hover:bg-opacity-[0.48] rounded-[4px]">
-          {open ?
-            <CollapseLeft />
-            :
-            <CollapseRight />
-          }
+          className="inline-flex h-[30px] p-2 hover:bg-twbuttonbg hover:bg-opacity-[0.48] rounded-[4px]"
+        >
+          {open ? <CollapseLeft /> : <CollapseRight />}
         </button>
       </div>
-      <div className={`flex basis-20 shrink-0 grow-0 max-w-full text-center items-center ${open ? "justify-start" : "justify-center"} px-4`}>
-        <span className={`${!open ? "hidden": ""} uppercase font-bold text-sm`}>Followed Channels</span>
-        <div className={`${open ? "hidden" : ""} h-8`}><Heart /></div>
+      <div
+        className={`flex basis-20 shrink-0 grow-0 max-w-full text-center items-center ${
+          open ? 'justify-start' : 'justify-center'
+        } px-4`}
+      >
+        <span
+          className={`${!open ? 'hidden' : ''} uppercase font-bold text-sm`}
+        >
+          Followed Channels
+        </span>
+        <div className={`${open ? 'hidden' : ''} h-8`}>
+          <Heart />
+        </div>
       </div>
       {streams.map((stream, i) => {
         let user = users.find((u) => u.id == stream.user_id);
@@ -145,7 +157,11 @@ const StreamRow = ({
           />
         )}
       </div>
-      <div className={`${!open ? "hidden" : ""} flex justify-between content-center ml-2 grow min-w-0`}>
+      <div
+        className={`${
+          !open ? 'hidden' : ''
+        } flex justify-between content-center ml-4 grow min-w-0`}
+      >
         <div className="flex flex-col shrink overflow-hidden">
           <p className="text-[#dedee3] text-base font-semibold leading-tight truncate">
             {stream.user_name}

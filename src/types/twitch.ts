@@ -28,4 +28,3 @@ export interface User {
   view_count: number;
   created_at: string;
 }
-
