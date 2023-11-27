@@ -4,6 +4,7 @@ import Following from '@/components/following';
 import Player from '@/components/player';
 import MultiChat from '@/components/chat';
 import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation'
 import { User } from '@/types/twitch';
 import { Plus } from '@/components/icons';
 
@@ -12,12 +13,17 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 const LS_ACCESS_TOKEN = "ACCESS_TOKEN";
 
 export default function Home() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [watching, setWatching] = useState<string[]>([]);
   const [activeChat, setActiveChat] = useState(0);
   const [order, setOrder] = useState<string[]>([]);
 
   const [accessToken, setAccessToken] = useState<string | null>(null);
   useEffect(() => {
+    if (getError(searchParams)) {
+      router.replace('/');
+    }
     let token = getToken();
     if (!token) return;
 
@@ -174,7 +180,7 @@ function move(order: string[], from: number, to: number) {
   order.splice(to, 0, order.splice(from, 1)[0]);
 }
 
-const getToken = () => {
+function getToken() {
   // try get from storage
   let token = localStorage.getItem(LS_ACCESS_TOKEN);
   if (token) return token;
@@ -191,7 +197,7 @@ const getToken = () => {
   return token;
 } 
 
-const getHashValues = () => {
+function getHashValues() {
   let hash = document.location.hash.substr(1);
   var params: any = {};
   hash.split('&').map((hashkey) => {
@@ -202,3 +208,13 @@ const getHashValues = () => {
   return params;
 };
 
+function getError(searchParams: URLSearchParams) {
+  if (!searchParams) return false;
+  //const error = searchParams.get('error');
+  const description = searchParams.get('error_description');
+  //const state = searchParams.get('state');
+  if (!description) return false;
+
+  alert(description);
+  return true;
+}
