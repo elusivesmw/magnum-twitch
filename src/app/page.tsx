@@ -18,6 +18,7 @@ export default function Home() {
   const [watching, setWatching] = useState<string[]>([]);
   const [activeChat, setActiveChat] = useState(0);
   const [order, setOrder] = useState<string[]>([]);
+  const [vertical, setVertical] = useState<boolean>(false);
 
   const [accessToken, setAccessToken] = useState<string | null>(null);
   useEffect(() => {
@@ -102,6 +103,10 @@ export default function Home() {
     setOrder(newOrder);
   };
 
+  const toggleVertical = () => {
+    setVertical(!vertical);
+  }
+
   const updateUser = () => {
     if (!accessToken) return;
     const httpOptions: Object = {
@@ -124,6 +129,15 @@ export default function Home() {
       <header className="flex h-20 grow-0 shrink-0 bg-chatpanel z-20 header-shadow justify-between">
         <div className="flex p-4">
           <span className="flex self-center p-4 text-xl font-bold">T</span>
+          <button
+            onClick={toggleVertical}
+            className="h-full px-2 bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] active:bg-opacity-[0.55] rounded-[6px]"
+          >
+            <div className="flex h-[30px] w-[60px] justify-center items-center">
+              {vertical ? "Grid" : "Vertical"}
+            </div>
+          </button>
+
         </div>
         <div className="flex w-[40rem] h-[3.6rem] self-center">
           <input
@@ -163,7 +177,7 @@ export default function Home() {
         <div className="absolute w-full h-full">
           <div className="flex h-full">
             <Following accessToken={accessToken} addWatching={addWatching} />
-            <div className="flex flex-row basis-auto grow shrink bg-noplayer flex-wrap mt-[1px] mb-[2px]">
+            <div className={`flex ${vertical ? "flex-col flex-nowrap vert" : "flex-row flex-wrap"} basis-auto grow shrink bg-noplayer mt-[1px] mb-[2px]`}>
               {watching.map((e, i) => (
                 <Player
                   channel={e}
