@@ -178,14 +178,14 @@ export default function Home() {
           <div className="flex h-full">
             <Following accessToken={accessToken} addWatching={addWatching} />
             <div className={`flex ${vertical ? "flex-col flex-nowrap vert" : "flex-row flex-wrap"} basis-auto grow shrink bg-noplayer mt-[1px] mb-[2px]`}>
-              {watching.map((e, i) => (
+              {watching.map((e) => (
                 <Player
                   channel={e}
                   order={order.findIndex((o) => o == e)}
                   total={watching.length}
                   reorderWatching={reorderWatching}
                   removeWatching={removeWatching}
-                  key={i}
+                  key={`$player-key-${e}`}
                 />
               ))}
             </div>
