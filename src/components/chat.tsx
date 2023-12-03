@@ -69,7 +69,7 @@ const MultiChat = ({
       </div>
       <div className={`${open ? "block" : "hidden"} flex grow h-auto`}>
         {channels.map((e, i) => (
-          <Chat channel={e} visible={i == visibleIndex} key={i} />
+          <Chat channel={e} visible={i == visibleIndex} key={`chat-key-${e}`} />
         ))}
       </div>
     </div>
