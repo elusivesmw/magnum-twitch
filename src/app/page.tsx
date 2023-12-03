@@ -11,6 +11,7 @@ import { Plus } from '@/components/icons';
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 const LS_ACCESS_TOKEN = 'ACCESS_TOKEN';
+const VALIDATE_INTERVAL = 60 * 60 * 1000;
 
 export default function Home() {
   const router = useRouter();
@@ -35,6 +36,33 @@ export default function Home() {
   useEffect(() => {
     updateUser();
   }, [accessToken]);
+
+  useEffect(() => {
+    validateToken();
+    const intervalId = setInterval(() => {
+      validateToken();
+    }, VALIDATE_INTERVAL);
+
+    return () => clearInterval(intervalId);
+  }, [accessToken]);
+
+  // TODO: pick up here
+  const validateToken = () => {
+    console.log('try validate token');
+    if (!accessToken) return;
+    const httpOptions: Object = {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    };
+    fetch('https://id.twitch.tv/oauth2/validate', httpOptions)
+      .then((res) => {
+        if (!res.ok) {
+          // token no good
+        }
+        console.log('valid token');
+      });
+  }
 
   const addWatching = (channel: string) => {
     if (watching.includes(channel)) {
