@@ -63,6 +63,7 @@ const Following = ({
 
   const updateUsers = () => {
     if (!accessToken) return;
+    if (!streams) return;
     let ids = streams.map((s) => s.user_id);
     let ids_param = 'id=' + ids.join('&id=');
 
@@ -116,7 +117,7 @@ const Following = ({
           <Heart />
         </div>
       </div>
-      {streams.map((stream, i) => {
+      {streams && streams.map((stream, i) => {
         let user = users.find((u) => u.id == stream.user_id);
         return (
           <StreamRow
