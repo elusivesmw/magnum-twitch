@@ -7,42 +7,51 @@ import { CollapseLeft, CollapseRight, Heart } from './icons';
 
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
 
-const USER_ID = 9214095;
 const GAME_ID = 1229;
 const POLL_INTERVAL = 60 * 1000;
 
 const Following = ({
   accessToken,
+  user,
   addWatching,
 }: {
-  accessToken: string | null;
+  accessToken: string | undefined;
+  user: User | undefined;
   addWatching: (stream: string) => void;
 }) => {
   const router = useRouter();
 
-  let [streams, setStreams] = useState<Stream[]>([]);
+  let [streams, setStreams] = useState<Stream[] | undefined>();
   useEffect(() => {
     if (accessToken) {
       // remove token from url
       router.replace('/');
     }
 
+    if (!accessToken) return;
+    if (!user) return;
     updateStreams();
-    // probably should use event sub eventually
+
     const intervalId = setInterval(() => {
+      console.log('update')
       updateStreams();
     }, POLL_INTERVAL);
 
     return () => clearInterval(intervalId);
   }, [accessToken]);
 
-  let [users, setUsers] = useState<User[]>([]);
+  useEffect(() => {
+    updateStreams();
+  }, [user]);
+
+
+  let [users, setUsers] = useState<User[] | undefined>();
   useEffect(() => {
     updateUsers();
   }, [streams]);
 
   const updateStreams = () => {
-    if (!accessToken) return;
+    if (!user) return;
     const httpOptions: Object = {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -51,19 +60,20 @@ const Following = ({
     };
     fetch(
       //`https://api.twitch.tv/helix/streams/?game_id=${GAME_ID}&first=100`,
-      `https://api.twitch.tv/helix/streams/followed?user_id=${USER_ID}&first=100`,
+      `https://api.twitch.tv/helix/streams/followed?user_id=${user.id}&first=100`,
       httpOptions
     )
       .then((res) => res.json())
       .then((json) => {
         let streams = json.data as Stream[];
         setStreams(streams);
-      });
+      }).catch((err) => console.log(err));
   };
 
   const updateUsers = () => {
     if (!accessToken) return;
     if (!streams) return;
+
     let ids = streams.map((s) => s.user_id);
     let ids_param = 'id=' + ids.join('&id=');
 
@@ -78,7 +88,7 @@ const Following = ({
       .then((json) => {
         let users = json.data as User[];
         setUsers(users);
-      });
+      }).catch((err)  => console.log(err));
   };
 
   let [open, setOpen] = useState<boolean>(true);
@@ -118,7 +128,7 @@ const Following = ({
         </div>
       </div>
       {streams && streams.map((stream, i) => {
-        let user = users.find((u) => u.id == stream.user_id);
+        let user = users?.find((u) => u.id == stream.user_id);
         return (
           <StreamRow
             stream={stream}

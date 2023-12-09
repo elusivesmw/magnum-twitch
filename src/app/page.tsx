@@ -21,7 +21,7 @@ export default function Home() {
   const [order, setOrder] = useState<string[]>([]);
   const [vertical, setVertical] = useState<boolean>(false);
 
-  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<string | undefined>();
   useEffect(() => {
     if (getError(searchParams)) {
       router.replace('/');
@@ -32,7 +32,7 @@ export default function Home() {
     setAccessToken(token);
   }, []);
 
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | undefined>();
   useEffect(() => {
     updateUser();
   }, [accessToken]);
@@ -59,9 +59,10 @@ export default function Home() {
       .then((res) => {
         if (!res.ok) {
           // token no good
+          throw new Error(`Validate responded with ${res.status}`);
         }
         console.log('valid token');
-      });
+      }).catch((err) => console.log(err));
   }
 
   const addWatching = (channel: string) => {
@@ -149,7 +150,7 @@ export default function Home() {
         let users = json.data as User[];
         if (users.length != 1) return;
         setUser(users[0]);
-      });
+      }).catch((err) => console.log(err));
   };
 
   return (
@@ -204,7 +205,7 @@ export default function Home() {
       <div className="relative h-full">
         <div className="absolute w-full h-full">
           <div className="flex h-full">
-            <Following accessToken={accessToken} addWatching={addWatching} />
+            <Following accessToken={accessToken} user={user} addWatching={addWatching} />
             <div className={`flex ${vertical ? "flex-col flex-nowrap vert" : "flex-row flex-wrap"} basis-auto grow shrink justify-between bg-noplayer mt-[1px] mb-[2px]`}>
               {watching.map((e) => (
                 <Player
