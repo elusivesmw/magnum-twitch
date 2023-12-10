@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { User } from '@/types/twitch';
 import { Plus } from '@/components/icons';
+import { getAuthHeaders } from '@/lib/auth';
 
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -138,12 +139,7 @@ export default function Home() {
 
   const updateUser = () => {
     if (!accessToken) return;
-    const httpOptions: Object = {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Client-Id': TWITCH_CLIENT_ID,
-      },
-    };
+    const httpOptions = getAuthHeaders(accessToken);
     fetch('https://api.twitch.tv/helix/users', httpOptions)
       .then((res) => res.json())
       .then((json) => {

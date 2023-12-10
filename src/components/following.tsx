@@ -4,8 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Stream, User } from '@/types/twitch';
 import { CollapseLeft, CollapseRight, Heart } from './icons';
-
-const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
+import { getAuthHeaders } from '@/lib/auth';
 
 const GAME_ID = 1229;
 const POLL_INTERVAL = 60 * 1000;
@@ -49,12 +48,7 @@ const Following = ({
   const updateStreams = () => {
     if (!accessToken) return;
     if (!user) return;
-    const httpOptions: Object = {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Client-Id': TWITCH_CLIENT_ID,
-      },
-    };
+    const httpOptions = getAuthHeaders(accessToken);
     fetch(
       //`https://api.twitch.tv/helix/streams/?game_id=${GAME_ID}&first=100`,
       `https://api.twitch.tv/helix/streams/followed?user_id=${user.id}&first=100`,
@@ -76,12 +70,7 @@ const Following = ({
     let ids = streams.map((s) => s.user_id);
     let ids_param = 'id=' + ids.join('&id=');
 
-    const httpOptions: Object = {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Client-Id': TWITCH_CLIENT_ID,
-      },
-    };
+    const httpOptions = getAuthHeaders(accessToken);
     fetch(`https://api.twitch.tv/helix/users?${ids_param}`, httpOptions)
       .then((res) => res.json())
       .then((json) => {
@@ -193,7 +182,7 @@ const StreamRow = ({
   );
 };
 
-const displayViewerCount = (viewerCount: number) => {
+function displayViewerCount(viewerCount: number) {
   if (viewerCount > 1000) {
     let rounded = Number.parseFloat((viewerCount / 1000).toFixed(1)).toString();
     return `${rounded}K`;
