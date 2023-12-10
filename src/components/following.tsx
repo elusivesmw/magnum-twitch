@@ -19,6 +19,9 @@ const Following = ({
   user: User | undefined;
   addWatching: (stream: string) => void;
 }) => {
+  // temporary fix
+  if (!user) return;
+
   const router = useRouter();
 
   let [streams, setStreams] = useState<Stream[] | undefined>();
@@ -28,8 +31,6 @@ const Following = ({
       router.replace('/');
     }
 
-    if (!accessToken) return;
-    if (!user) return;
     updateStreams();
 
     const intervalId = setInterval(() => {
@@ -40,17 +41,13 @@ const Following = ({
     return () => clearInterval(intervalId);
   }, [accessToken]);
 
-  useEffect(() => {
-    updateStreams();
-  }, [user]);
-
-
   let [users, setUsers] = useState<User[] | undefined>();
   useEffect(() => {
     updateUsers();
   }, [streams]);
 
   const updateStreams = () => {
+    if (!accessToken) return;
     if (!user) return;
     const httpOptions: Object = {
       headers: {
@@ -73,6 +70,8 @@ const Following = ({
   const updateUsers = () => {
     if (!accessToken) return;
     if (!streams) return;
+    // no online streams to get user data for
+    if (streams.length == 0) return;
 
     let ids = streams.map((s) => s.user_id);
     let ids_param = 'id=' + ids.join('&id=');
