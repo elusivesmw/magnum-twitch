@@ -15,12 +15,9 @@ const Following = ({
   addWatching,
 }: {
   accessToken: string | undefined;
-  user: User | undefined;
+  user: User;
   addWatching: (stream: string) => void;
 }) => {
-  // temporary fix
-  if (!user) return;
-
   const router = useRouter();
 
   let [streams, setStreams] = useState<Stream[] | undefined>();
@@ -31,9 +28,7 @@ const Following = ({
     }
 
     updateStreams();
-
     const intervalId = setInterval(() => {
-      console.log('update')
       updateStreams();
     }, POLL_INTERVAL);
 
@@ -47,7 +42,6 @@ const Following = ({
 
   const updateStreams = () => {
     if (!accessToken) return;
-    if (!user) return;
     const httpOptions = getAuthHeaders(accessToken);
     fetch(
       //`https://api.twitch.tv/helix/streams/?game_id=${GAME_ID}&first=100`,
