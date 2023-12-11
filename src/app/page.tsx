@@ -47,19 +47,14 @@ export default function Home() {
     return () => clearInterval(intervalId);
   }, [accessToken]);
 
-  // TODO: pick up here
   const validateToken = () => {
-    console.log('try validate token');
     if (!accessToken) return;
-    const httpOptions: Object = {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    };
+    const httpOptions = getAuthHeaders(accessToken);
     fetch('https://id.twitch.tv/oauth2/validate', httpOptions)
       .then((res) => {
         if (!res.ok) {
-          // token no good
+          // token no good, clear
+          setAccessToken(undefined);
           throw new Error(`Validate responded with ${res.status}`);
         }
         console.log('valid token');
