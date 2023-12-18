@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { User } from '@/types/twitch';
 import { Plus } from '@/components/icons';
 import { getAuthHeaders } from '@/lib/auth';
+import { PlayerLayout } from '@/types/state';
 
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -20,7 +21,7 @@ export default function Home() {
   const [watching, setWatching] = useState<string[]>([]);
   const [activeChat, setActiveChat] = useState(0);
   const [order, setOrder] = useState<string[]>([]);
-  const [vertical, setVertical] = useState<boolean>(false);
+  const [playerLayout, setPlayerLayout] = useState<PlayerLayout>(PlayerLayout.Grid);
 
   const [accessToken, setAccessToken] = useState<string | undefined>();
   useEffect(() => {
@@ -129,7 +130,9 @@ export default function Home() {
   };
 
   const toggleVertical = () => {
-    setVertical(!vertical);
+    let next = playerLayout + 1;
+    if (next > 2) next = 0;
+    setPlayerLayout(next);
   }
 
   const updateUser = () => {
@@ -154,7 +157,7 @@ export default function Home() {
             className="h-full px-2 bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] active:bg-opacity-[0.55] rounded-[6px]"
           >
             <div className="flex h-[30px] w-[60px] justify-center items-center">
-              {vertical ? "Grid" : "Vertical"}
+              {playerLayout.toString()}
             </div>
           </button>
 
@@ -199,7 +202,7 @@ export default function Home() {
             {user &&
               <Following accessToken={accessToken} user={user} addWatching={addWatching} />
             }
-            <div className={`flex ${vertical ? "flex-col flex-nowrap vert" : "flex-row flex-wrap"} basis-auto grow shrink justify-around bg-black mt-[1px] mb-[2px]`}>
+            <div className={`flex ${playerClass(playerLayout)} basis-auto grow shrink justify-around bg-black mt-[1px] mb-[2px]`}>
               {watching.map((e) => (
                 <Player
                   channel={e}
@@ -264,4 +267,16 @@ function getError(searchParams: URLSearchParams) {
 
   alert(description);
   return true;
+}
+
+function playerClass(layout: PlayerLayout) {
+  switch (layout) {
+    case PlayerLayout.Vertical:
+      return "flex-col flex-nowrap vertical";
+    case PlayerLayout.Spotlight:
+      return "flex-row flex-wrap spotlight";
+    case PlayerLayout.Grid:
+    default:
+      return "flex-row flex-wrap";
+  }
 }
