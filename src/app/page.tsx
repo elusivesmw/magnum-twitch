@@ -200,7 +200,7 @@ export default function Home() {
         <div className="absolute w-full h-full">
           <div className="flex h-full">
             {user &&
-              <Following accessToken={accessToken} user={user} addWatching={addWatching} />
+              <Following accessToken={accessToken} user={user} watching={watching} addWatching={addWatching} />
             }
             <div className={`flex ${playerClass(playerLayout)} basis-auto grow shrink justify-around bg-black mt-[1px] mb-[2px]`}>
               {watching.map((e) => (

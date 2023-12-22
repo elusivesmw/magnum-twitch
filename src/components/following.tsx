@@ -12,10 +12,12 @@ const POLL_INTERVAL = 60 * 1000;
 const Following = ({
   accessToken,
   user,
+  watching,
   addWatching,
 }: {
   accessToken: string | undefined;
   user: User;
+  watching: string[];
   addWatching: (stream: string) => void;
 }) => {
   const router = useRouter();
@@ -111,11 +113,13 @@ const Following = ({
       </div>
       {streams && streams.map((stream, i) => {
         let user = users?.find((u) => u.id == stream.user_id);
+        let isWatching = watching?.includes(stream.user_login);
         return (
           <StreamRow
             stream={stream}
             user={user}
             open={open}
+            isWatching={isWatching}
             addWatching={addWatching}
             key={i}
           />
@@ -129,11 +133,13 @@ const StreamRow = ({
   stream,
   user,
   open,
+  isWatching,
   addWatching,
 }: {
   stream: Stream;
   user: User | undefined;
   open: boolean;
+  isWatching: boolean;
   addWatching: (stream: string) => void;
 }) => {
   return (
@@ -156,7 +162,7 @@ const StreamRow = ({
         } flex justify-between content-center ml-4 grow min-w-0`}
       >
         <div className="flex flex-col shrink overflow-hidden">
-          <p className="text-[#dedee3] text-base font-semibold leading-tight truncate">
+          <p className={`${isWatching ? 'text-twpurple' : 'text-[#dedee3]'} text-base font-semibold leading-tight truncate`}>
             {stream.user_name}
           </p>
           <p className="text-sm text-twfadedtext leading-tight truncate">
