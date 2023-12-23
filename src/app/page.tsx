@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { User } from '@/types/twitch';
 import { Plus } from '@/components/icons';
-import { getAuthHeaders } from '@/lib/auth';
+import { getHeaders, getOAuthHeaders } from '@/lib/auth';
 import { PlayerLayout } from '@/types/state';
 
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
@@ -50,7 +50,7 @@ export default function Home() {
 
   const validateToken = () => {
     if (!accessToken) return;
-    const httpOptions = getAuthHeaders(accessToken);
+    const httpOptions = getOAuthHeaders(accessToken);
     fetch('https://id.twitch.tv/oauth2/validate', httpOptions)
       .then((res) => {
         if (!res.ok) {
@@ -137,7 +137,7 @@ export default function Home() {
 
   const updateUser = () => {
     if (!accessToken) return;
-    const httpOptions = getAuthHeaders(accessToken);
+    const httpOptions = getHeaders(accessToken);
     fetch('https://api.twitch.tv/helix/users', httpOptions)
       .then((res) => res.json())
       .then((json) => {
