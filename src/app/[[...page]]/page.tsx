@@ -4,11 +4,12 @@ import Following from '@/components/following';
 import Player from '@/components/player';
 import MultiChat from '@/components/chat';
 import { useEffect, useState } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { User } from '@/types/twitch';
 import { Plus } from '@/components/icons';
 import { getHeaders, getOAuthHeaders } from '@/lib/auth';
 import { PlayerLayout } from '@/types/state';
+import { replacePath } from '@/lib/route';
 
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -39,6 +40,7 @@ export default function Home({ params } : { params: { page: string[] }}) {
   useEffect(() => {
     if (getError(searchParams)) {
       //router.replace('/'); // TODO: remove query params instead
+      replacePath(order);
     }
     let token = getToken();
     if (!token) return;
@@ -304,8 +306,3 @@ function playerClass(layout: PlayerLayout) {
   }
 }
 
-function replacePath(path: string[]) {
-  let newPath = '/' + path.join('/');
-  //console.log(newPath);
-  window.history.replaceState({}, '', newPath);
-}
