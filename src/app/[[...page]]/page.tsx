@@ -16,7 +16,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 const LS_ACCESS_TOKEN = 'ACCESS_TOKEN';
 const VALIDATE_INTERVAL = 60 * 60 * 1000;
 
-export default function Home({ params } : { params: { page: string[] }}) {
+export default function Home({ params }: { params: { page: string[] } }) {
   const searchParams = useSearchParams();
   const [watching, setWatching] = useState<string[]>([]);
   const [activeChat, setActiveChat] = useState(0);
@@ -25,10 +25,11 @@ export default function Home({ params } : { params: { page: string[] }}) {
 
   useEffect(() => {
     // initial page load, open channels
-    const serverPath = params.page ?? '/';
+    const serverPath = params.page;
     // make sure no duplicates
     const uniqueWatching = Array.from(new Set(serverPath));
 
+    if (uniqueWatching.length == 0) return;
     setWatching(uniqueWatching);
     setOrder(uniqueWatching);
 
@@ -39,7 +40,7 @@ export default function Home({ params } : { params: { page: string[] }}) {
   const [accessToken, setAccessToken] = useState<string | undefined>();
   useEffect(() => {
     if (getError(searchParams)) {
-      //router.replace('/'); // TODO: remove query params instead
+      // remove query params
       replacePath(order);
     }
     let token = getToken();
@@ -152,7 +153,7 @@ export default function Home({ params } : { params: { page: string[] }}) {
 
     // update client path
     replacePath(newOrder);
- };
+  };
 
   const toggleVertical = () => {
     let next = playerLayout + 1;
@@ -262,7 +263,7 @@ function getToken() {
 
   // else get from hash
   let hash = getHashValues();
-  token = hash.access_token;
+  token = hash?.access_token;
   if (!token) return;
 
   // save token
@@ -273,7 +274,8 @@ function getToken() {
 }
 
 function getHashValues() {
-  let hash = document.location.hash.substr(1);
+  let hash = document.location.hash.substring(1);
+  if (!hash) return undefined;
   var params: any = {};
   hash.split('&').map((hashkey) => {
     let temp = hashkey.split('=');
