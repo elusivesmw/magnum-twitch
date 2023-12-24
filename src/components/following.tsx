@@ -26,7 +26,7 @@ const Following = ({
   useEffect(() => {
     if (accessToken) {
       // remove token from url
-      router.replace('/');
+      //router.replace('/'); // TODO: remove query params instead
     }
 
     updateStreams();
