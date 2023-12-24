@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Stream, User } from '@/types/twitch';
 import { CollapseLeft, CollapseRight, Heart } from './icons';
 import { getHeaders } from '@/lib/auth';
+import { replacePath } from '@/lib/route';
 
 const GAME_ID = 1229;
 const POLL_INTERVAL = 60 * 1000;
@@ -20,13 +20,12 @@ const Following = ({
   watching: string[];
   addWatching: (stream: string) => void;
 }) => {
-  const router = useRouter();
-
   let [streams, setStreams] = useState<Stream[] | undefined>();
   useEffect(() => {
     if (accessToken) {
       // remove token from url
-      router.replace('/');
+      // NOTE: this won't preserve order, but this is an edge case so ¯\_(ツ)_/¯
+      replacePath(watching);
     }
 
     updateStreams();

@@ -4,29 +4,44 @@ import Following from '@/components/following';
 import Player from '@/components/player';
 import MultiChat from '@/components/chat';
 import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { User } from '@/types/twitch';
 import { Plus } from '@/components/icons';
 import { getHeaders, getOAuthHeaders } from '@/lib/auth';
 import { PlayerLayout } from '@/types/state';
+import { replacePath } from '@/lib/route';
 
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 const LS_ACCESS_TOKEN = 'ACCESS_TOKEN';
 const VALIDATE_INTERVAL = 60 * 60 * 1000;
 
-export default function Home() {
-  const router = useRouter();
+export default function Home({ params }: { params: { page: string[] } }) {
   const searchParams = useSearchParams();
   const [watching, setWatching] = useState<string[]>([]);
   const [activeChat, setActiveChat] = useState(0);
   const [order, setOrder] = useState<string[]>([]);
   const [playerLayout, setPlayerLayout] = useState<PlayerLayout>(PlayerLayout.Grid);
 
+  useEffect(() => {
+    // initial page load, open channels
+    const serverPath = params.page;
+    // make sure no duplicates
+    const uniqueWatching = Array.from(new Set(serverPath));
+
+    if (uniqueWatching.length == 0) return;
+    setWatching(uniqueWatching);
+    setOrder(uniqueWatching);
+
+    // update client path
+    replacePath(uniqueWatching);
+  }, []);
+
   const [accessToken, setAccessToken] = useState<string | undefined>();
   useEffect(() => {
     if (getError(searchParams)) {
-      router.replace('/');
+      // remove query params
+      replacePath(order);
     }
     let token = getToken();
     if (!token) return;
@@ -78,7 +93,11 @@ export default function Home() {
     }
 
     setWatching([...watching, channel]);
-    setOrder([...order, channel]);
+    let newOrder = [...order, channel];
+    setOrder(newOrder);
+
+    // update client path
+    replacePath(newOrder);
 
     if (watching.length < 1) {
       setActiveChat(0);
@@ -91,7 +110,11 @@ export default function Home() {
     // remove player
     setWatching(watching.filter((_, i) => i != watchingIndex));
     // update order
-    setOrder(order.filter((o) => o != channel));
+    let newOrder = order.filter((o) => o != channel);
+    setOrder(newOrder);
+
+    // update client path
+    replacePath(newOrder);
 
     // set active chat
     if (watchingIndex >= watching.length - 1) {
@@ -127,6 +150,9 @@ export default function Home() {
     let newOrder = [...order];
     move(newOrder, fromOrder, toOrder);
     setOrder(newOrder);
+
+    // update client path
+    replacePath(newOrder);
   };
 
   const toggleVertical = () => {
@@ -237,7 +263,7 @@ function getToken() {
 
   // else get from hash
   let hash = getHashValues();
-  token = hash.access_token;
+  token = hash?.access_token;
   if (!token) return;
 
   // save token
@@ -248,7 +274,8 @@ function getToken() {
 }
 
 function getHashValues() {
-  let hash = document.location.hash.substr(1);
+  let hash = document.location.hash.substring(1);
+  if (!hash) return undefined;
   var params: any = {};
   hash.split('&').map((hashkey) => {
     let temp = hashkey.split('=');
@@ -280,3 +307,4 @@ function playerClass(layout: PlayerLayout) {
       return "flex-row flex-wrap";
   }
 }
+
