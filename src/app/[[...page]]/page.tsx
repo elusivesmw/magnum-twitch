@@ -4,7 +4,7 @@ import Following from '@/components/following';
 import Player from '@/components/player';
 import MultiChat from '@/components/chat';
 import { useEffect, useState } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { User } from '@/types/twitch';
 import { Plus } from '@/components/icons';
 import { getHeaders, getOAuthHeaders } from '@/lib/auth';
@@ -16,31 +16,23 @@ const LS_ACCESS_TOKEN = 'ACCESS_TOKEN';
 const VALIDATE_INTERVAL = 60 * 60 * 1000;
 
 export default function Home({ params } : { params: { page: string[] }}) {
-  const router = useRouter();
-  const path = usePathname();
   const searchParams = useSearchParams();
   const [watching, setWatching] = useState<string[]>([]);
   const [activeChat, setActiveChat] = useState(0);
   const [order, setOrder] = useState<string[]>([]);
   const [playerLayout, setPlayerLayout] = useState<PlayerLayout>(PlayerLayout.Grid);
 
-  const clientPath = path ?? '/';
-  console.log('clientpath', clientPath);
-  const serverPath = params.page ?? '/';
-  console.log('serverpath', serverPath);
-  const uniqueWatching = Array.from(new Set(serverPath));
-  console.log(uniqueWatching);
-
-
   useEffect(() => {
     // initial page load, open channels
+    const serverPath = params.page ?? '/';
+    // make sure no duplicates
+    const uniqueWatching = Array.from(new Set(serverPath));
+
     setWatching(uniqueWatching);
     setOrder(uniqueWatching);
-    // make sure no duplicates in url
-    let newPath = '/' + uniqueWatching.join('/');
-    console.log(newPath);
-    window.history.replaceState({}, '', newPath);
-    //router.replace(newPath);
+
+    // update client path
+    replacePath(uniqueWatching);
   }, []);
 
   const [accessToken, setAccessToken] = useState<string | undefined>();
@@ -98,12 +90,11 @@ export default function Home({ params } : { params: { page: string[] }}) {
     }
 
     setWatching([...watching, channel]);
-    setOrder([...order, channel]);
+    let newOrder = [...order, channel];
+    setOrder(newOrder);
 
     // update client path
-    let newPath = `/${[...order, channel].join('/')}`;
-    //router.replace(newPath);
-    window.history.replaceState({}, '', newPath);
+    replacePath(newOrder);
 
     if (watching.length < 1) {
       setActiveChat(0);
@@ -120,9 +111,7 @@ export default function Home({ params } : { params: { page: string[] }}) {
     setOrder(newOrder);
 
     // update client path
-     let newPath = `/${newOrder.join('/')}`;
-    //router.replace(newPath);
-    window.history.replaceState({}, '', newPath);
+    replacePath(newOrder);
 
     // set active chat
     if (watchingIndex >= watching.length - 1) {
@@ -159,12 +148,8 @@ export default function Home({ params } : { params: { page: string[] }}) {
     move(newOrder, fromOrder, toOrder);
     setOrder(newOrder);
 
-    console.log('newOrder', newOrder)
-
     // update client path
-    let newPath = '/' + newOrder.join('/');
-    //router.replace(newPath);
-    window.history.replaceState({}, '', newPath);
+    replacePath(newOrder);
  };
 
   const toggleVertical = () => {
@@ -317,4 +302,10 @@ function playerClass(layout: PlayerLayout) {
     default:
       return "flex-row flex-wrap";
   }
+}
+
+function replacePath(path: string[]) {
+  let newPath = '/' + path.join('/');
+  //console.log(newPath);
+  window.history.replaceState({}, '', newPath);
 }
