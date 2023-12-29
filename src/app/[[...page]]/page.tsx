@@ -6,7 +6,7 @@ import MultiChat from '@/components/chat';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { User } from '@/types/twitch';
-import { Plus } from '@/components/icons';
+import { Carousel, Grid, Plus } from '@/components/icons';
 import { getHeaders, getOAuthHeaders } from '@/lib/auth';
 import { PlayerLayout } from '@/types/state';
 import { replacePath } from '@/lib/route';
@@ -155,12 +155,6 @@ export default function Home({ params }: { params: { page: string[] } }) {
     replacePath(newOrder);
   };
 
-  const toggleVertical = () => {
-    let next = playerLayout + 1;
-    if (next > 2) next = 0;
-    setPlayerLayout(next);
-  }
-
   const updateUser = () => {
     if (!accessToken) return;
     const httpOptions = getHeaders(accessToken);
@@ -178,16 +172,34 @@ export default function Home({ params }: { params: { page: string[] } }) {
       <header className="flex h-20 grow-0 shrink-0 bg-chatpanel z-20 header-shadow justify-between">
         <div className="flex p-4">
           <span className="flex self-center p-4 text-xl font-bold">T</span>
-          <button
-            onClick={toggleVertical}
-            className="h-full px-2 bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] active:bg-opacity-[0.55] rounded-[6px]"
-          >
-            <div className="flex h-[30px] w-[60px] justify-center items-center">
-              {playerLayout.toString()}
-            </div>
-          </button>
+            <div className="flex h-full px-2 ">
+              <button
+                onClick={() => setPlayerLayout(PlayerLayout.Grid)}
+                className="flex items-center bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] active:bg-opacity-[0.55] rounded-l-[6px]"
+              >
+                <div className="px-4">
+                  <Grid />
+                </div>
+              </button>
+              <button
+                onClick={() => setPlayerLayout(PlayerLayout.Spotlight)}
+                className="flex items-center bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] active:bg-opacity-[0.55]"
+              >
+                <div className="px-4 border-l border-twbuttonbg/[0.48]">
+                  <Carousel />
+                </div>
+              </button>
+              <button
+                onClick={() => setPlayerLayout(PlayerLayout.Vertical)}
+                className="flex items-center bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] active:bg-opacity-[0.55] rounded-r-[6px]"
+              >
+                <div className="px-4 border-l border-twbuttonbg/[0.48]">
+                  Vert
+                </div>
+              </button>
 
-        </div>
+            </div>
+          </div>
         <div className="flex w-[40rem] h-[3.6rem] self-center">
           <input
             type="text"

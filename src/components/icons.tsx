@@ -163,3 +163,19 @@ export const Spotlight = ({ className = '' }: { className?: string }) => {
     </svg>
   );
 };
+
+export const Grid = ({ className = '' }: { className?: string }) => {
+  return (
+    <svg width="2rem" height="2rem" viewBox="0 0 20 20" fill="currentColor" className={className}>
+      <path d="M9 4H2v5h7V4zm9 0h-7v5h7V4zM2 11h7v5H2v-5zm16 0h-7v5h7v-5z"></path>
+    </svg>
+  );
+}
+
+export const Carousel = ({ className = '' }: { className?: string }) => {
+  return (
+    <svg width="2rem" height="2rem" viewBox="0 0 20 20" fill="currentColor" className={className}>
+      <path d="M2 3h16v9H2V3zm9 11v3h7v-3h-7zm-9 0h7v3H2v-3z"></path>
+    </svg>
+  );
+}
