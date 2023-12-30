@@ -239,6 +239,7 @@ export default function Home({ params }: { params: { page: string[] } }) {
                   channel={e}
                   order={order.findIndex((o) => o == e)}
                   total={watching.length}
+                  isActiveChat={watching[activeChat] == e}
                   reorderWatching={reorderWatching}
                   removeWatching={removeWatching}
                   key={`$player-key-${e}`}

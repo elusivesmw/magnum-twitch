@@ -7,12 +7,14 @@ const Player = ({
   channel,
   order,
   total,
+  isActiveChat,
   removeWatching,
   reorderWatching,
 }: {
   channel: string;
   order: number;
   total: number;
+  isActiveChat: boolean;
   removeWatching: (channel: string) => void;
   reorderWatching: (channel: string, index: number, relative: boolean) => void;
 }) => {
@@ -20,7 +22,7 @@ const Player = ({
     <>
       <div
         id={`twitch-embed-${channel}`}
-        className="twitch-player relative aspect-video select-none group border-[3px] border-black animate-highlight"
+        className={`twitch-player relative aspect-video select-none group border-[3px] ${isActiveChat && total > 1 ? 'border-twpurple' : 'border-black animate-highlight'}`}
         onAnimationEnd={stopAnimation}
         data-pos={order + 1}
         data-of={total}
