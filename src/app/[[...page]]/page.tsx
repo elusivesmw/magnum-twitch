@@ -177,7 +177,7 @@ export default function Home({ params }: { params: { page: string[] } }) {
                 onClick={() => setPlayerLayout(PlayerLayout.Grid)}
                 className="flex items-center bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] active:bg-opacity-[0.55] rounded-l-[6px]"
               >
-                <div className="px-4">
+                <div className={`px-4 ${playerLayout == PlayerLayout.Grid ? 'text-twpurple': ''}`}>
                   <Grid />
                 </div>
               </button>
@@ -185,7 +185,7 @@ export default function Home({ params }: { params: { page: string[] } }) {
                 onClick={() => setPlayerLayout(PlayerLayout.Spotlight)}
                 className="flex items-center bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] active:bg-opacity-[0.55] rounded-r-[6px]"
               >
-                <div className="px-4 border-l border-twbuttonbg/[0.48]">
+                <div className={`px-4 border-l border-twbuttonbg/[0.48] ${playerLayout == PlayerLayout.Spotlight ? 'text-twpurple': ''}`}>
                   <Carousel />
                 </div>
               </button>
