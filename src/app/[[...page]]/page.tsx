@@ -6,7 +6,7 @@ import MultiChat from '@/components/chat';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { User } from '@/types/twitch';
-import { Carousel, Grid, Plus } from '@/components/icons';
+import { Carousel, Grid, Plus, Twitch } from '@/components/icons';
 import { getHeaders, getOAuthHeaders } from '@/lib/auth';
 import { PlayerLayout } from '@/types/state';
 import { replacePath } from '@/lib/route';
@@ -170,27 +170,29 @@ export default function Home({ params }: { params: { page: string[] } }) {
   return (
     <main className="flex flex-col h-screen">
       <header className="flex h-20 grow-0 shrink-0 bg-chatpanel z-20 header-shadow justify-between">
-        <div className="flex p-4">
-          <span className="flex self-center p-4 text-xl font-bold">T</span>
-            <div className="flex h-full px-2 ">
-              <button
-                onClick={() => setPlayerLayout(PlayerLayout.Grid)}
-                className="flex items-center bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] active:bg-opacity-[0.55] rounded-l-[6px]"
-              >
-                <div className={`px-4 ${playerLayout == PlayerLayout.Grid ? 'text-twpurple': ''}`}>
-                  <Grid />
-                </div>
-              </button>
-              <button
-                onClick={() => setPlayerLayout(PlayerLayout.Spotlight)}
-                className="flex items-center bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] active:bg-opacity-[0.55] rounded-r-[6px]"
-              >
-                <div className={`px-4 border-l border-twbuttonbg/[0.48] ${playerLayout == PlayerLayout.Spotlight ? 'text-twpurple': ''}`}>
-                  <Carousel />
-                </div>
-              </button>
-            </div>
+        <div className="flex">
+          <div className="p-2">
+            <Twitch />
           </div>
+          <div className="flex h-full py-4 px-2">
+            <button
+              onClick={() => setPlayerLayout(PlayerLayout.Grid)}
+              className="flex items-center bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] active:bg-opacity-[0.55] rounded-l-[6px]"
+            >
+              <div className={`px-4 ${playerLayout == PlayerLayout.Grid ? 'text-twpurple': ''}`}>
+                <Grid />
+              </div>
+            </button>
+            <button
+              onClick={() => setPlayerLayout(PlayerLayout.Spotlight)}
+              className="flex items-center bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] active:bg-opacity-[0.55] rounded-r-[6px]"
+            >
+              <div className={`px-4 border-l border-twbuttonbg/[0.48] ${playerLayout == PlayerLayout.Spotlight ? 'text-twpurple': ''}`}>
+                <Carousel />
+              </div>
+            </button>
+          </div>
+        </div>
         <div className="flex w-[40rem] h-[3.6rem] self-center">
           <input
             type="text"
