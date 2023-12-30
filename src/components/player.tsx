@@ -22,7 +22,8 @@ const Player = ({
         id={`twitch-embed-${channel}`}
         className="twitch-player relative aspect-video select-none group border-[3px] border-black animate-highlight"
         onAnimationEnd={stopAnimation}
-        data-pos={`${order + 1}/${total}`}
+        data-pos={order + 1}
+        data-of={total}
         style={{ order: order }}
       >
         <div className="absolute top-1 right-1 hidden group-hover:block">
