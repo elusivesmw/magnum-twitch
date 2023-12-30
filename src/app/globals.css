@@ -115,7 +115,7 @@ input[type='text'] {
   @apply w-1/2 max-h-[20%] self-end;
 }
 .spotlight > .twitch-player[data-of='4'] {
-  @apply w-[33%] max-h-[20%] self-end;
+  @apply w-[33.33%] max-h-[20%] self-end;
 }
 .spotlight > .twitch-player[data-of='5'] {
   @apply w-[25%] max-h-[20%] self-end;
@@ -141,5 +141,41 @@ input[type='text'] {
 /* one and only player */
 .twitch-player[data-pos='1'][data-of='1'] {
   @apply w-full max-h-full self-start;
+}
+
+/* vertical stacking */
+#player-container{
+  container-type: size;
+  container-name: player;
+}
+
+@container player (orientation:portrait) and (width < 600px) {
+  .twitch-player {
+    @apply w-full !important;
+  }
+  .twitch-player[data-of='2'] {
+    @apply max-h-1/2 !important;
+  }
+  .twitch-player[data-of='3'] {
+    @apply max-h-1/3 !important;
+  }
+  .twitch-player[data-of='4'] {
+    @apply max-h-1/4 !important;
+  }
+  .twitch-player[data-of='5'] {
+    @apply max-h-[20%] !important;
+  }
+  .twitch-player[data-of='6'] {
+    @apply max-h-[16.66%] !important;
+  }
+  .twitch-player[data-of='7'] {
+    @apply max-h-[14.28%] !important;
+  }
+  .twitch-player[data-of='8'] {
+    @apply max-h-[12.5%] !important;
+  }
+  .twitch-player[data-of='9'] {
+    @apply max-h-[11.11%] !important;
+  }
 }
 

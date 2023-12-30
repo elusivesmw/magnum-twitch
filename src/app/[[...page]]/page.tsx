@@ -183,21 +183,12 @@ export default function Home({ params }: { params: { page: string[] } }) {
               </button>
               <button
                 onClick={() => setPlayerLayout(PlayerLayout.Spotlight)}
-                className="flex items-center bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] active:bg-opacity-[0.55]"
+                className="flex items-center bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] active:bg-opacity-[0.55] rounded-r-[6px]"
               >
                 <div className="px-4 border-l border-twbuttonbg/[0.48]">
                   <Carousel />
                 </div>
               </button>
-              <button
-                onClick={() => setPlayerLayout(PlayerLayout.Vertical)}
-                className="flex items-center bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] active:bg-opacity-[0.55] rounded-r-[6px]"
-              >
-                <div className="px-4 border-l border-twbuttonbg/[0.48]">
-                  Vert
-                </div>
-              </button>
-
             </div>
           </div>
         <div className="flex w-[40rem] h-[3.6rem] self-center">
@@ -240,7 +231,7 @@ export default function Home({ params }: { params: { page: string[] } }) {
             {user &&
               <Following accessToken={accessToken} user={user} watching={watching} addWatching={addWatching} />
             }
-            <div className={`flex ${playerClass(playerLayout)} basis-auto grow shrink justify-around bg-black mt-[1px] mb-[2px]`}>
+            <div id="player-container" className={`flex ${playerClass(playerLayout)} basis-auto grow shrink justify-around bg-black mt-[1px] mb-[2px]`}>
               {watching.map((e) => (
                 <Player
                   channel={e}
