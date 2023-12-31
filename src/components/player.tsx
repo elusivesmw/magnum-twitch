@@ -22,48 +22,50 @@ const Player = ({
     <>
       <div
         id={`twitch-embed-${channel}`}
-        className={`twitch-player relative aspect-video select-none group border-[3px] ${isActiveChat && total > 1 ? 'border-twpurple' : 'border-black animate-highlight'}`}
+        className="twitch-player relative select-none group"
         onAnimationEnd={stopAnimation}
         data-pos={order + 1}
         data-of={total}
         style={{ order: order }}
       >
-        <div className="absolute top-1 right-1 hidden group-hover:block">
-          <div className="flex gap-1">
-            <div
-              className="h-[20px] cursor-pointer rounded bg-black bg-opacity-50"
-              onClick={() => reorderWatching(channel, 0, false)}
-            >
-              <Spotlight />
-            </div>
-            <div
-              className="h-[20px] cursor-pointer rounded bg-black bg-opacity-50"
-              onClick={() => reorderWatching(channel, -1, true)}
-            >
-              <ArrowUp />
-            </div>
-            <div
-              className="h-[20px] cursor-pointer rounded bg-black bg-opacity-50"
-              onClick={() => reorderWatching(channel, 1, true)}
-            >
-              <ArrowDown />
-            </div>
+        <div className="absolute top-0 left-0 bottom-0 right-0 m-auto aspect-video max-w-full max-h-full">
+          <div className="absolute top-1 right-1 hidden group-hover:block">
+            <div className="flex gap-1">
+              <div
+                className="h-[20px] cursor-pointer rounded bg-black bg-opacity-50 z-50"
+                onClick={() => reorderWatching(channel, 0, false)}
+              >
+                <Spotlight />
+              </div>
+              <div
+                className="h-[20px] cursor-pointer rounded bg-black bg-opacity-50 z-50"
+                onClick={() => reorderWatching(channel, -1, true)}
+              >
+                <ArrowUp />
+              </div>
+              <div
+                className="h-[20px] cursor-pointer rounded bg-black bg-opacity-50 z-50"
+                onClick={() => reorderWatching(channel, 1, true)}
+              >
+                <ArrowDown />
+              </div>
 
-            <div
-              className="h-[20px] cursor-pointer rounded bg-black bg-opacity-50"
-              onClick={() => removeWatching(channel)}
-            >
-              <CloseX />
+              <div
+                className="h-[20px] cursor-pointer rounded bg-black bg-opacity-50 z-50"
+                onClick={() => removeWatching(channel)}
+              >
+                <CloseX />
+              </div>
             </div>
           </div>
+          <iframe
+            className={`w-full h-full border-[3px] ${isActiveChat && total > 1 ? 'border-twpurple' : 'border-black animate-highlight'}`}
+            src={`https://player.twitch.tv/?channel=${channel}&parent=${EMBED_PARENT}`}
+            height="720"
+            width="1280"
+            allowFullScreen
+          ></iframe>
         </div>
-        <iframe
-          className="max-w-full w-full h-full"
-          src={`https://player.twitch.tv/?channel=${channel}&parent=${EMBED_PARENT}`}
-          height="720"
-          width="1280"
-          allowFullScreen
-        ></iframe>
       </div>
     </>
   );

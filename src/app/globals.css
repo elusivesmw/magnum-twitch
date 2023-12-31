@@ -50,37 +50,37 @@ input[type='text'] {
 
 /* grid 2 players */
 .twitch-player[data-of='2'] {
-  @apply w-full max-h-1/2;
+  @apply w-full h-1/2 max-h-1/2;
 }
 
 /* grid 3 players */
 .twitch-player[data-pos='1'][data-of='3'] {
-  @apply w-full max-h-2/3;
+  @apply w-full h-2/3 max-h-2/3;
 }
 .twitch-player[data-pos='2'][data-of='3'],
 .twitch-player[data-pos='3'][data-of='3'] {
-  @apply w-1/2 max-h-1/3;
+  @apply w-1/2 h-1/3 max-h-1/3;
 }
 
 /* grid 4 players */
 .twitch-player[data-of='4'] {
-  @apply w-1/2 max-h-1/2;
+  @apply w-1/2 h-1/2 max-h-1/2;
 }
 
 /* grid 5 players */
 .twitch-player[data-pos='1'][data-of='5'],
 .twitch-player[data-pos='2'][data-of='5'] {
-  @apply w-1/2 max-h-1/2;
+  @apply w-1/2 h-1/2 max-h-1/2;
 }
 .twitch-player[data-pos='3'][data-of='5'],
 .twitch-player[data-pos='4'][data-of='5'],
 .twitch-player[data-pos='5'][data-of='5'] {
-  @apply w-1/3 max-h-1/2;
+  @apply w-1/3 h-1/2 max-h-1/2;
 }
 
 /* grid 6 players */
 .twitch-player[data-of='6'] {
-  @apply w-1/2 max-h-1/3;
+  @apply w-1/2 h-1/3 max-h-1/3;
 }
 
 /* grid 7 players */
@@ -88,59 +88,59 @@ input[type='text'] {
 .twitch-player[data-pos='2'][data-of='7'],
 .twitch-player[data-pos='3'][data-of='7'],
 .twitch-player[data-pos='4'][data-of='7'] {
-  @apply w-1/2 max-h-1/3;
+  @apply w-1/2 h-1/3 max-h-1/3;
 }
 .twitch-player[data-pos='5'][data-of='7'],
 .twitch-player[data-pos='6'][data-of='7'],
 .twitch-player[data-pos='7'][data-of='7'] {
-  @apply w-1/3 max-h-1/3;
+  @apply w-1/3 h-1/3 max-h-1/3;
 }
 
 /* grid 8 players */
 .twitch-player[data-of='8'] {
-  @apply w-1/2 max-h-1/4;
+  @apply w-1/2 h-1/4 max-h-1/4;
 }
 
 /* grid 9 players */
 .twitch-player[data-of='9'] {
-  @apply w-1/3 max-h-1/3;
+  @apply w-1/3 h-1/3 max-h-1/3;
 }
 
 
 /* spotlight not first players */
 .spotlight > .twitch-player[data-of='2'] {
-  @apply w-full max-h-[20%] self-end;
+  @apply w-full h-[20%] max-h-[20%];
 }
 .spotlight > .twitch-player[data-of='3'] {
-  @apply w-1/2 max-h-[20%] self-end;
+  @apply w-1/2 h-[20%] max-h-[20%];
 }
 .spotlight > .twitch-player[data-of='4'] {
-  @apply w-[33.33%] max-h-[20%] self-end;
+  @apply w-[33.33%] h-[20%] max-h-[20%];
 }
 .spotlight > .twitch-player[data-of='5'] {
-  @apply w-[25%] max-h-[20%] self-end;
+  @apply w-[25%] h-[20%] max-h-[20%];
 }
 .spotlight > .twitch-player[data-of='6'] {
-  @apply w-[20%] max-h-[20%] self-end;
+  @apply w-[20%] h-[20%] max-h-[20%];
 }
 .spotlight > .twitch-player[data-of='7'] {
-  @apply w-[14.28%] max-h-[20%] self-end;
+  @apply w-[14.28%] h-[20%] max-h-[20%];
 }
 .spotlight > .twitch-player[data-of='8'] {
-  @apply w-[12.5%] max-h-[20%] self-end;
+  @apply w-[12.5%] h-[20%] max-h-[20%];
 }
 .spotlight > .twitch-player[data-of='9'] {
-  @apply w-[11.11%] max-h-[20%] self-end;
+  @apply w-[11.11%] h-[20%] max-h-[20%];
 }
 
 /* spotlight first player */
 .spotlight > .twitch-player[data-pos='1'] {
-  @apply w-full max-h-[80%];
+  @apply w-full h-[80%] max-h-[80%];
 }
 
 /* one and only player */
 .twitch-player[data-pos='1'][data-of='1'] {
-  @apply w-full max-h-full self-start;
+  @apply w-full max-h-full;
 }
 
 /* vertical stacking */
