@@ -21,7 +21,9 @@ export default function Home({ params }: { params: { page: string[] } }) {
   const [watching, setWatching] = useState<string[]>([]);
   const [activeChat, setActiveChat] = useState(0);
   const [order, setOrder] = useState<string[]>([]);
-  const [playerLayout, setPlayerLayout] = useState<PlayerLayout>(PlayerLayout.Grid);
+  const [playerLayout, setPlayerLayout] = useState<PlayerLayout>(
+    PlayerLayout.Grid
+  );
 
   useEffect(() => {
     // initial page load, open channels
@@ -74,8 +76,9 @@ export default function Home({ params }: { params: { page: string[] } }) {
           throw new Error(`Validate responded with ${res.status}`);
         }
         console.log('valid token');
-      }).catch((err) => console.log(err));
-  }
+      })
+      .catch((err) => console.log(err));
+  };
 
   const addWatching = (channel: string) => {
     if (watching.includes(channel)) {
@@ -164,7 +167,8 @@ export default function Home({ params }: { params: { page: string[] } }) {
         let users = json.data as User[];
         if (users.length != 1) return;
         setUser(users[0]);
-      }).catch((err) => console.log(err));
+      })
+      .catch((err) => console.log(err));
   };
 
   return (
@@ -179,7 +183,11 @@ export default function Home({ params }: { params: { page: string[] } }) {
               onClick={() => setPlayerLayout(PlayerLayout.Grid)}
               className="flex items-center bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] active:bg-opacity-[0.55] rounded-l-[6px]"
             >
-              <div className={`px-4 ${playerLayout == PlayerLayout.Grid ? 'text-twpurple': ''}`}>
+              <div
+                className={`px-4 ${
+                  playerLayout == PlayerLayout.Grid ? 'text-twpurple' : ''
+                }`}
+              >
                 <Grid />
               </div>
             </button>
@@ -187,7 +195,11 @@ export default function Home({ params }: { params: { page: string[] } }) {
               onClick={() => setPlayerLayout(PlayerLayout.Spotlight)}
               className="flex items-center bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] active:bg-opacity-[0.55] rounded-r-[6px]"
             >
-              <div className={`px-4 border-l border-twbuttonbg/[0.48] ${playerLayout == PlayerLayout.Spotlight ? 'text-twpurple': ''}`}>
+              <div
+                className={`px-4 border-l border-twbuttonbg/[0.48] ${
+                  playerLayout == PlayerLayout.Spotlight ? 'text-twpurple' : ''
+                }`}
+              >
                 <Carousel />
               </div>
             </button>
@@ -230,10 +242,20 @@ export default function Home({ params }: { params: { page: string[] } }) {
       <div className="relative h-full">
         <div className="absolute w-full h-full">
           <div className="flex h-full">
-            {user &&
-              <Following accessToken={accessToken} user={user} watching={watching} addWatching={addWatching} />
-            }
-            <div id="player-container" className={`flex ${playerClass(playerLayout)} basis-auto grow shrink justify-around bg-black mt-[1px] mb-[2px]`}>
+            {user && (
+              <Following
+                accessToken={accessToken}
+                user={user}
+                watching={watching}
+                addWatching={addWatching}
+              />
+            )}
+            <div
+              id="player-container"
+              className={`flex ${playerClass(
+                playerLayout
+              )} basis-auto grow shrink justify-around bg-black mt-[1px] mb-[2px]`}
+            >
               {watching.map((e) => (
                 <Player
                   channel={e}
@@ -305,12 +327,11 @@ function getError(searchParams: URLSearchParams) {
 function playerClass(layout: PlayerLayout) {
   switch (layout) {
     case PlayerLayout.Vertical:
-      return "flex-col flex-nowrap vertical";
+      return 'flex-col flex-nowrap vertical';
     case PlayerLayout.Spotlight:
-      return "flex-row flex-wrap spotlight";
+      return 'flex-row flex-wrap spotlight';
     case PlayerLayout.Grid:
     default:
-      return "flex-row flex-wrap";
+      return 'flex-row flex-wrap';
   }
 }
-

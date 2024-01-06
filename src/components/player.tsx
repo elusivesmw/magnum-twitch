@@ -59,7 +59,11 @@ const Player = ({
             </div>
           </div>
           <iframe
-            className={`w-full h-full border-[3px] ${isActiveChat && total > 1 ? 'border-twpurple' : 'border-black animate-highlight'}`}
+            className={`w-full h-full border-[3px] ${
+              isActiveChat && total > 1
+                ? 'border-twpurple'
+                : 'border-black animate-highlight'
+            }`}
             src={`https://player.twitch.tv/?channel=${channel}&parent=${EMBED_PARENT}`}
             height="720"
             width="1280"

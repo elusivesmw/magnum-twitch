@@ -3,4 +3,3 @@ export enum PlayerLayout {
   Vertical = 1,
   Spotlight = 2,
 }
-

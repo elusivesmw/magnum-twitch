@@ -3,4 +3,3 @@ export function replacePath(path: string[]) {
   //console.log(newPath);
   window.history.replaceState({}, '', newPath);
 }
-

@@ -53,7 +53,8 @@ const Following = ({
       .then((json) => {
         let streams = json.data as Stream[];
         setStreams(streams);
-      }).catch((err) => console.log(err));
+      })
+      .catch((err) => console.log(err));
   };
 
   const updateUsers = () => {
@@ -71,7 +72,8 @@ const Following = ({
       .then((json) => {
         let users = json.data as User[];
         setUsers(users);
-      }).catch((err)  => console.log(err));
+      })
+      .catch((err) => console.log(err));
   };
 
   let [open, setOpen] = useState<boolean>(true);
@@ -110,20 +112,21 @@ const Following = ({
           <Heart />
         </div>
       </div>
-      {streams && streams.map((stream, i) => {
-        let user = users?.find((u) => u.id == stream.user_id);
-        let isWatching = watching?.includes(stream.user_login);
-        return (
-          <StreamRow
-            stream={stream}
-            user={user}
-            open={open}
-            isWatching={isWatching}
-            addWatching={addWatching}
-            key={i}
-          />
-        );
-      })}
+      {streams &&
+        streams.map((stream, i) => {
+          let user = users?.find((u) => u.id == stream.user_id);
+          let isWatching = watching?.includes(stream.user_login);
+          return (
+            <StreamRow
+              stream={stream}
+              user={user}
+              open={open}
+              isWatching={isWatching}
+              addWatching={addWatching}
+              key={i}
+            />
+          );
+        })}
     </div>
   );
 };
@@ -161,7 +164,11 @@ const StreamRow = ({
         } flex justify-between content-center ml-4 grow min-w-0`}
       >
         <div className="flex flex-col shrink overflow-hidden">
-          <p className={`${isWatching ? 'text-twpurple' : 'text-[#dedee3]'} text-base font-semibold leading-tight truncate`}>
+          <p
+            className={`${
+              isWatching ? 'text-twpurple' : 'text-[#dedee3]'
+            } text-base font-semibold leading-tight truncate`}
+          >
             {stream.user_name}
           </p>
           <p className="text-sm text-twfadedtext leading-tight truncate">
@@ -187,6 +194,6 @@ function displayViewerCount(viewerCount: number) {
     return `${rounded}K`;
   }
   return viewerCount;
-};
+}
 
 export default Following;
