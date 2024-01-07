@@ -152,27 +152,27 @@ input[type='text'] {
     @apply w-full !important;
   }
   .twitch-player[data-of='2'] {
-    @apply max-h-1/2 !important;
+    @apply h-1/2 max-h-1/2 !important;
   }
   .twitch-player[data-of='3'] {
-    @apply max-h-1/3 !important;
+    @apply h-1/3 max-h-1/3 !important;
   }
   .twitch-player[data-of='4'] {
-    @apply max-h-1/4 !important;
+    @apply h-1/4 max-h-1/4 !important;
   }
   .twitch-player[data-of='5'] {
-    @apply max-h-[20%] !important;
+    @apply h-[20%] max-h-[20%] !important;
   }
   .twitch-player[data-of='6'] {
-    @apply max-h-[16.66%] !important;
+    @apply h-[16.66] max-h-[16.66%] !important;
   }
   .twitch-player[data-of='7'] {
-    @apply max-h-[14.28%] !important;
+    @apply h-[14.28%] max-h-[14.28%] !important;
   }
   .twitch-player[data-of='8'] {
-    @apply max-h-[12.5%] !important;
+    @apply h-[12.5%] max-h-[12.5%] !important;
   }
   .twitch-player[data-of='9'] {
-    @apply max-h-[11.11%] !important;
+    @apply h-[11.11%] max-h-[11.11%] !important;
   }
 }
