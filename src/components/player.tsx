@@ -22,7 +22,7 @@ const Player = ({
     <>
       <div
         id={`twitch-embed-${channel}`}
-        className="twitch-player relative select-none group"
+        className="twitch-player relative select-none group transition-all duration-200"
         onAnimationEnd={stopAnimation}
         data-pos={order + 1}
         data-of={total}
