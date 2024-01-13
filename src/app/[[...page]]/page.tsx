@@ -176,7 +176,10 @@ export default function Home({ params }: { params: { page: string[] } }) {
       <header className="flex h-20 grow-0 shrink-0 bg-chatpanel z-20 header-shadow justify-between">
         <div className="flex">
           <div className="p-2">
-            <Twitch />
+            <a href="/">
+              {/* temporarily use this logo to reset all players */}
+              <Twitch />
+            </a>
           </div>
           <div className="flex h-full py-4 px-2">
             <button
