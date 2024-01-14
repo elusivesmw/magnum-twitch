@@ -1,6 +1,7 @@
 import { Carousel, Grid, Plus, Twitch } from '@/components/icons';
 import { PlayerLayout } from '@/types/state';
 import { User } from '@/types/twitch';
+import { FormEvent } from 'react';
 
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -18,10 +19,13 @@ export default function Header({
   playerLayout: PlayerLayout;
   setPlayerLayout: (layout: PlayerLayout) => void;
 }) {
-  const addAnyChannel = () => {
-    const e = document.getElementById('header-search') as HTMLInputElement;
-    let channel = e.value;
-    e.value = '';
+  const addAnyChannel = (e: FormEvent) => {
+    e.preventDefault();
+    const textbox = document.getElementById(
+      'header-search'
+    ) as HTMLInputElement;
+    let channel = textbox.value;
+    textbox.value = '';
     if (channel.length <= 0) return;
     addWatching(channel);
   };
@@ -63,19 +67,21 @@ export default function Header({
         </div>
       </div>
       <div className="flex w-[40rem] h-[3.6rem] self-center">
-        <input
-          type="text"
-          id="header-search"
-          className="w-full h-full rounded-tl-[6px] rounded-bl-[6px]"
-        />
-        <button
-          onClick={addAnyChannel}
-          className="h-full px-2 bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] active:bg-opacity-[0.55] rounded-tr-[6px] rounded-br-[6px]"
-        >
-          <div className="h-[30px]">
-            <Plus />
-          </div>
-        </button>
+        <form onSubmit={addAnyChannel} className="flex w-full h-full">
+          <input
+            type="text"
+            id="header-search"
+            className="w-full h-full rounded-tl-[6px] rounded-bl-[6px]"
+          />
+          <button
+            type="submit"
+            className="h-full px-2 bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] active:bg-opacity-[0.55] rounded-tr-[6px] rounded-br-[6px]"
+          >
+            <div className="h-[30px]">
+              <Plus />
+            </div>
+          </button>
+        </form>
       </div>
       <div className="flex p-4">
         {user && (
