@@ -14,7 +14,7 @@ export default function Header({
   setPlayerLayout,
 }: {
   accessToken: string | undefined;
-  user: User;
+  user: User | undefined;
   addWatching: (channel: string) => void;
   playerLayout: PlayerLayout;
   setPlayerLayout: (layout: PlayerLayout) => void;
