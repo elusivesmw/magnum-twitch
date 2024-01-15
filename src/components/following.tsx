@@ -5,6 +5,7 @@ import { Stream, User } from '@/types/twitch';
 import { CollapseLeft, CollapseRight, Heart } from './icons';
 import { getHeaders } from '@/lib/auth';
 import { replacePath } from '@/lib/route';
+import Image from 'next/image';
 
 const GAME_ID = 1229;
 const POLL_INTERVAL = 60 * 1000;
@@ -28,21 +29,25 @@ const Following = ({
       replacePath(watching);
     }
 
-    updateStreams();
+    updateStreams(accessToken, user);
     const intervalId = setInterval(() => {
-      updateStreams();
+      updateStreams(accessToken, user);
     }, POLL_INTERVAL);
 
     return () => clearInterval(intervalId);
-  }, [accessToken]);
+  }, [accessToken, user, watching]);
 
   let [users, setUsers] = useState<User[] | undefined>();
   useEffect(() => {
-    updateUsers();
-  }, [streams]);
+    updateUsers(accessToken, streams);
+  }, [accessToken, streams]);
 
-  const updateStreams = () => {
+  const updateStreams = (
+    accessToken: string | undefined,
+    user: User | undefined
+  ) => {
     if (!accessToken) return;
+    if (!user) return;
     const httpOptions = getHeaders(accessToken);
     fetch(
       //`https://api.twitch.tv/helix/streams/?game_id=${GAME_ID}&first=100`,
@@ -57,7 +62,10 @@ const Following = ({
       .catch((err) => console.log(err));
   };
 
-  const updateUsers = () => {
+  const updateUsers = (
+    accessToken: string | undefined,
+    streams: Stream[] | undefined
+  ) => {
     if (!accessToken) return;
     if (!streams) return;
     // no online streams to get user data for
@@ -151,7 +159,7 @@ const StreamRow = ({
     >
       <div className="basis-[30px] grow-0 shrink-0 self-center">
         {user && (
-          <img
+          <Image
             src={user.profile_image_url}
             alt={`${stream.user_name} profile`}
             className="w-full max-w-full rounded-full object-cover"

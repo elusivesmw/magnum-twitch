@@ -1,6 +1,7 @@
 import { Carousel, Grid, Plus, Twitch } from '@/components/icons';
 import { PlayerLayout } from '@/types/state';
 import { User } from '@/types/twitch';
+import Image from 'next/image';
 import { FormEvent } from 'react';
 
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
@@ -86,8 +87,9 @@ export default function Header({
       <div className="flex p-4">
         {user && (
           <div className="w-[30px]">
-            <img
+            <Image
               src={user.profile_image_url}
+              alt={`${user.login} profile`}
               className="w-full max-w-full rounded-full object-cover"
             />
           </div>

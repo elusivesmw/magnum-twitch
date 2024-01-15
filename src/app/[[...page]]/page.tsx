@@ -37,7 +37,7 @@ export default function Home({ params }: { params: { page: string[] } }) {
 
     // update client path
     replacePath(uniqueWatching);
-  }, []);
+  }, [params.page]);
 
   const [accessToken, setAccessToken] = useState<string | undefined>();
   useEffect(() => {
@@ -49,23 +49,23 @@ export default function Home({ params }: { params: { page: string[] } }) {
     if (!token) return;
 
     setAccessToken(token);
-  }, []);
+  }, [order, searchParams]);
 
   const [user, setUser] = useState<User | undefined>();
   useEffect(() => {
-    updateUser();
+    updateUser(accessToken);
   }, [accessToken]);
 
   useEffect(() => {
-    validateToken();
+    validateToken(accessToken);
     const intervalId = setInterval(() => {
-      validateToken();
+      validateToken(accessToken);
     }, VALIDATE_INTERVAL);
 
     return () => clearInterval(intervalId);
   }, [accessToken]);
 
-  const validateToken = () => {
+  const validateToken = (accessToken: string | undefined) => {
     if (!accessToken) return;
     const httpOptions = getOAuthHeaders(accessToken);
     fetch('https://id.twitch.tv/oauth2/validate', httpOptions)
@@ -150,7 +150,7 @@ export default function Home({ params }: { params: { page: string[] } }) {
     replacePath(newOrder);
   };
 
-  const updateUser = () => {
+  const updateUser = (accessToken: string | undefined) => {
     if (!accessToken) return;
     const httpOptions = getHeaders(accessToken);
     fetch('https://api.twitch.tv/helix/users', httpOptions)
