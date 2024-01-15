@@ -91,6 +91,8 @@ export default function Header({
               src={user.profile_image_url}
               alt={`${user.login} profile`}
               className="w-full max-w-full rounded-full object-cover"
+              width={30}
+              height={30}
             />
           </div>
         )}

@@ -163,6 +163,8 @@ const StreamRow = ({
             src={user.profile_image_url}
             alt={`${stream.user_name} profile`}
             className="w-full max-w-full rounded-full object-cover"
+            width={30}
+            height={30}
           />
         )}
       </div>
