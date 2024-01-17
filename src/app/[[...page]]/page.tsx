@@ -10,6 +10,7 @@ import { getHeaders, getOAuthHeaders } from '@/lib/auth';
 import { replacePath } from '@/lib/route';
 import { PlayerLayout } from '@/types/state';
 import Header from '@/components/header';
+import { FollowingPopup } from '@/components/popups';
 
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -212,6 +213,7 @@ export default function Home({ params }: { params: { page: string[] } }) {
           </div>
         </div>
       </div>
+      <FollowingPopup />
     </main>
   );
 }

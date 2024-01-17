@@ -6,6 +6,7 @@ import { CollapseLeft, CollapseRight, Heart } from './icons';
 import { getHeaders } from '@/lib/auth';
 import { replacePath } from '@/lib/route';
 import Image from 'next/image';
+import { FollowingPopup } from './popups';
 
 const GAME_ID = 1229;
 const POLL_INTERVAL = 60 * 1000;
@@ -89,6 +90,10 @@ const Following = ({
     setOpen(!open);
   };
 
+  let [showModal, setShowModal] = useState<boolean>(false);
+  const toggleModal = () => {
+    setShowModal(!showModal);
+  };
   return (
     <div
       className={`flex flex-col bg-sidepanel ${
@@ -125,14 +130,18 @@ const Following = ({
           let user = users?.find((u) => u.id == stream.user_id);
           let isWatching = watching?.includes(stream.user_login);
           return (
-            <StreamRow
-              stream={stream}
-              user={user}
-              open={open}
-              isWatching={isWatching}
-              addWatching={addWatching}
-              key={i}
-            />
+            <>
+              <StreamRow
+                stream={stream}
+                user={user}
+                open={open}
+                isWatching={isWatching}
+                addWatching={addWatching}
+                key={i}
+              />
+              <button onClick={toggleModal}>Modal</button>
+              <FollowingPopup show={showModal} />
+            </>
           );
         })}
     </div>
