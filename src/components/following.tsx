@@ -91,9 +91,15 @@ const Following = ({
   };
 
   let [showModal, setShowModal] = useState<boolean>(false);
-  const toggleModal = () => {
-    setShowModal(!showModal);
+  let [modalStream, setModalStream] = useState<string>('');
+  const toggleModal = (stream: string) => {
+    console.log(stream);
+    if (!showModal || stream == modalStream) {
+      setShowModal(!showModal);
+    }
+    setModalStream(stream);
   };
+
   return (
     <div
       className={`flex flex-col bg-sidepanel ${
@@ -139,11 +145,13 @@ const Following = ({
                 addWatching={addWatching}
                 key={i}
               />
-              <button onClick={toggleModal}>Modal</button>
-              <FollowingPopup show={showModal} />
+              <button onClick={() => toggleModal(stream.user_login)}>
+                Modal
+              </button>
             </>
           );
         })}
+      <FollowingPopup show={showModal} stream={modalStream} />
     </div>
   );
 };
@@ -163,6 +171,7 @@ const StreamRow = ({
 }) => {
   return (
     <div
+      id={`following-stream-${stream.user_login}`}
       className="flex max-w-full h-[4.2rem] px-4 py-2 cursor-pointer hover:bg-sidepanelhover"
       onClick={() => addWatching(stream.user_login)}
     >
