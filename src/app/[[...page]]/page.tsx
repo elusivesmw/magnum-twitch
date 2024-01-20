@@ -73,9 +73,9 @@ export default function Home({ params }: { params: { page: string[] } }) {
         if (!res.ok) {
           // token no good, clear
           setAccessToken(undefined);
-          throw new Error(`Validate responded with ${res.status}`);
+          return Promise.reject(res);
         }
-        console.log('valid token');
+        console.log('Valid token');
       })
       .catch((err) => console.log(err));
   };
@@ -154,7 +154,10 @@ export default function Home({ params }: { params: { page: string[] } }) {
     if (!accessToken) return;
     const httpOptions = getHeaders(accessToken);
     fetch('https://api.twitch.tv/helix/users', httpOptions)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) return Promise.reject(res);
+        return res.json();
+      })
       .then((json) => {
         let users = json.data as User[];
         if (users.length != 1) return;
@@ -217,20 +220,18 @@ function move(order: string[], from: number, to: number) {
   order.splice(to, 0, order.splice(from, 1)[0]);
 }
 
-function getToken() {
-  // try get from storage
-  let token = localStorage.getItem(LS_ACCESS_TOKEN);
-  if (token) return token;
-
-  // else get from hash
+function getToken(): string | null {
+  // get from hash
   let hash = getHashValues();
-  token = hash?.access_token;
-  if (!token) return;
+  let token = hash?.access_token;
+  if (token) {
+    // save token
+    localStorage.setItem(LS_ACCESS_TOKEN, token);
+    return token;
+  }
 
-  // save token
-  // TODO: handle expiry
-  localStorage.setItem(LS_ACCESS_TOKEN, token);
-
+  // else try get from storage
+  token = localStorage.getItem(LS_ACCESS_TOKEN);
   return token;
 }
 
