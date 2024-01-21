@@ -1,12 +1,12 @@
 'use client';
 
-import { MouseEventHandler, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Stream, User } from '@/types/twitch';
 import { CollapseLeft, CollapseRight, Heart } from './icons';
 import { getHeaders } from '@/lib/auth';
 import { replacePath } from '@/lib/route';
 import Image from 'next/image';
-import { FollowingPopup } from './popups';
+import { FollowingTooltip } from './tooltip';
 
 const GAME_ID = 1229;
 const POLL_INTERVAL = 60 * 1000;
@@ -92,7 +92,7 @@ const Following = ({
 
   let [showModal, setShowModal] = useState<boolean>(false);
   let [modalStream, setModalStream] = useState<Stream>();
-  const showPopup = (
+  const showTooltip = (
     e: React.MouseEvent<HTMLDivElement>,
     stream: Stream | undefined
   ) => {
@@ -151,12 +151,12 @@ const Following = ({
               open={open}
               isWatching={isWatching}
               addWatching={addWatching}
-              showPopup={showPopup}
+              showTooltip={showTooltip}
               key={i}
             />
           );
         })}
-      {showModal && <FollowingPopup stream={modalStream} />}
+      {showModal && <FollowingTooltip stream={modalStream} />}
     </div>
   );
 };
@@ -167,14 +167,14 @@ const StreamRow = ({
   open,
   isWatching,
   addWatching,
-  showPopup,
+  showTooltip: showTooltip,
 }: {
   stream: Stream;
   user: User | undefined;
   open: boolean;
   isWatching: boolean;
   addWatching: (stream: string) => void;
-  showPopup: (
+  showTooltip: (
     e: React.MouseEvent<HTMLDivElement>,
     stream: Stream | undefined
   ) => void;
@@ -185,8 +185,8 @@ const StreamRow = ({
       data-stream={user?.login}
       className="flex max-w-full h-[4.2rem] px-4 py-2 cursor-pointer hover:bg-sidepanelhover"
       onClick={() => addWatching(stream.user_login)}
-      onMouseOver={(e) => showPopup(e, stream)}
-      onMouseOut={(e) => showPopup(e, stream)}
+      onMouseOver={(e) => showTooltip(e, stream)}
+      onMouseOut={(e) => showTooltip(e, stream)}
     >
       <div className="basis-[30px] grow-0 shrink-0 self-center">
         {user && (

@@ -2,7 +2,11 @@ import { Stream } from '@/types/twitch';
 import Image from 'next/image';
 import { createPortal } from 'react-dom';
 
-export const FollowingPopup = ({ stream }: { stream: Stream | undefined }) => {
+export const FollowingTooltip = ({
+  stream,
+}: {
+  stream: Stream | undefined;
+}) => {
   if (!stream) return;
   let target = document.getElementById(`following-stream-${stream.user_login}`);
   let rect = target?.getBoundingClientRect();
@@ -39,7 +43,7 @@ export const FollowingPopup = ({ stream }: { stream: Stream | undefined }) => {
         src={streamThumbnail}
         width={IMAGE_WIDTH}
         height={IMAGE_HEIGHT}
-        alt=""
+        alt={`${stream.user_name} stream thumbnail`}
       />
     </div>,
     document.body
