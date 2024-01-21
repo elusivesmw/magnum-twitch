@@ -91,10 +91,10 @@ const Following = ({
   };
 
   let [showModal, setShowModal] = useState<boolean>(false);
-  let [modalStream, setModalStream] = useState<string>('');
+  let [modalStream, setModalStream] = useState<Stream>();
   const showPopup = (
     e: React.MouseEvent<HTMLDivElement>,
-    stream: string | undefined
+    stream: Stream | undefined
   ) => {
     let target = e.target as HTMLDivElement;
     if (!target) return;
@@ -176,7 +176,7 @@ const StreamRow = ({
   addWatching: (stream: string) => void;
   showPopup: (
     e: React.MouseEvent<HTMLDivElement>,
-    stream: string | undefined
+    stream: Stream | undefined
   ) => void;
 }) => {
   return (
@@ -185,8 +185,8 @@ const StreamRow = ({
       data-stream={user?.login}
       className="flex max-w-full h-[4.2rem] px-4 py-2 cursor-pointer hover:bg-sidepanelhover"
       onClick={() => addWatching(stream.user_login)}
-      onMouseOver={(e) => showPopup(e, user?.login)}
-      onMouseOut={(e) => showPopup(e, user?.login)}
+      onMouseOver={(e) => showPopup(e, stream)}
+      onMouseOut={(e) => showPopup(e, stream)}
     >
       <div className="basis-[30px] grow-0 shrink-0 self-center">
         {user && (

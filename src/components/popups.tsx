@@ -1,16 +1,17 @@
+import { Stream } from '@/types/twitch';
 import { createPortal } from 'react-dom';
 
-export const FollowingPopup = ({ stream }: { stream: string }) => {
-  let target = document.getElementById(`following-stream-${stream}`);
+export const FollowingPopup = ({ stream }: { stream: Stream | undefined }) => {
+  if (!stream) return;
+  let target = document.getElementById(`following-stream-${stream.user_login}`);
   let rect = target?.getBoundingClientRect();
   if (!rect) return;
-  console.log(rect);
   return createPortal(
     <div
-      className="absolute top-20 left-20 z-50 bg-red-500 text-black p-2"
-      style={{ top: rect.top, left: rect.x + rect.width + 20 }}
+      className="absolute top-20 left-20 w-96 z-50 bg-sidepanel text-white px-4 py-2 rounded-xl"
+      style={{ top: rect.top, left: rect.x + rect.width + 15 }}
     >
-      portal
+      {stream.title}
     </div>,
     document.body
   );
