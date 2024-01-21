@@ -92,19 +92,12 @@ const Following = ({
 
   let [showModal, setShowModal] = useState<boolean>(false);
   let [modalStream, setModalStream] = useState<string>('');
-  const toggleModal = (stream: string) => {
-    console.log(stream);
-    if (!showModal || stream == modalStream) {
-      setShowModal(!showModal);
-    }
-    setModalStream(stream);
-  };
-
-  const showPopup = (e: React.MouseEvent<HTMLDivElement>) => {
-    console.log('e', e);
+  const showPopup = (
+    e: React.MouseEvent<HTMLDivElement>,
+    stream: string | undefined
+  ) => {
     let target = e.target as HTMLDivElement;
     if (!target) return;
-    let stream = target.dataset.stream;
     if (!stream) return;
 
     e.stopPropagation();
@@ -152,20 +145,15 @@ const Following = ({
           let user = users?.find((u) => u.id == stream.user_id);
           let isWatching = watching?.includes(stream.user_login);
           return (
-            <>
-              <StreamRow
-                stream={stream}
-                user={user}
-                open={open}
-                isWatching={isWatching}
-                addWatching={addWatching}
-                showPopup={showPopup}
-                key={i}
-              />
-              <button onClick={() => toggleModal(stream.user_login)}>
-                Modal
-              </button>
-            </>
+            <StreamRow
+              stream={stream}
+              user={user}
+              open={open}
+              isWatching={isWatching}
+              addWatching={addWatching}
+              showPopup={showPopup}
+              key={i}
+            />
           );
         })}
       {showModal && <FollowingPopup stream={modalStream} />}
@@ -186,7 +174,10 @@ const StreamRow = ({
   open: boolean;
   isWatching: boolean;
   addWatching: (stream: string) => void;
-  showPopup: MouseEventHandler<HTMLDivElement>;
+  showPopup: (
+    e: React.MouseEvent<HTMLDivElement>,
+    stream: string | undefined
+  ) => void;
 }) => {
   return (
     <div
@@ -194,8 +185,8 @@ const StreamRow = ({
       data-stream={user?.login}
       className="flex max-w-full h-[4.2rem] px-4 py-2 cursor-pointer hover:bg-sidepanelhover"
       onClick={() => addWatching(stream.user_login)}
-      onMouseOver={showPopup}
-      onMouseOut={showPopup}
+      onMouseOver={(e) => showPopup(e, user?.login)}
+      onMouseOut={(e) => showPopup(e, user?.login)}
     >
       <div className="basis-[30px] grow-0 shrink-0 self-center">
         {user && (
