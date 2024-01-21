@@ -213,7 +213,6 @@ export default function Home({ params }: { params: { page: string[] } }) {
           </div>
         </div>
       </div>
-      <FollowingPopup />
     </main>
   );
 }
