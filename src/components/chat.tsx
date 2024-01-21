@@ -26,7 +26,6 @@ const MultiChat = ({
   }, [activeChat]);
 
   const next = () => {
-    console.log('next');
     var i = visibleIndex + 1;
     if (i > channels.length - 1) i = 0;
     setVisibleIndex(i);
@@ -34,7 +33,6 @@ const MultiChat = ({
   };
 
   const prev = () => {
-    console.log('prev');
     var i = visibleIndex - 1;
     if (i < 0) i = channels.length - 1;
     setVisibleIndex(i);
@@ -53,7 +51,7 @@ const MultiChat = ({
           onClick={prev}
           className={`${
             open ? 'block' : 'hidden'
-          } h-[20px] px-1 cursor-pointer select-none`}
+          } h-[20px] px-2 cursor-pointer select-none hover:bg-twbuttonbg hover:bg-opacity-[0.48]`}
         >
           <ArrowLeft />
         </div>
@@ -68,7 +66,7 @@ const MultiChat = ({
           onClick={next}
           className={`${
             open ? 'block' : 'hidden'
-          } h-[20px] px-1 cursor-pointer select-none`}
+          } h-[20px] px-2 cursor-pointer select-none hover:bg-twbuttonbg hover:bg-opacity-[0.48]`}
         >
           <ArrowRight />
         </div>
