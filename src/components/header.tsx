@@ -76,7 +76,7 @@ export default function Header({
           />
           <button
             type="submit"
-            className="h-full px-2 bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] active:bg-opacity-[0.55] rounded-tr-[6px] rounded-br-[6px]"
+            className="h-full w-auto px-2 bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] active:bg-opacity-[0.55] rounded-tr-[6px] rounded-br-[6px]"
           >
             <div className="h-[30px]">
               <Plus />
