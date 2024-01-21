@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { MouseEventHandler, useEffect, useState } from 'react';
 import { Stream, User } from '@/types/twitch';
 import { CollapseLeft, CollapseRight, Heart } from './icons';
 import { getHeaders } from '@/lib/auth';
@@ -100,6 +100,22 @@ const Following = ({
     setModalStream(stream);
   };
 
+  const showPopup = (e: React.MouseEvent<HTMLDivElement>) => {
+    console.log('e', e);
+    let target = e.target as HTMLDivElement;
+    if (!target) return;
+    let stream = target.dataset.stream;
+    if (!stream) return;
+
+    e.stopPropagation();
+    setModalStream(stream);
+    if (e.type == 'mouseover') {
+      setShowModal(true);
+    } else {
+      setShowModal(false);
+    }
+  };
+
   return (
     <div
       className={`flex flex-col bg-sidepanel ${
@@ -143,6 +159,7 @@ const Following = ({
                 open={open}
                 isWatching={isWatching}
                 addWatching={addWatching}
+                showPopup={showPopup}
                 key={i}
               />
               <button onClick={() => toggleModal(stream.user_login)}>
@@ -151,7 +168,7 @@ const Following = ({
             </>
           );
         })}
-      <FollowingPopup show={showModal} stream={modalStream} />
+      {showModal && <FollowingPopup stream={modalStream} />}
     </div>
   );
 };
@@ -162,18 +179,23 @@ const StreamRow = ({
   open,
   isWatching,
   addWatching,
+  showPopup,
 }: {
   stream: Stream;
   user: User | undefined;
   open: boolean;
   isWatching: boolean;
   addWatching: (stream: string) => void;
+  showPopup: MouseEventHandler<HTMLDivElement>;
 }) => {
   return (
     <div
       id={`following-stream-${stream.user_login}`}
+      data-stream={user?.login}
       className="flex max-w-full h-[4.2rem] px-4 py-2 cursor-pointer hover:bg-sidepanelhover"
       onClick={() => addWatching(stream.user_login)}
+      onMouseOver={showPopup}
+      onMouseOut={showPopup}
     >
       <div className="basis-[30px] grow-0 shrink-0 self-center">
         {user && (
