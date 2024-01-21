@@ -167,7 +167,7 @@ export default function Home({ params }: { params: { page: string[] } }) {
   };
 
   return (
-    <main className="flex flex-col h-screen">
+    <div id="root" className="flex flex-col h-screen">
       <Header
         accessToken={accessToken}
         user={user}
@@ -175,44 +175,40 @@ export default function Home({ params }: { params: { page: string[] } }) {
         playerLayout={playerLayout}
         setPlayerLayout={setPlayerLayout}
       />
-      <div className="relative h-full">
-        <div className="absolute w-full h-full">
-          <div className="flex h-full">
-            {user && (
-              <Following
-                accessToken={accessToken}
-                user={user}
-                watching={watching}
-                addWatching={addWatching}
-              />
-            )}
-            <div
-              id="player-container"
-              className={`flex ${playerClass(
-                playerLayout
-              )} basis-auto grow shrink justify-around bg-black mt-[1px] mb-[2px]`}
-            >
-              {watching.map((e) => (
-                <Player
-                  channel={e}
-                  order={order.findIndex((o) => o == e)}
-                  total={watching.length}
-                  isActiveChat={watching[activeChat] == e}
-                  reorderWatching={reorderWatching}
-                  removeWatching={removeWatching}
-                  key={`player-key-${e}`}
-                />
-              ))}
-            </div>
-            <MultiChat
-              channels={watching}
-              activeChat={activeChat}
-              updateActiveChat={setActiveChat}
+      <main className="relative flex h-full">
+        {user && (
+          <Following
+            accessToken={accessToken}
+            user={user}
+            watching={watching}
+            addWatching={addWatching}
+          />
+        )}
+        <div
+          id="player-container"
+          className={`flex ${playerClass(
+            playerLayout
+          )} basis-auto grow shrink justify-around bg-black mt-[1px] mb-[2px]`}
+        >
+          {watching.map((e) => (
+            <Player
+              channel={e}
+              order={order.findIndex((o) => o == e)}
+              total={watching.length}
+              isActiveChat={watching[activeChat] == e}
+              reorderWatching={reorderWatching}
+              removeWatching={removeWatching}
+              key={`player-key-${e}`}
             />
-          </div>
+          ))}
         </div>
-      </div>
-    </main>
+        <MultiChat
+          channels={watching}
+          activeChat={activeChat}
+          updateActiveChat={setActiveChat}
+        />
+      </main>
+    </div>
   );
 }
 
