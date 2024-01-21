@@ -37,7 +37,11 @@ body {
     rgba(0, 0, 0, 0.9) 0px 1px 2px 0px,
     rgba(0, 0, 0, 0.9) 0px 0px 2px 0px;
 }
-
+.user-menu-shadow {
+  box-shadow:
+    rgba(0, 0, 0, 0.4) 0px 4px 8px 0px,
+    rgba(0, 0, 0, 0.4) 0px 0px 4px 0px;
+}
 input[type='text'] {
   @apply bg-chatpanel border-none outline-none px-4 py-2
          shadow-[rgba(222,222,227,0.4)_0_0_0_1px_inset]

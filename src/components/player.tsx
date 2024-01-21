@@ -32,26 +32,26 @@ const Player = ({
           <div className="absolute top-1 right-1 hidden group-hover:block">
             <div className="flex gap-1">
               <div
-                className="h-[20px] cursor-pointer rounded bg-black bg-opacity-50 z-50"
+                className="h-[20px] cursor-pointer rounded bg-black bg-opacity-50 z-10"
                 onClick={() => reorderWatching(channel, 0, false)}
               >
                 <Spotlight />
               </div>
               <div
-                className="h-[20px] cursor-pointer rounded bg-black bg-opacity-50 z-50"
+                className="h-[20px] cursor-pointer rounded bg-black bg-opacity-50 z-10"
                 onClick={() => reorderWatching(channel, -1, true)}
               >
                 <ArrowUp />
               </div>
               <div
-                className="h-[20px] cursor-pointer rounded bg-black bg-opacity-50 z-50"
+                className="h-[20px] cursor-pointer rounded bg-black bg-opacity-50 z-10"
                 onClick={() => reorderWatching(channel, 1, true)}
               >
                 <ArrowDown />
               </div>
 
               <div
-                className="h-[20px] cursor-pointer rounded bg-black bg-opacity-50 z-50"
+                className="h-[20px] cursor-pointer rounded bg-black bg-opacity-50 z-10"
                 onClick={() => removeWatching(channel)}
               >
                 <CloseX />

@@ -31,7 +31,7 @@ export const FollowingTooltip = ({
 
   return createPortal(
     <div
-      className="absolute top-20 left-20 w-96 z-50 bg-sidepanel text-white px-4 py-2 rounded-xl"
+      className="absolute top-20 left-20 w-96 z-50 bg-sidepanel text-white px-4 pt-2 pb-4 rounded-xl"
       style={{
         top: tooltipTop,
         bottom: tooltipBottom,

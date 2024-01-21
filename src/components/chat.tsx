@@ -73,7 +73,7 @@ const MultiChat = ({
         <div
           className={`${
             open ? 'left-2' : 'left-[-30px]'
-          } absolute bottom-[-3em] z-50`}
+          } absolute bottom-[-3em] z-10`}
         >
           <button
             onClick={toggleOpen}
