@@ -4,8 +4,10 @@ import { createPortal } from 'react-dom';
 
 export const FollowingTooltip = ({
   stream,
+  open,
 }: {
   stream: Stream | undefined;
+  open: boolean;
 }) => {
   if (!stream) return;
   let target = document.getElementById(`following-stream-${stream.user_login}`);
@@ -38,6 +40,16 @@ export const FollowingTooltip = ({
         left: rect.x + rect.width + 15,
       }}
     >
+      {!open && (
+        <>
+          <div className="text-[#dedee3] text-base font-semibold leading-tight truncate">
+            {stream.user_name}
+          </div>
+          <div className="text-sm text-twfadedtext leading-tight truncate mb-2">
+            {stream.game_name}
+          </div>
+        </>
+      )}
       <span className="block mb-2">{stream.title}</span>
       <Image
         src={streamThumbnail}

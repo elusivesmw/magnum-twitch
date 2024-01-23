@@ -156,7 +156,7 @@ const Following = ({
             />
           );
         })}
-      {showModal && <FollowingTooltip stream={modalStream} />}
+      {showModal && <FollowingTooltip stream={modalStream} open={open} />}
     </div>
   );
 };
