@@ -16,11 +16,13 @@ const Following = ({
   user,
   watching,
   addWatching,
+  removeWatching,
 }: {
   accessToken: string | undefined;
   user: User;
   watching: string[];
   addWatching: (stream: string) => void;
+  removeWatching: (stream: string) => void;
 }) => {
   let [streams, setStreams] = useState<Stream[] | undefined>();
   useEffect(() => {
@@ -151,6 +153,7 @@ const Following = ({
               open={open}
               isWatching={isWatching}
               addWatching={addWatching}
+              removeWatching={removeWatching}
               showTooltip={showTooltip}
               key={i}
             />
@@ -167,6 +170,7 @@ const StreamRow = ({
   open,
   isWatching,
   addWatching,
+  removeWatching,
   showTooltip: showTooltip,
 }: {
   stream: Stream;
@@ -174,17 +178,26 @@ const StreamRow = ({
   open: boolean;
   isWatching: boolean;
   addWatching: (stream: string) => void;
+  removeWatching: (stream: string) => void;
   showTooltip: (
     e: React.MouseEvent<HTMLDivElement>,
     stream: Stream | undefined
   ) => void;
 }) => {
+  const updateWatching = (stream: string) => {
+    if (!isWatching) {
+      addWatching(stream);
+    } else {
+      removeWatching(stream);
+    }
+  };
+
   return (
     <div
       id={`following-stream-${stream.user_login}`}
       data-stream={user?.login}
       className="flex max-w-full h-[4.2rem] px-4 py-2 cursor-pointer hover:bg-sidepanelhover"
-      onClick={() => addWatching(stream.user_login)}
+      onClick={() => updateWatching(stream.user_login)}
       onMouseOver={(e) => showTooltip(e, stream)}
       onMouseOut={(e) => showTooltip(e, stream)}
     >

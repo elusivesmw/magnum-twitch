@@ -182,6 +182,7 @@ export default function Home({ params }: { params: { page: string[] } }) {
             user={user}
             watching={watching}
             addWatching={addWatching}
+            removeWatching={removeWatching}
           />
         )}
         <div
