@@ -5,7 +5,7 @@ import Player from '@/components/player';
 import MultiChat from '@/components/chat';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { User } from '@/types/twitch';
+import { Stream, User } from '@/types/twitch';
 import { getHeaders, getOAuthHeaders } from '@/lib/auth';
 import { replacePath } from '@/lib/route';
 import { PlayerLayout } from '@/types/state';
@@ -15,6 +15,7 @@ const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 const LS_ACCESS_TOKEN = 'ACCESS_TOKEN';
 const VALIDATE_INTERVAL = 60 * 60 * 1000;
+const LIVE_CHECK_INTERVAL = 30 * 1000;
 
 export default function Home({ params }: { params: { page: string[] } }) {
   const searchParams = useSearchParams();
@@ -24,7 +25,6 @@ export default function Home({ params }: { params: { page: string[] } }) {
   const [playerLayout, setPlayerLayout] = useState<PlayerLayout>(
     PlayerLayout.Grid
   );
-
   useEffect(() => {
     // initial page load, open channels
     const serverPath = params.page;
@@ -76,6 +76,32 @@ export default function Home({ params }: { params: { page: string[] } }) {
           return Promise.reject(res);
         }
         console.log('Valid token');
+      })
+      .catch((err) => console.log(err));
+  };
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      liveCheckStreams(accessToken);
+    }, LIVE_CHECK_INTERVAL);
+
+    return () => clearInterval(intervalId);
+  }, [accessToken, watching]);
+
+  const liveCheckStreams = (accessToken: string | undefined) => {
+    if (!accessToken) return;
+    if (watching.length == 0) return;
+
+    const httpOptions = getHeaders(accessToken);
+    let logins_param = 'user_login=' + watching.join('&user_login=');
+    fetch(`https://api.twitch.tv/helix/streams?${logins_param}`, httpOptions)
+      .then((res) => res.json())
+      .then((json) => {
+        let streams = json.data as Stream[];
+        let s = streams.map((e) => e.user_login);
+        console.log(s);
+        setWatching(s);
+        // TODO: handle chats
       })
       .catch((err) => console.log(err));
   };
