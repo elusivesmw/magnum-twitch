@@ -99,11 +99,34 @@ export default function Home({ params }: { params: { page: string[] } }) {
       .then((json) => {
         let streams = json.data as Stream[];
         let s = streams.map((e) => e.user_login);
-        console.log(s);
-        setWatching(s);
-        // TODO: handle chats
+        reconcileStreams(s);
       })
       .catch((err) => console.log(err));
+  };
+
+  const reconcileStreams = (stillLive: string[]) => {
+    // remove from watching
+    setWatching(stillLive);
+
+    // remove from order
+    let newOrder: string[] = [];
+    let activeChatRemoved = false;
+    for (let o of order) {
+      if (stillLive.findIndex((e) => e == o) < 0) {
+        activeChatRemoved = true;
+        continue;
+      }
+      // found - add
+      newOrder = [...newOrder, o];
+    }
+    setOrder(newOrder);
+
+    // update client path
+    replacePath(newOrder);
+
+    if (activeChatRemoved) {
+      setActiveChat(0);
+    }
   };
 
   const addWatching = (channel: string) => {
