@@ -110,23 +110,23 @@ export default function Home({ params }: { params: { page: string[] } }) {
 
     // remove from order
     let newOrder: string[] = [];
-    let activeChatRemoved = false;
-    for (let o of order) {
-      if (stillLive.findIndex((e) => e == o) < 0) {
-        activeChatRemoved = true;
+    for (let i = 0; i < order.length; ++i) {
+      let o = order[i];
+      if (stillLive.findIndex((e) => e == o) > 0) {
+        // found, keep in new order
+        newOrder = [...newOrder, o];
         continue;
       }
-      // found - add
-      newOrder = [...newOrder, o];
+
+      if (i == activeChat) {
+        // active chat removed, set to 0
+        setActiveChat(0);
+      }
     }
     setOrder(newOrder);
 
     // update client path
     replacePath(newOrder);
-
-    if (activeChatRemoved) {
-      setActiveChat(0);
-    }
   };
 
   const addWatching = (channel: string) => {
