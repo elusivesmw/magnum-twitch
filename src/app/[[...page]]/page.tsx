@@ -18,13 +18,20 @@ const VALIDATE_INTERVAL = 60 * 60 * 1000;
 const LIVE_CHECK_INTERVAL = 30 * 1000;
 
 export default function Home({ params }: { params: { page: string[] } }) {
+  // global helpers
   const searchParams = useSearchParams();
+
+  // state
+  const [accessToken, setAccessToken] = useState<string | undefined>();
+  const [user, setUser] = useState<User | undefined>();
   const [watching, setWatching] = useState<string[]>([]);
-  const [activeChat, setActiveChat] = useState(0);
   const [order, setOrder] = useState<string[]>([]);
+  const [activeChat, setActiveChat] = useState(0);
   const [playerLayout, setPlayerLayout] = useState<PlayerLayout>(
     PlayerLayout.Grid
   );
+
+  // get watching list from params
   useEffect(() => {
     // initial page load, open channels
     const serverPath = params.page;
@@ -39,7 +46,7 @@ export default function Home({ params }: { params: { page: string[] } }) {
     replacePath(uniqueWatching);
   }, [params.page]);
 
-  const [accessToken, setAccessToken] = useState<string | undefined>();
+  // set token
   useEffect(() => {
     if (getError(searchParams)) {
       // remove query params
@@ -51,11 +58,12 @@ export default function Home({ params }: { params: { page: string[] } }) {
     setAccessToken(token);
   }, [order, searchParams]);
 
-  const [user, setUser] = useState<User | undefined>();
+  // set user
   useEffect(() => {
     updateUser(accessToken);
   }, [accessToken]);
 
+  // validate token every hour
   useEffect(() => {
     validateToken(accessToken);
     const intervalId = setInterval(() => {
@@ -65,7 +73,17 @@ export default function Home({ params }: { params: { page: string[] } }) {
     return () => clearInterval(intervalId);
   }, [accessToken]);
 
-  const validateToken = (accessToken: string | undefined) => {
+  // check if all streams are still live
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      liveCheckStreams(accessToken);
+    }, LIVE_CHECK_INTERVAL);
+
+    return () => clearInterval(intervalId);
+  }, [accessToken, watching]);
+
+  //
+  function validateToken(accessToken: string | undefined) {
     if (!accessToken) return;
     const httpOptions = getOAuthHeaders(accessToken);
     fetch('https://id.twitch.tv/oauth2/validate', httpOptions)
@@ -78,17 +96,27 @@ export default function Home({ params }: { params: { page: string[] } }) {
         console.log('Valid token');
       })
       .catch((err) => console.log(err));
-  };
+  }
 
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      liveCheckStreams(accessToken);
-    }, LIVE_CHECK_INTERVAL);
+  //
+  function updateUser(accessToken: string | undefined) {
+    if (!accessToken) return;
+    const httpOptions = getHeaders(accessToken);
+    fetch('https://api.twitch.tv/helix/users', httpOptions)
+      .then((res) => {
+        if (!res.ok) return Promise.reject(res);
+        return res.json();
+      })
+      .then((json) => {
+        let users = json.data as User[];
+        if (users.length != 1) return;
+        setUser(users[0]);
+      })
+      .catch((err) => console.log(err));
+  }
 
-    return () => clearInterval(intervalId);
-  }, [accessToken, watching]);
-
-  const liveCheckStreams = (accessToken: string | undefined) => {
+  //
+  function liveCheckStreams(accessToken: string | undefined) {
     if (!accessToken) return;
     if (watching.length == 0) return;
 
@@ -102,9 +130,10 @@ export default function Home({ params }: { params: { page: string[] } }) {
         reconcileStreams(s);
       })
       .catch((err) => console.log(err));
-  };
+  }
 
-  const reconcileStreams = (stillLive: string[]) => {
+  //
+  function reconcileStreams(stillLive: string[]) {
     // see if active chat will be removed
     // NOTE: currently using a ref to watching, rather than order
     for (let i = 0; i < watching.length; ++i) {
@@ -130,9 +159,10 @@ export default function Home({ params }: { params: { page: string[] } }) {
 
     // update client path
     replacePath(newOrder);
-  };
+  }
 
-  const addWatching = (channel: string) => {
+  //
+  function addWatching(channel: string) {
     if (watching.includes(channel)) {
       // add highlight animation
       let channelDiv = document.getElementById(`twitch-embed-${channel}`);
@@ -157,9 +187,10 @@ export default function Home({ params }: { params: { page: string[] } }) {
     if (watching.length < 1) {
       setActiveChat(0);
     }
-  };
+  }
 
-  const removeWatching = (channel: string) => {
+  //
+  function removeWatching(channel: string) {
     let watchingIndex = watching.findIndex((c) => c == channel);
     if (watchingIndex < 0) return;
     // remove player
@@ -176,13 +207,10 @@ export default function Home({ params }: { params: { page: string[] } }) {
       watchingIndex--;
     }
     setActiveChat(watchingIndex);
-  };
+  }
 
-  const reorderWatching = (
-    channel: string,
-    index: number,
-    relative: boolean
-  ) => {
+  //
+  function reorderWatching(channel: string, index: number, relative: boolean) {
     let fromOrder = order.findIndex((o) => o == channel);
     let toOrder = relative ? fromOrder + index : index;
     if (toOrder < 0 || toOrder > watching.length + 1) return;
@@ -200,23 +228,7 @@ export default function Home({ params }: { params: { page: string[] } }) {
 
     // update client path
     replacePath(newOrder);
-  };
-
-  const updateUser = (accessToken: string | undefined) => {
-    if (!accessToken) return;
-    const httpOptions = getHeaders(accessToken);
-    fetch('https://api.twitch.tv/helix/users', httpOptions)
-      .then((res) => {
-        if (!res.ok) return Promise.reject(res);
-        return res.json();
-      })
-      .then((json) => {
-        let users = json.data as User[];
-        if (users.length != 1) return;
-        setUser(users[0]);
-      })
-      .catch((err) => console.log(err));
-  };
+  }
 
   return (
     <div id="root" className="flex flex-col h-screen">
