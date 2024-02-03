@@ -105,6 +105,14 @@ export default function Home({ params }: { params: { page: string[] } }) {
   };
 
   const reconcileStreams = (stillLive: string[]) => {
+    // see if active chat will be removed
+    // NOTE: currently using a ref to watching, rather than order
+    for (let i = 0; i < watching.length; ++i) {
+      if (i == activeChat) {
+        // active chat removed, set to 0
+        setActiveChat(0);
+      }
+    }
     // remove from watching
     setWatching(stillLive);
 
@@ -112,15 +120,10 @@ export default function Home({ params }: { params: { page: string[] } }) {
     let newOrder: string[] = [];
     for (let i = 0; i < order.length; ++i) {
       let o = order[i];
-      if (stillLive.findIndex((e) => e == o) > 0) {
+      if (stillLive.findIndex((e) => e == o) >= 0) {
         // found, keep in new order
         newOrder = [...newOrder, o];
         continue;
-      }
-
-      if (i == activeChat) {
-        // active chat removed, set to 0
-        setActiveChat(0);
       }
     }
     setOrder(newOrder);
