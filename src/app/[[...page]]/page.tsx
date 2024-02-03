@@ -134,31 +134,13 @@ export default function Home({ params }: { params: { page: string[] } }) {
 
   //
   function reconcileStreams(stillLive: string[]) {
-    // see if active chat will be removed
-    // NOTE: currently using a ref to watching, rather than order
-    for (let i = 0; i < watching.length; ++i) {
-      if (i == activeChat) {
-        // active chat removed, set to 0
-        setActiveChat(0);
-      }
-    }
     // remove from watching
-    setWatching(stillLive);
-
-    // remove from order
-    let newOrder: string[] = [];
-    for (let i = 0; i < order.length; ++i) {
-      let o = order[i];
-      if (stillLive.findIndex((e) => e == o) >= 0) {
-        // found, keep in new order
-        newOrder = [...newOrder, o];
-        continue;
+    for (let i = 0; i < watching.length; ++i) {
+      let w = watching[i];
+      if (!stillLive.find((e) => e == w)) {
+        removeWatching(w);
       }
     }
-    setOrder(newOrder);
-
-    // update client path
-    replacePath(newOrder);
   }
 
   //
@@ -191,22 +173,21 @@ export default function Home({ params }: { params: { page: string[] } }) {
 
   //
   function removeWatching(channel: string) {
-    let watchingIndex = watching.findIndex((c) => c == channel);
-    if (watchingIndex < 0) return;
+    if (!watching.find((e) => e == channel)) return;
+
     // remove player
-    setWatching(watching.filter((_, i) => i != watchingIndex));
+    setWatching((w) => w.filter((e) => e != channel));
     // update order
-    let newOrder = order.filter((o) => o != channel);
-    setOrder(newOrder);
+    setOrder((o) => o.filter((e) => e != channel));
 
     // update client path
+    let newOrder = order.filter((e) => e != channel);
     replacePath(newOrder);
 
     // set active chat
-    if (watchingIndex >= watching.length - 1) {
-      watchingIndex--;
+    if (!newOrder.find((e) => e == channel)) {
+      setActiveChat(0);
     }
-    setActiveChat(watchingIndex);
   }
 
   //
