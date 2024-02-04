@@ -26,7 +26,7 @@ export default function Home({ params }: { params: { page: string[] } }) {
   const [user, setUser] = useState<User | undefined>();
   const [watching, setWatching] = useState<string[]>([]);
   const [order, setOrder] = useState<string[]>([]);
-  const [activeChat, setActiveChat] = useState(0);
+  const [activeChat, setActiveChat] = useState('');
   const [playerLayout, setPlayerLayout] = useState<PlayerLayout>(
     PlayerLayout.Grid
   );
@@ -41,9 +41,6 @@ export default function Home({ params }: { params: { page: string[] } }) {
     if (uniqueWatching.length == 0) return;
     setWatching(uniqueWatching);
     setOrder(uniqueWatching);
-
-    // update client path
-    replacePath(uniqueWatching);
   }, [params.page]);
 
   // set token
@@ -81,6 +78,19 @@ export default function Home({ params }: { params: { page: string[] } }) {
 
     return () => clearInterval(intervalId);
   }, [accessToken, watching]);
+
+  // update active chat if removed
+  useEffect(() => {
+    let found = watching.find((e) => e == activeChat);
+    if (!found) {
+      setActiveChat(watching[0]);
+    }
+  }, [watching]);
+
+  // keep path in sync with order
+  useEffect(() => {
+    replacePath(order);
+  }, [order]);
 
   //
   function validateToken(accessToken: string | undefined) {
@@ -159,15 +169,12 @@ export default function Home({ params }: { params: { page: string[] } }) {
       return;
     }
 
+    // add player
     setWatching([...watching, channel]);
-    let newOrder = [...order, channel];
-    setOrder(newOrder);
-
-    // update client path
-    replacePath(newOrder);
+    setOrder([...order, channel]);
 
     if (watching.length < 1) {
-      setActiveChat(0);
+      setActiveChat(watching[0]);
     }
   }
 
@@ -177,17 +184,7 @@ export default function Home({ params }: { params: { page: string[] } }) {
 
     // remove player
     setWatching((w) => w.filter((e) => e != channel));
-    // update order
     setOrder((o) => o.filter((e) => e != channel));
-
-    // update client path
-    let newOrder = order.filter((e) => e != channel);
-    replacePath(newOrder);
-
-    // set active chat
-    if (!newOrder.find((e) => e == channel)) {
-      setActiveChat(0);
-    }
   }
 
   //
@@ -198,17 +195,13 @@ export default function Home({ params }: { params: { page: string[] } }) {
 
     // set active chat on goto first
     if (!relative && toOrder == 0) {
-      let chatIndex = watching.findIndex((o) => o == channel);
-      setActiveChat(chatIndex);
+      setActiveChat(channel);
     }
 
     // move channel to index 0
     let newOrder = [...order];
     move(newOrder, fromOrder, toOrder);
     setOrder(newOrder);
-
-    // update client path
-    replacePath(newOrder);
   }
 
   return (
@@ -241,7 +234,7 @@ export default function Home({ params }: { params: { page: string[] } }) {
               channel={e}
               order={order.findIndex((o) => o == e)}
               total={watching.length}
-              isActiveChat={watching[activeChat] == e}
+              isActiveChat={activeChat == e}
               reorderWatching={reorderWatching}
               removeWatching={removeWatching}
               key={`player-key-${e}`}
@@ -249,7 +242,7 @@ export default function Home({ params }: { params: { page: string[] } }) {
           ))}
         </div>
         <MultiChat
-          channels={watching}
+          channels={order}
           activeChat={activeChat}
           updateActiveChat={setActiveChat}
         />

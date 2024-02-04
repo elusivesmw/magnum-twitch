@@ -16,27 +16,27 @@ const MultiChat = ({
   updateActiveChat,
 }: {
   channels: string[];
-  activeChat: number;
-  updateActiveChat: (chat: number) => void;
+  activeChat: string;
+  updateActiveChat: (chat: string) => void;
 }) => {
   const [visibleIndex, setVisibleIndex] = useState(0);
 
   useEffect(() => {
-    setVisibleIndex(activeChat);
+    setVisibleIndex(channels.findIndex((e) => e == activeChat));
   }, [activeChat]);
 
   const next = () => {
     var i = visibleIndex + 1;
     if (i > channels.length - 1) i = 0;
     setVisibleIndex(i);
-    updateActiveChat(i);
+    updateActiveChat(channels[i]);
   };
 
   const prev = () => {
     var i = visibleIndex - 1;
     if (i < 0) i = channels.length - 1;
     setVisibleIndex(i);
-    updateActiveChat(i);
+    updateActiveChat(channels[i]);
   };
 
   let [open, setOpen] = useState<boolean>(true);
@@ -60,7 +60,7 @@ const MultiChat = ({
             open ? 'block' : 'hidden'
           } uppercase font-bold text-sm text-center`}
         >
-          {channels[visibleIndex]}
+          {activeChat}
         </span>
         <div
           onClick={next}
@@ -84,8 +84,8 @@ const MultiChat = ({
         </div>
       </div>
       <div className={`${open ? 'block' : 'hidden'} flex grow h-auto`}>
-        {channels.map((e, i) => (
-          <Chat channel={e} visible={i == visibleIndex} key={`chat-key-${e}`} />
+        {channels.map((e) => (
+          <Chat channel={e} visible={e == activeChat} key={`chat-key-${e}`} />
         ))}
       </div>
     </div>
