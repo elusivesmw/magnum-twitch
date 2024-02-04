@@ -15,7 +15,7 @@ const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 const LS_ACCESS_TOKEN = 'ACCESS_TOKEN';
 const VALIDATE_INTERVAL = 60 * 60 * 1000;
-const LIVE_CHECK_INTERVAL = 30 * 1000;
+const LIVE_CHECK_INTERVAL = 60 * 1000;
 
 export default function Home({ params }: { params: { page: string[] } }) {
   // global helpers
@@ -170,6 +170,7 @@ export default function Home({ params }: { params: { page: string[] } }) {
       })
       .catch((err) => console.log(err));
   }
+
   //
   function addWatching(channel: string) {
     if (watching.includes(channel)) {
