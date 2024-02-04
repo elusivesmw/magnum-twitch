@@ -23,7 +23,7 @@ const MultiChat = ({
 
   useEffect(() => {
     setVisibleIndex(channels.findIndex((e) => e == activeChat));
-  }, [activeChat]);
+  }, [activeChat, channels]);
 
   const next = () => {
     var i = visibleIndex + 1;

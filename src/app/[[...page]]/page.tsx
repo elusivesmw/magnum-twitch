@@ -3,7 +3,7 @@
 import Following from '@/components/following';
 import Player from '@/components/player';
 import MultiChat from '@/components/chat';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Stream, User } from '@/types/twitch';
 import { getHeaders, getOAuthHeaders } from '@/lib/auth';
@@ -70,6 +70,52 @@ export default function Home({ params }: { params: { page: string[] } }) {
     return () => clearInterval(intervalId);
   }, [accessToken]);
 
+  //
+  const removeWatching = useCallback(
+    (channel: string) => {
+      if (!watching.find((e) => e == channel)) return;
+
+      // remove player
+      setWatching((w) => w.filter((e) => e != channel));
+      setOrder((o) => o.filter((e) => e != channel));
+    },
+    [watching]
+  );
+
+  //
+  const reconcileStreams = useCallback(
+    (stillLive: string[]) => {
+      // remove from watching
+      for (let i = 0; i < watching.length; ++i) {
+        let w = watching[i];
+        if (!stillLive.find((e) => e == w)) {
+          removeWatching(w);
+        }
+      }
+    },
+    [removeWatching, watching]
+  );
+
+  //
+  const liveCheckStreams = useCallback(
+    (accessToken: string | undefined) => {
+      if (!accessToken) return;
+      if (watching.length == 0) return;
+
+      const httpOptions = getHeaders(accessToken);
+      let logins_param = 'user_login=' + watching.join('&user_login=');
+      fetch(`https://api.twitch.tv/helix/streams?${logins_param}`, httpOptions)
+        .then((res) => res.json())
+        .then((json) => {
+          let streams = json.data as Stream[];
+          let s = streams.map((e) => e.user_login);
+          reconcileStreams(s);
+        })
+        .catch((err) => console.log(err));
+    },
+    [watching, reconcileStreams]
+  );
+
   // check if all streams are still live
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -77,7 +123,7 @@ export default function Home({ params }: { params: { page: string[] } }) {
     }, LIVE_CHECK_INTERVAL);
 
     return () => clearInterval(intervalId);
-  }, [accessToken, watching]);
+  }, [accessToken, liveCheckStreams]);
 
   // update active chat if removed
   useEffect(() => {
@@ -85,7 +131,7 @@ export default function Home({ params }: { params: { page: string[] } }) {
     if (!found) {
       setActiveChat(watching[0]);
     }
-  }, [watching]);
+  }, [watching, activeChat]);
 
   // keep path in sync with order
   useEffect(() => {
@@ -124,35 +170,6 @@ export default function Home({ params }: { params: { page: string[] } }) {
       })
       .catch((err) => console.log(err));
   }
-
-  //
-  function liveCheckStreams(accessToken: string | undefined) {
-    if (!accessToken) return;
-    if (watching.length == 0) return;
-
-    const httpOptions = getHeaders(accessToken);
-    let logins_param = 'user_login=' + watching.join('&user_login=');
-    fetch(`https://api.twitch.tv/helix/streams?${logins_param}`, httpOptions)
-      .then((res) => res.json())
-      .then((json) => {
-        let streams = json.data as Stream[];
-        let s = streams.map((e) => e.user_login);
-        reconcileStreams(s);
-      })
-      .catch((err) => console.log(err));
-  }
-
-  //
-  function reconcileStreams(stillLive: string[]) {
-    // remove from watching
-    for (let i = 0; i < watching.length; ++i) {
-      let w = watching[i];
-      if (!stillLive.find((e) => e == w)) {
-        removeWatching(w);
-      }
-    }
-  }
-
   //
   function addWatching(channel: string) {
     if (watching.includes(channel)) {
@@ -176,15 +193,6 @@ export default function Home({ params }: { params: { page: string[] } }) {
     if (watching.length < 1) {
       setActiveChat(watching[0]);
     }
-  }
-
-  //
-  function removeWatching(channel: string) {
-    if (!watching.find((e) => e == channel)) return;
-
-    // remove player
-    setWatching((w) => w.filter((e) => e != channel));
-    setOrder((o) => o.filter((e) => e != channel));
   }
 
   //
