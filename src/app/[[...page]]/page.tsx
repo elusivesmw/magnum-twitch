@@ -3,9 +3,9 @@
 import Following from '@/components/following';
 import Player from '@/components/player';
 import MultiChat from '@/components/chat';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { User } from '@/types/twitch';
+import { Stream, User } from '@/types/twitch';
 import { getHeaders, getOAuthHeaders } from '@/lib/auth';
 import { replacePath } from '@/lib/route';
 import { PlayerLayout } from '@/types/state';
@@ -15,16 +15,23 @@ const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 const LS_ACCESS_TOKEN = 'ACCESS_TOKEN';
 const VALIDATE_INTERVAL = 60 * 60 * 1000;
+const LIVE_CHECK_INTERVAL = 60 * 1000;
 
 export default function Home({ params }: { params: { page: string[] } }) {
+  // global helpers
   const searchParams = useSearchParams();
+
+  // state
+  const [accessToken, setAccessToken] = useState<string | undefined>();
+  const [user, setUser] = useState<User | undefined>();
   const [watching, setWatching] = useState<string[]>([]);
-  const [activeChat, setActiveChat] = useState(0);
   const [order, setOrder] = useState<string[]>([]);
+  const [activeChat, setActiveChat] = useState('');
   const [playerLayout, setPlayerLayout] = useState<PlayerLayout>(
     PlayerLayout.Grid
   );
 
+  // get watching list from params
   useEffect(() => {
     // initial page load, open channels
     const serverPath = params.page;
@@ -34,12 +41,9 @@ export default function Home({ params }: { params: { page: string[] } }) {
     if (uniqueWatching.length == 0) return;
     setWatching(uniqueWatching);
     setOrder(uniqueWatching);
-
-    // update client path
-    replacePath(uniqueWatching);
   }, [params.page]);
 
-  const [accessToken, setAccessToken] = useState<string | undefined>();
+  // set token
   useEffect(() => {
     if (getError(searchParams)) {
       // remove query params
@@ -51,11 +55,12 @@ export default function Home({ params }: { params: { page: string[] } }) {
     setAccessToken(token);
   }, [order, searchParams]);
 
-  const [user, setUser] = useState<User | undefined>();
+  // set user
   useEffect(() => {
     updateUser(accessToken);
   }, [accessToken]);
 
+  // validate token every hour
   useEffect(() => {
     validateToken(accessToken);
     const intervalId = setInterval(() => {
@@ -65,7 +70,76 @@ export default function Home({ params }: { params: { page: string[] } }) {
     return () => clearInterval(intervalId);
   }, [accessToken]);
 
-  const validateToken = (accessToken: string | undefined) => {
+  //
+  const removeWatching = useCallback(
+    (channel: string) => {
+      if (!watching.find((e) => e == channel)) return;
+
+      // remove player
+      setWatching((w) => w.filter((e) => e != channel));
+      setOrder((o) => o.filter((e) => e != channel));
+    },
+    [watching]
+  );
+
+  //
+  const reconcileStreams = useCallback(
+    (stillLive: string[]) => {
+      // remove from watching
+      for (let i = 0; i < watching.length; ++i) {
+        let w = watching[i];
+        if (!stillLive.find((e) => e == w)) {
+          removeWatching(w);
+        }
+      }
+    },
+    [removeWatching, watching]
+  );
+
+  //
+  const liveCheckStreams = useCallback(
+    (accessToken: string | undefined) => {
+      if (!accessToken) return;
+      if (watching.length == 0) return;
+
+      const httpOptions = getHeaders(accessToken);
+      let logins_param = 'user_login=' + watching.join('&user_login=');
+      fetch(`https://api.twitch.tv/helix/streams?${logins_param}`, httpOptions)
+        .then((res) => res.json())
+        .then((json) => {
+          let streams = json.data as Stream[];
+          let s = streams.map((e) => e.user_login);
+          reconcileStreams(s);
+        })
+        .catch((err) => console.log(err));
+    },
+    [watching, reconcileStreams]
+  );
+
+  // check if all streams are still live
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      liveCheckStreams(accessToken);
+    }, LIVE_CHECK_INTERVAL);
+
+    return () => clearInterval(intervalId);
+  }, [accessToken, liveCheckStreams]);
+
+  // update active chat if removed
+  useEffect(() => {
+    let found = watching.find((e) => e == activeChat);
+    if (!found) {
+      setActiveChat(watching[0]);
+    }
+  }, [watching, activeChat]);
+
+  // keep path in sync with order
+  useEffect(() => {
+    replacePath(order);
+  }, [order]);
+
+  //
+  function validateToken(accessToken: string | undefined) {
     if (!accessToken) return;
     const httpOptions = getOAuthHeaders(accessToken);
     fetch('https://id.twitch.tv/oauth2/validate', httpOptions)
@@ -78,9 +152,27 @@ export default function Home({ params }: { params: { page: string[] } }) {
         console.log('Valid token');
       })
       .catch((err) => console.log(err));
-  };
+  }
 
-  const addWatching = (channel: string) => {
+  //
+  function updateUser(accessToken: string | undefined) {
+    if (!accessToken) return;
+    const httpOptions = getHeaders(accessToken);
+    fetch('https://api.twitch.tv/helix/users', httpOptions)
+      .then((res) => {
+        if (!res.ok) return Promise.reject(res);
+        return res.json();
+      })
+      .then((json) => {
+        let users = json.data as User[];
+        if (users.length != 1) return;
+        setUser(users[0]);
+      })
+      .catch((err) => console.log(err));
+  }
+
+  //
+  function addWatching(channel: string) {
     if (watching.includes(channel)) {
       // add highlight animation
       let channelDiv = document.getElementById(`twitch-embed-${channel}`);
@@ -95,76 +187,31 @@ export default function Home({ params }: { params: { page: string[] } }) {
       return;
     }
 
+    // add player
     setWatching([...watching, channel]);
-    let newOrder = [...order, channel];
-    setOrder(newOrder);
-
-    // update client path
-    replacePath(newOrder);
+    setOrder([...order, channel]);
 
     if (watching.length < 1) {
-      setActiveChat(0);
+      setActiveChat(watching[0]);
     }
-  };
+  }
 
-  const removeWatching = (channel: string) => {
-    let watchingIndex = watching.findIndex((c) => c == channel);
-    if (watchingIndex < 0) return;
-    // remove player
-    setWatching(watching.filter((_, i) => i != watchingIndex));
-    // update order
-    let newOrder = order.filter((o) => o != channel);
-    setOrder(newOrder);
-
-    // update client path
-    replacePath(newOrder);
-
-    // set active chat
-    if (watchingIndex >= watching.length - 1) {
-      watchingIndex--;
-    }
-    setActiveChat(watchingIndex);
-  };
-
-  const reorderWatching = (
-    channel: string,
-    index: number,
-    relative: boolean
-  ) => {
+  //
+  function reorderWatching(channel: string, index: number, relative: boolean) {
     let fromOrder = order.findIndex((o) => o == channel);
     let toOrder = relative ? fromOrder + index : index;
     if (toOrder < 0 || toOrder > watching.length + 1) return;
 
     // set active chat on goto first
     if (!relative && toOrder == 0) {
-      let chatIndex = watching.findIndex((o) => o == channel);
-      setActiveChat(chatIndex);
+      setActiveChat(channel);
     }
 
     // move channel to index 0
     let newOrder = [...order];
     move(newOrder, fromOrder, toOrder);
     setOrder(newOrder);
-
-    // update client path
-    replacePath(newOrder);
-  };
-
-  const updateUser = (accessToken: string | undefined) => {
-    if (!accessToken) return;
-    const httpOptions = getHeaders(accessToken);
-    fetch('https://api.twitch.tv/helix/users', httpOptions)
-      .then((res) => {
-        if (!res.ok) return Promise.reject(res);
-        return res.json();
-      })
-      .then((json) => {
-        let users = json.data as User[];
-        if (users.length != 1) return;
-        setUser(users[0]);
-      })
-      .catch((err) => console.log(err));
-  };
+  }
 
   return (
     <div id="root" className="flex flex-col h-screen">
@@ -196,7 +243,7 @@ export default function Home({ params }: { params: { page: string[] } }) {
               channel={e}
               order={order.findIndex((o) => o == e)}
               total={watching.length}
-              isActiveChat={watching[activeChat] == e}
+              isActiveChat={activeChat == e}
               reorderWatching={reorderWatching}
               removeWatching={removeWatching}
               key={`player-key-${e}`}
@@ -204,7 +251,7 @@ export default function Home({ params }: { params: { page: string[] } }) {
           ))}
         </div>
         <MultiChat
-          channels={watching}
+          channels={order}
           activeChat={activeChat}
           updateActiveChat={setActiveChat}
         />
