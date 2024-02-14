@@ -24,7 +24,10 @@ const Channels = ({
   addWatching: (stream: string) => void;
   removeWatching: (stream: string) => void;
 }) => {
-  let [streams, setStreams] = useState<Stream[] | undefined>();
+  let [followingStreams, setFollowingStreams] = useState<
+    Stream[] | undefined
+  >();
+  let [gameStreams, setGameStreams] = useState<Stream[] | undefined>();
   useEffect(() => {
     if (accessToken) {
       // remove token from url
@@ -32,15 +35,17 @@ const Channels = ({
       replacePath(watching);
     }
 
-    updateStreams(accessToken, user);
+    updateFollowingStreams(accessToken, user);
+    updateGameStreams(accessToken, user);
     const intervalId = setInterval(() => {
-      updateStreams(accessToken, user);
+      updateFollowingStreams(accessToken, user);
+      updateGameStreams(accessToken, user);
     }, POLL_INTERVAL);
 
     return () => clearInterval(intervalId);
   }, [accessToken, user, watching]);
 
-  const updateStreams = (
+  const updateFollowingStreams = (
     accessToken: string | undefined,
     user: User | undefined
   ) => {
@@ -48,14 +53,32 @@ const Channels = ({
     if (!user) return;
     const httpOptions = getHeaders(accessToken);
     fetch(
-      //`https://api.twitch.tv/helix/streams/?game_id=${GAME_ID}&first=100`,
       `https://api.twitch.tv/helix/streams/followed?user_id=${user.id}&first=100`,
       httpOptions
     )
       .then((res) => res.json())
       .then((json) => {
         let streams = json.data as Stream[];
-        setStreams(streams);
+        setFollowingStreams(streams);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const updateGameStreams = (
+    accessToken: string | undefined,
+    user: User | undefined
+  ) => {
+    if (!accessToken) return;
+    if (!user) return;
+    const httpOptions = getHeaders(accessToken);
+    fetch(
+      `https://api.twitch.tv/helix/streams/?game_id=${GAME_ID}&first=100`,
+      httpOptions
+    )
+      .then((res) => res.json())
+      .then((json) => {
+        let streams = json.data as Stream[];
+        setGameStreams(streams);
       })
       .catch((err) => console.log(err));
   };
@@ -88,7 +111,7 @@ const Channels = ({
         headerIcon={<Heart />}
         open={open}
         watching={watching}
-        streams={streams}
+        streams={followingStreams}
         addWatching={addWatching}
         removeWatching={removeWatching}
       />
@@ -98,7 +121,7 @@ const Channels = ({
         headerIcon={<Heart />}
         open={open}
         watching={watching}
-        streams={streams}
+        streams={gameStreams}
         addWatching={addWatching}
         removeWatching={removeWatching}
       />
@@ -229,7 +252,8 @@ const ChannelRow = ({
   ) => void;
 }) => {
   const updateWatching = (stream: string) => {
-    if (isWatching) {
+    console.log(stream);
+    if (!isWatching) {
       addWatching(stream);
     } else {
       removeWatching(stream);

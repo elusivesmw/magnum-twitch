@@ -10,6 +10,7 @@ import { getHeaders, getOAuthHeaders } from '@/lib/auth';
 import { replacePath } from '@/lib/route';
 import { PlayerLayout } from '@/types/state';
 import Header from '@/components/header';
+import Channels from '@/components/channels';
 
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -224,7 +225,7 @@ export default function Home({ params }: { params: { page: string[] } }) {
       />
       <main className="relative flex h-full">
         {user && (
-          <Following
+          <Channels
             accessToken={accessToken}
             user={user}
             watching={watching}
