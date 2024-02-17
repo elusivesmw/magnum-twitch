@@ -1,6 +1,5 @@
 'use client';
 
-import Following from '@/components/following';
 import Player from '@/components/player';
 import MultiChat from '@/components/chat';
 import { useCallback, useEffect, useState } from 'react';
