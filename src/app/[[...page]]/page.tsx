@@ -1,6 +1,5 @@
 'use client';
 
-import Following from '@/components/following';
 import Player from '@/components/player';
 import MultiChat from '@/components/chat';
 import { useCallback, useEffect, useState } from 'react';
@@ -10,6 +9,7 @@ import { getHeaders, getOAuthHeaders } from '@/lib/auth';
 import { replacePath } from '@/lib/route';
 import { PlayerLayout } from '@/types/state';
 import Header from '@/components/header';
+import Channels from '@/components/channels';
 
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -222,9 +222,9 @@ export default function Home({ params }: { params: { page: string[] } }) {
         playerLayout={playerLayout}
         setPlayerLayout={setPlayerLayout}
       />
-      <main className="relative flex h-full">
+      <main className="relative flex h-full overflow-y-hidden">
         {user && (
-          <Following
+          <Channels
             accessToken={accessToken}
             user={user}
             watching={watching}

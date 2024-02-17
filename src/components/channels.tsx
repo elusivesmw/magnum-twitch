@@ -7,11 +7,12 @@ import { getHeaders } from '@/lib/auth';
 import { replacePath } from '@/lib/route';
 import Image from 'next/image';
 import { FollowingTooltip } from './tooltip';
+import { SectionType } from '@/types/channel';
 
 const GAME_ID = 1229;
 const POLL_INTERVAL = 60 * 1000;
 
-const Following = ({
+const Channels = ({
   accessToken,
   user,
   watching,
@@ -24,7 +25,10 @@ const Following = ({
   addWatching: (stream: string) => void;
   removeWatching: (stream: string) => void;
 }) => {
-  let [streams, setStreams] = useState<Stream[] | undefined>();
+  let [followingStreams, setFollowingStreams] = useState<
+    Stream[] | undefined
+  >();
+  let [gameStreams, setGameStreams] = useState<Stream[] | undefined>();
   useEffect(() => {
     if (accessToken) {
       // remove token from url
@@ -32,20 +36,17 @@ const Following = ({
       replacePath(watching);
     }
 
-    updateStreams(accessToken, user);
+    updateFollowingStreams(accessToken, user);
+    updateGameStreams(accessToken, user);
     const intervalId = setInterval(() => {
-      updateStreams(accessToken, user);
+      updateFollowingStreams(accessToken, user);
+      updateGameStreams(accessToken, user);
     }, POLL_INTERVAL);
 
     return () => clearInterval(intervalId);
   }, [accessToken, user, watching]);
 
-  let [users, setUsers] = useState<User[] | undefined>();
-  useEffect(() => {
-    updateUsers(accessToken, streams);
-  }, [accessToken, streams]);
-
-  const updateStreams = (
+  const updateFollowingStreams = (
     accessToken: string | undefined,
     user: User | undefined
   ) => {
@@ -53,17 +54,109 @@ const Following = ({
     if (!user) return;
     const httpOptions = getHeaders(accessToken);
     fetch(
-      //`https://api.twitch.tv/helix/streams/?game_id=${GAME_ID}&first=100`,
       `https://api.twitch.tv/helix/streams/followed?user_id=${user.id}&first=100`,
       httpOptions
     )
       .then((res) => res.json())
       .then((json) => {
         let streams = json.data as Stream[];
-        setStreams(streams);
+        setFollowingStreams(streams);
       })
       .catch((err) => console.log(err));
   };
+
+  const updateGameStreams = (
+    accessToken: string | undefined,
+    user: User | undefined
+  ) => {
+    if (!accessToken) return;
+    if (!user) return;
+    const httpOptions = getHeaders(accessToken);
+    fetch(
+      `https://api.twitch.tv/helix/streams/?game_id=${GAME_ID}&first=100`,
+      httpOptions
+    )
+      .then((res) => res.json())
+      .then((json) => {
+        let streams = json.data as Stream[];
+        setGameStreams(streams);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  let [open, setOpen] = useState<boolean>(true);
+  const toggleOpen = () => {
+    setOpen(!open);
+  };
+
+  return (
+    <div
+      className={`flex flex-col bg-sidepanel ${
+        open ? 'basis-[240px]' : 'basis-[50px]'
+      } shrink-0 grow-0 overflow-y-scroll scrollbar`}
+    >
+      <div className="flex shrink-0 grow-0 max-w-full text-center items-center justify-between mt-4 pl-4 pr-2">
+        <span className={`${open ? '' : 'hidden'} font-semibold text-xl`}>
+          For You
+        </span>
+        <button
+          onClick={toggleOpen}
+          className="inline-flex h-[30px] p-2 hover:bg-twbuttonbg hover:bg-opacity-[0.48] rounded-[4px]"
+        >
+          {open ? <CollapseLeft /> : <CollapseRight />}
+        </button>
+      </div>
+      <ChannelSection
+        accessToken={accessToken}
+        type={SectionType.Channel}
+        headerText="Followed Channels"
+        headerIcon={<Heart />}
+        open={open}
+        watching={watching}
+        streams={followingStreams}
+        addWatching={addWatching}
+        removeWatching={removeWatching}
+      />
+      <ChannelSection
+        accessToken={accessToken}
+        type={SectionType.Game}
+        headerText="Super Mario World"
+        headerIcon={<Heart />}
+        open={open}
+        watching={watching}
+        streams={gameStreams}
+        addWatching={addWatching}
+        removeWatching={removeWatching}
+      />
+    </div>
+  );
+};
+
+const ChannelSection = ({
+  accessToken,
+  type,
+  headerText,
+  headerIcon,
+  open,
+  watching,
+  streams,
+  addWatching,
+  removeWatching,
+}: {
+  accessToken: string | undefined;
+  type: SectionType;
+  headerText: string;
+  headerIcon: React.ReactNode;
+  open: boolean;
+  watching: string[];
+  streams: Stream[] | undefined;
+  addWatching: (stream: string) => void;
+  removeWatching: (stream: string) => void;
+}) => {
+  let [users, setUsers] = useState<User[] | undefined>();
+  useEffect(() => {
+    updateUsers(accessToken, streams);
+  }, [accessToken, streams]);
 
   const updateUsers = (
     accessToken: string | undefined,
@@ -87,11 +180,6 @@ const Following = ({
       .catch((err) => console.log(err));
   };
 
-  let [open, setOpen] = useState<boolean>(true);
-  const toggleOpen = () => {
-    setOpen(!open);
-  };
-
   let [showModal, setShowModal] = useState<boolean>(false);
   let [modalStream, setModalStream] = useState<Stream>();
   const showTooltip = (
@@ -111,23 +199,9 @@ const Following = ({
     }
   };
 
+  //
   return (
-    <div
-      className={`flex flex-col bg-sidepanel ${
-        open ? 'basis-[240px]' : 'basis-[50px]'
-      } shrink-0 grow-0 overflow-y-scroll scrollbar`}
-    >
-      <div className="flex shrink-0 grow-0 max-w-full text-center items-center justify-between mt-4 pl-4 pr-2">
-        <span className={`${open ? '' : 'hidden'} font-semibold text-xl`}>
-          For You
-        </span>
-        <button
-          onClick={toggleOpen}
-          className="inline-flex h-[30px] p-2 hover:bg-twbuttonbg hover:bg-opacity-[0.48] rounded-[4px]"
-        >
-          {open ? <CollapseLeft /> : <CollapseRight />}
-        </button>
-      </div>
+    <>
       <div
         className={`flex basis-20 shrink-0 grow-0 max-w-full text-center items-center ${
           open ? 'justify-start' : 'justify-center'
@@ -136,20 +210,19 @@ const Following = ({
         <span
           className={`${!open ? 'hidden' : ''} uppercase font-bold text-sm`}
         >
-          Followed Channels
+          {headerText}
         </span>
-        <div className={`${open ? 'hidden' : ''} h-8`}>
-          <Heart />
-        </div>
+        <div className={`${open ? 'hidden' : ''} h-8`}>{headerIcon}</div>
       </div>
       {streams &&
         streams.map((stream, i) => {
           let user = users?.find((u) => u.id == stream.user_id);
           let isWatching = watching?.includes(stream.user_login);
           return (
-            <StreamRow
+            <ChannelRow
               stream={stream}
               user={user}
+              type={type}
               open={open}
               isWatching={isWatching}
               addWatching={addWatching}
@@ -159,13 +232,16 @@ const Following = ({
             />
           );
         })}
-      {showModal && <FollowingTooltip stream={modalStream} open={open} />}
-    </div>
+      {showModal && (
+        <FollowingTooltip type={type} stream={modalStream} open={open} />
+      )}
+    </>
   );
 };
 
-const StreamRow = ({
+const ChannelRow = ({
   stream,
+  type,
   user,
   open,
   isWatching,
@@ -174,6 +250,7 @@ const StreamRow = ({
   showTooltip: showTooltip,
 }: {
   stream: Stream;
+  type: SectionType;
   user: User | undefined;
   open: boolean;
   isWatching: boolean;
@@ -194,7 +271,7 @@ const StreamRow = ({
 
   return (
     <div
-      id={`following-stream-${stream.user_login}`}
+      id={`following-${type}-${stream.user_login}`}
       data-stream={user?.login}
       className="flex max-w-full h-[4.2rem] px-4 py-2 cursor-pointer hover:bg-sidepanelhover"
       onClick={() => updateWatching(stream.user_login)}
@@ -250,4 +327,4 @@ function displayViewerCount(viewerCount: number) {
   return viewerCount;
 }
 
-export default Following;
+export default Channels;
