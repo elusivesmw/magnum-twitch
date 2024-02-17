@@ -7,6 +7,7 @@ import { getHeaders } from '@/lib/auth';
 import { replacePath } from '@/lib/route';
 import Image from 'next/image';
 import { FollowingTooltip } from './tooltip';
+import { SectionType } from '@/types/channel';
 
 const GAME_ID = 1229;
 const POLL_INTERVAL = 60 * 1000;
@@ -107,6 +108,7 @@ const Channels = ({
       </div>
       <ChannelSection
         accessToken={accessToken}
+        type={SectionType.Channel}
         headerText="Followed Channels"
         headerIcon={<Heart />}
         open={open}
@@ -117,6 +119,7 @@ const Channels = ({
       />
       <ChannelSection
         accessToken={accessToken}
+        type={SectionType.Game}
         headerText="Super Mario World"
         headerIcon={<Heart />}
         open={open}
@@ -131,6 +134,7 @@ const Channels = ({
 
 const ChannelSection = ({
   accessToken,
+  type,
   headerText,
   headerIcon,
   open,
@@ -140,6 +144,7 @@ const ChannelSection = ({
   removeWatching,
 }: {
   accessToken: string | undefined;
+  type: SectionType;
   headerText: string;
   headerIcon: React.ReactNode;
   open: boolean;
@@ -217,6 +222,7 @@ const ChannelSection = ({
             <ChannelRow
               stream={stream}
               user={user}
+              type={type}
               open={open}
               isWatching={isWatching}
               addWatching={addWatching}
@@ -226,13 +232,16 @@ const ChannelSection = ({
             />
           );
         })}
-      {showModal && <FollowingTooltip stream={modalStream} open={open} />}
+      {showModal && (
+        <FollowingTooltip type={type} stream={modalStream} open={open} />
+      )}
     </>
   );
 };
 
 const ChannelRow = ({
   stream,
+  type,
   user,
   open,
   isWatching,
@@ -241,6 +250,7 @@ const ChannelRow = ({
   showTooltip: showTooltip,
 }: {
   stream: Stream;
+  type: SectionType;
   user: User | undefined;
   open: boolean;
   isWatching: boolean;
@@ -252,7 +262,6 @@ const ChannelRow = ({
   ) => void;
 }) => {
   const updateWatching = (stream: string) => {
-    console.log(stream);
     if (!isWatching) {
       addWatching(stream);
     } else {
@@ -262,7 +271,7 @@ const ChannelRow = ({
 
   return (
     <div
-      id={`following-stream-${stream.user_login}`}
+      id={`following-${type}-${stream.user_login}`}
       data-stream={user?.login}
       className="flex max-w-full h-[4.2rem] px-4 py-2 cursor-pointer hover:bg-sidepanelhover"
       onClick={() => updateWatching(stream.user_login)}

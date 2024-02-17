@@ -223,7 +223,7 @@ export default function Home({ params }: { params: { page: string[] } }) {
         playerLayout={playerLayout}
         setPlayerLayout={setPlayerLayout}
       />
-      <main className="relative flex h-full">
+      <main className="relative flex h-full overflow-y-hidden">
         {user && (
           <Channels
             accessToken={accessToken}
