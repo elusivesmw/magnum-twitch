@@ -68,6 +68,7 @@ export const FollowingTooltip = ({
         width={IMAGE_WIDTH}
         height={IMAGE_HEIGHT}
         alt={`${stream.user_name} stream thumbnail`}
+        unoptimized
       />
     </div>,
     document.body

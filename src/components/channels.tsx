@@ -286,6 +286,7 @@ const ChannelRow = ({
             className="w-full max-w-full rounded-full object-cover"
             width={30}
             height={30}
+            unoptimized
           />
         )}
       </div>

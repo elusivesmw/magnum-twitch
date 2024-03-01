@@ -99,6 +99,7 @@ export default function Header({
                 className="w-full max-w-full rounded-full object-cover"
                 width={30}
                 height={30}
+                unoptimized
               />
             </div>
             <div
@@ -115,6 +116,7 @@ export default function Header({
                     className="w-full max-w-full rounded-full object-cover"
                     width={40}
                     height={40}
+                    unoptimized
                   />
                 </div>
                 <span className="pl-4 font-semibold">{user.display_name}</span>
