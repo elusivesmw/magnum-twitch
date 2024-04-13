@@ -278,7 +278,7 @@ const ChannelRow = ({
       onMouseOver={(e) => showTooltip(e, stream)}
       onMouseOut={(e) => showTooltip(e, stream)}
     >
-      <div className="basis-[30px] grow-0 shrink-0 self-center">
+      <div className="basis-[30px] grow-0 shrink-0 self-center mb-[2px]">
         {user && (
           <Image
             src={user.profile_image_url}
