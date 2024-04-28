@@ -8,6 +8,7 @@ export const Twitch = ({ className = '' }: { className?: string }) => {
       viewBox="0 0 40 40"
       x="0px"
       y="0px"
+      className={className}
     >
       <g>
         <polygon
@@ -173,6 +174,21 @@ export const Plus = ({ className = '' }: { className?: string }) => {
         d="M9 11v5h2v-5h5V9h-5V4H9v5H4v2h5z"
         clipRule="evenodd"
       ></path>
+    </svg>
+  );
+};
+
+export const PopOut = ({ className = '' }: { className?: string }) => {
+  return (
+    <svg
+      width="100%"
+      height="100%"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      className={className}
+    >
+      <path d="M12 4h2.586L9.293 9.293l1.414 1.414L16 5.414V8h2V2h-6v2z"></path>
+      <path d="M4 4h6v2H4v10h10v-6h2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"></path>
     </svg>
   );
 };

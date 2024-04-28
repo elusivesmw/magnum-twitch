@@ -1,4 +1,4 @@
-import { CloseX, ArrowDown, ArrowUp, Spotlight } from './icons';
+import { CloseX, ArrowDown, ArrowUp, Spotlight, PopOut } from './icons';
 import { AnimationEvent } from 'react';
 
 const EMBED_PARENT = process.env.NEXT_PUBLIC_TWITCH_EMBED_PARENT;
@@ -18,6 +18,11 @@ const Player = ({
   removeWatching: (channel: string) => void;
   reorderWatching: (channel: string, index: number, relative: boolean) => void;
 }) => {
+  function popout(channel: string) {
+    window.open(`https://www.twitch.tv/${channel}`, '_blank');
+    removeWatching(channel);
+  }
+
   return (
     <>
       <div
@@ -49,7 +54,12 @@ const Player = ({
               >
                 <ArrowDown />
               </div>
-
+              <div
+                className="h-[20px] cursor-pointer rounded bg-black bg-opacity-50 z-10 ml-8"
+                onClick={() => popout(channel)}
+              >
+                <PopOut />
+              </div>
               <div
                 className="h-[20px] cursor-pointer rounded bg-black bg-opacity-50 z-10"
                 onClick={() => removeWatching(channel)}
