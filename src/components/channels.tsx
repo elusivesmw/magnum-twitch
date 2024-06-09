@@ -2,7 +2,13 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Stream, User } from '@/types/twitch';
-import { CollapseLeft, CollapseRight, Heart } from './icons';
+import {
+  BrokenHeart,
+  CollapseLeft,
+  CollapseRight,
+  HollowHeart,
+  SolidHeart,
+} from './icons';
 import { getHeaders } from '@/lib/auth';
 import { replacePath } from '@/lib/route';
 import Image from 'next/image';
@@ -149,7 +155,7 @@ const Channels = ({
         accessToken={accessToken}
         type={SectionType.Channel}
         headerText="Followed Channels"
-        headerIcon={<Heart />}
+        headerIcon={<HollowHeart />}
         open={open}
         watching={watching}
         streams={followingStreams}
@@ -160,7 +166,7 @@ const Channels = ({
         accessToken={accessToken}
         type={SectionType.NotFollowing}
         headerText="Not Following"
-        headerIcon={<Heart />}
+        headerIcon={<BrokenHeart />}
         open={open}
         watching={watching}
         streams={notFollowingStreams}
@@ -171,7 +177,7 @@ const Channels = ({
         accessToken={accessToken}
         type={SectionType.Game}
         headerText="Super Mario World"
-        headerIcon={<Heart />}
+        headerIcon={<SolidHeart />}
         open={open}
         watching={watching}
         streams={gameStreams}
