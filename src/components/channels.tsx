@@ -64,14 +64,14 @@ const Channels = ({
     ) => {
       if (!accessToken) return;
       if (!followingStreams) return;
-      if (watching.length == 0) return;
-
       let notFollowing = watching.filter(
         (w) => !followingStreams?.map((f) => f.user_login).includes(w)
       );
-      if (notFollowing.length == 0) return;
+      if (notFollowing.length == 0) {
+        setNotFollowingStreams([]);
+        return;
+      }
       let user_logins_param = 'user_login=' + notFollowing.join('&user_login=');
-
       const httpOptions = getHeaders(accessToken);
       fetch(
         `https://api.twitch.tv/helix/streams?${user_logins_param}&first=100`,
@@ -88,6 +88,7 @@ const Channels = ({
   );
 
   useEffect(() => {
+    console.log('something changed watching');
     updateNotFollowingStreams(accessToken, followingStreams, watching);
   }, [accessToken, followingStreams, watching, updateNotFollowingStreams]);
 
@@ -162,17 +163,19 @@ const Channels = ({
         addWatching={addWatching}
         removeWatching={removeWatching}
       />
-      <ChannelSection
-        accessToken={accessToken}
-        type={SectionType.NotFollowing}
-        headerText="Not Following"
-        headerIcon={<BrokenHeart />}
-        open={open}
-        watching={watching}
-        streams={notFollowingStreams}
-        addWatching={addWatching}
-        removeWatching={removeWatching}
-      />
+      {notFollowingStreams && notFollowingStreams.length > 0 && (
+        <ChannelSection
+          accessToken={accessToken}
+          type={SectionType.NotFollowing}
+          headerText="Not Followed Channels"
+          headerIcon={<BrokenHeart />}
+          open={open}
+          watching={watching}
+          streams={notFollowingStreams}
+          addWatching={addWatching}
+          removeWatching={removeWatching}
+        />
+      )}
       <ChannelSection
         accessToken={accessToken}
         type={SectionType.Game}
