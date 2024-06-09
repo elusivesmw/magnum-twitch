@@ -34,7 +34,6 @@ const Channels = ({
   let [gameStreams, setGameStreams] = useState<Stream[] | undefined>();
 
   useEffect(() => {
-    console.log('watching-effect');
     if (accessToken) {
       // remove token from url
       // NOTE: this won't preserve order, but this is an edge case so ¯\_(ツ)_/¯
@@ -51,16 +50,40 @@ const Channels = ({
     return () => clearInterval(intervalId);
   }, [accessToken, user, watching]);
 
-  useEffect(() => {
-    console.log('watching-effect');
-    if (accessToken) {
-      // remove token from url
-      // NOTE: this won't preserve order, but this is an edge case so ¯\_(ツ)_/¯
-      replacePath(watching);
-    }
+  const updateNotFollowingStreams = useCallback(
+    (
+      accessToken: string | undefined,
+      followingStreams: Stream[] | undefined,
+      watching: string[]
+    ) => {
+      if (!accessToken) return;
+      if (!followingStreams) return;
+      if (watching.length == 0) return;
 
-    updateNotFollowingStreams(accessToken, watching);
-  }, [accessToken, watching, followingStreams]);
+      let notFollowing = watching.filter(
+        (w) => !followingStreams?.map((f) => f.user_login).includes(w)
+      );
+      if (notFollowing.length == 0) return;
+      let user_logins_param = 'user_login=' + notFollowing.join('&user_login=');
+
+      const httpOptions = getHeaders(accessToken);
+      fetch(
+        `https://api.twitch.tv/helix/streams?${user_logins_param}&first=100`,
+        httpOptions
+      )
+        .then((res) => res.json())
+        .then((json) => {
+          let streams = json.data as Stream[];
+          setNotFollowingStreams(streams);
+        })
+        .catch((err) => console.log(err));
+    },
+    []
+  );
+
+  useEffect(() => {
+    updateNotFollowingStreams(accessToken, followingStreams, watching);
+  }, [accessToken, followingStreams, watching, updateNotFollowingStreams]);
 
   const updateFollowingStreams = (
     accessToken: string | undefined,
@@ -77,37 +100,6 @@ const Channels = ({
       .then((json) => {
         let streams = json.data as Stream[];
         setFollowingStreams(streams);
-      })
-      .catch((err) => console.log(err));
-  };
-
-  const updateNotFollowingStreams = (
-    accessToken: string | undefined,
-    watching: string[]
-  ) => {
-    console.log('waching-callback');
-    if (!accessToken) return;
-    if (watching.length == 0) return;
-    if (!followingStreams) return;
-    console.log('watching', watching);
-    console.log('watching-following', followingStreams);
-
-    let notFollowing = watching.filter(
-      (w) => !followingStreams?.map((f) => f.user_login).includes(w)
-    );
-    console.log('watching-notfolllowing', notFollowing);
-    if (notFollowing.length == 0) return;
-    let user_logins_param = 'user_login=' + notFollowing.join('&user_login=');
-
-    const httpOptions = getHeaders(accessToken);
-    fetch(
-      `https://api.twitch.tv/helix/streams?${user_logins_param}&first=100`,
-      httpOptions
-    )
-      .then((res) => res.json())
-      .then((json) => {
-        let streams = json.data as Stream[];
-        setNotFollowingStreams(streams);
       })
       .catch((err) => console.log(err));
   };
