@@ -13,9 +13,7 @@ export const FollowingTooltip = ({
   open: boolean;
 }) => {
   if (!stream) return;
-  let target = document.getElementById(
-    `following-${type}-${stream.user_login}`
-  );
+  let target = document.getElementById(`${type}-${stream.user_login}`);
   let rect = target?.getBoundingClientRect();
   if (!rect) return;
 

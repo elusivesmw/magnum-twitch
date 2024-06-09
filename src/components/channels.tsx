@@ -158,7 +158,7 @@ const Channels = ({
       />
       <ChannelSection
         accessToken={accessToken}
-        type={SectionType.Channel}
+        type={SectionType.NotFollowing}
         headerText="Not Following"
         headerIcon={<Heart />}
         open={open}
@@ -321,7 +321,7 @@ const ChannelRow = ({
 
   return (
     <div
-      id={`following-${type}-${stream.user_login}`}
+      id={`${type}-${stream.user_login}`}
       data-stream={user?.login}
       className="flex max-w-full h-[4.2rem] px-4 py-2 cursor-pointer hover:bg-sidepanelhover"
       onClick={() => updateWatching(stream.user_login)}
