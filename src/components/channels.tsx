@@ -1,8 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Stream, User } from '@/types/twitch';
-import { CollapseLeft, CollapseRight, Heart } from './icons';
+import {
+  BrokenHeart,
+  CollapseLeft,
+  CollapseRight,
+  HollowHeart,
+  SolidHeart,
+} from './icons';
 import { getHeaders } from '@/lib/auth';
 import { replacePath } from '@/lib/route';
 import Image from 'next/image';
@@ -28,7 +34,11 @@ const Channels = ({
   let [followingStreams, setFollowingStreams] = useState<
     Stream[] | undefined
   >();
+  let [notFollowingStreams, setNotFollowingStreams] = useState<
+    Stream[] | undefined
+  >();
   let [gameStreams, setGameStreams] = useState<Stream[] | undefined>();
+
   useEffect(() => {
     if (accessToken) {
       // remove token from url
@@ -45,6 +55,42 @@ const Channels = ({
 
     return () => clearInterval(intervalId);
   }, [accessToken, user, watching]);
+
+  const updateNotFollowingStreams = useCallback(
+    (
+      accessToken: string | undefined,
+      followingStreams: Stream[] | undefined,
+      watching: string[]
+    ) => {
+      if (!accessToken) return;
+      if (!followingStreams) return;
+      let notFollowing = watching.filter(
+        (w) => !followingStreams?.map((f) => f.user_login).includes(w)
+      );
+      if (notFollowing.length == 0) {
+        setNotFollowingStreams([]);
+        return;
+      }
+      let user_logins_param = 'user_login=' + notFollowing.join('&user_login=');
+      const httpOptions = getHeaders(accessToken);
+      fetch(
+        `https://api.twitch.tv/helix/streams?${user_logins_param}&first=100`,
+        httpOptions
+      )
+        .then((res) => res.json())
+        .then((json) => {
+          let streams = json.data as Stream[];
+          setNotFollowingStreams(streams);
+        })
+        .catch((err) => console.log(err));
+    },
+    []
+  );
+
+  useEffect(() => {
+    console.log('something changed watching');
+    updateNotFollowingStreams(accessToken, followingStreams, watching);
+  }, [accessToken, followingStreams, watching, updateNotFollowingStreams]);
 
   const updateFollowingStreams = (
     accessToken: string | undefined,
@@ -110,18 +156,31 @@ const Channels = ({
         accessToken={accessToken}
         type={SectionType.Channel}
         headerText="Followed Channels"
-        headerIcon={<Heart />}
+        headerIcon={<HollowHeart />}
         open={open}
         watching={watching}
         streams={followingStreams}
         addWatching={addWatching}
         removeWatching={removeWatching}
       />
+      {notFollowingStreams && notFollowingStreams.length > 0 && (
+        <ChannelSection
+          accessToken={accessToken}
+          type={SectionType.NotFollowing}
+          headerText="Not Followed Channels"
+          headerIcon={<BrokenHeart />}
+          open={open}
+          watching={watching}
+          streams={notFollowingStreams}
+          addWatching={addWatching}
+          removeWatching={removeWatching}
+        />
+      )}
       <ChannelSection
         accessToken={accessToken}
         type={SectionType.Game}
         headerText="Super Mario World"
-        headerIcon={<Heart />}
+        headerIcon={<SolidHeart />}
         open={open}
         watching={watching}
         streams={gameStreams}
@@ -271,7 +330,7 @@ const ChannelRow = ({
 
   return (
     <div
-      id={`following-${type}-${stream.user_login}`}
+      id={`${type}-${stream.user_login}`}
       data-stream={user?.login}
       className="flex max-w-full h-[4.2rem] px-4 py-2 cursor-pointer hover:bg-sidepanelhover"
       onClick={() => updateWatching(stream.user_login)}
