@@ -1,20 +1,16 @@
-The is a Twitch client alternative, focusing on watching multiple streams simultaneously.
+# Magnum
 
-Deployed alpha coming soon.
+Magnum is a Twitch client **alternative**, focusing on watching multiple streams simultaneously.
+
+Unlike other multi-Twitch platforms, Magnum works best when linked to your Twitch account. Namely, by utilizing your following list to watching additional streams with a click of a button.
 
 ## Getting Started
 
- Run the development server:
+1) Open [Magnum](https://magnum-twitch.vercel.app/)
+2) Link your Twitch account by clicking the Login button
+3) Click on many streams
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Lore
 
-Open [http://localhost:3000](http://localhost:3000) and login with your Twitch account.
-
+- One stream is not enough
+- Two tabs is too many
