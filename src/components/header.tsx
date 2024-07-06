@@ -1,5 +1,5 @@
 import { Carousel, Grid, LogOut, Plus, Twitch } from '@/components/icons';
-import { PlayerLayout } from '@/types/state';
+import { PlayerView } from '@/types/state';
 import { User } from '@/types/twitch';
 import Image from 'next/image';
 import { FormEvent, useState } from 'react';
@@ -11,14 +11,14 @@ export default function Header({
   accessToken,
   user,
   addWatching,
-  playerLayout,
-  setPlayerLayout,
+  playerView,
+  setPlayerView,
 }: {
   accessToken: string | undefined;
   user: User | undefined;
   addWatching: (channel: string) => void;
-  playerLayout: PlayerLayout;
-  setPlayerLayout: (layout: PlayerLayout) => void;
+  playerView: PlayerView;
+  setPlayerView: (view: PlayerView) => void;
 }) {
   const addAnyChannel = (e: FormEvent) => {
     e.preventDefault();
@@ -47,24 +47,24 @@ export default function Header({
         </div>
         <div className="flex h-full py-4 px-2">
           <button
-            onClick={() => setPlayerLayout(PlayerLayout.Grid)}
+            onClick={() => setPlayerView(PlayerView.Grid)}
             className="flex items-center bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] active:bg-opacity-[0.55] rounded-l-[6px]"
           >
             <div
               className={`px-4 ${
-                playerLayout == PlayerLayout.Grid ? 'text-twpurple' : ''
+                playerView == PlayerView.Grid ? 'text-twpurple' : ''
               }`}
             >
               <Grid />
             </div>
           </button>
           <button
-            onClick={() => setPlayerLayout(PlayerLayout.Spotlight)}
+            onClick={() => setPlayerView(PlayerView.Spotlight)}
             className="flex items-center bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] active:bg-opacity-[0.55] rounded-r-[6px]"
           >
             <div
               className={`px-4 border-l border-twbuttonbg/[0.48] ${
-                playerLayout == PlayerLayout.Spotlight ? 'text-twpurple' : ''
+                playerView == PlayerView.Spotlight ? 'text-twpurple' : ''
               }`}
             >
               <Carousel />

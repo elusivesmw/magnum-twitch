@@ -193,9 +193,9 @@ export const SolidHeart = ({ className = '' }: { className?: string }) => {
     >
       <g>
         <path
-          fill-rule="evenodd"
+          fillRule="evenodd"
           d="M9.171 4.171A4 4 0 006.343 3H6a4 4 0 00-4 4v.343a4 4 0 001.172 2.829L10 17l6.828-6.828A4 4 0 0018 7.343V7a4 4 0 00-4-4h-.343a4 4 0 00-2.829 1.172L10 5l-.829-.829z"
-          clip-rule="evenodd"
+          clipRule="evenodd"
         ></path>
       </g>
     </svg>

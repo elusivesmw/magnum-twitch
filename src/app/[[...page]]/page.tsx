@@ -6,14 +6,13 @@ import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Stream, User } from '@/types/twitch';
 import { getHeaders, getOAuthHeaders } from '@/lib/auth';
-import { replacePath } from '@/lib/route';
-import { PlayerLayout } from '@/types/state';
+import { removeSearchParams, replaceSearchParams } from '@/lib/route';
+import { PlayerView, getPlayerView } from '@/types/state';
 import Header from '@/components/header';
 import Channels from '@/components/channels';
 
-const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 const LS_ACCESS_TOKEN = 'ACCESS_TOKEN';
+const SP_VIEW = 'v';
 const VALIDATE_INTERVAL = 60 * 60 * 1000;
 const LIVE_CHECK_INTERVAL = 60 * 1000;
 
@@ -21,33 +20,23 @@ export default function Home({ params }: { params: { page: string[] } }) {
   // global helpers
   const searchParams = useSearchParams();
 
+  // initial watching channels without duplicates
+  const initialWatching = Array.from(new Set(params.page));
+  const initialChat = initialWatching.length > 0 ? initialWatching[0] : '';
+  const initialView = getViewFromSearchParams(searchParams);
+
   // state
   const [accessToken, setAccessToken] = useState<string | undefined>();
   const [user, setUser] = useState<User | undefined>();
-  const [watching, setWatching] = useState<string[]>([]);
-  const [order, setOrder] = useState<string[]>([]);
-  const [activeChat, setActiveChat] = useState('');
-  const [playerLayout, setPlayerLayout] = useState<PlayerLayout>(
-    PlayerLayout.Grid
-  );
-
-  // get watching list from params
-  useEffect(() => {
-    // initial page load, open channels
-    const serverPath = params.page;
-    // make sure no duplicates
-    const uniqueWatching = Array.from(new Set(serverPath));
-
-    if (uniqueWatching.length == 0) return;
-    setWatching(uniqueWatching);
-    setOrder(uniqueWatching);
-  }, [params.page]);
+  const [watching, setWatching] = useState<string[]>(initialWatching);
+  const [order, setOrder] = useState<string[]>(initialWatching);
+  const [activeChat, setActiveChat] = useState(initialChat);
+  const [playerView, setPlayerView] = useState<PlayerView>(initialView);
 
   // set token
   useEffect(() => {
     if (getError(searchParams)) {
-      // remove query params
-      replacePath(order);
+      removeSearchParams(order);
     }
     let token = getToken();
     if (!token) return;
@@ -135,8 +124,8 @@ export default function Home({ params }: { params: { page: string[] } }) {
 
   // keep path in sync with order
   useEffect(() => {
-    replacePath(order);
-  }, [order]);
+    replaceSearchParams(order, playerView);
+  }, [order, playerView]);
 
   //
   function validateToken(accessToken: string | undefined) {
@@ -213,14 +202,26 @@ export default function Home({ params }: { params: { page: string[] } }) {
     setOrder(newOrder);
   }
 
+  //
+  function getViewFromSearchParams(searchParams: URLSearchParams) {
+    let view = getPlayerView(searchParams.get(SP_VIEW));
+    return view;
+  }
+
+  //
+  function setSearchParamsFromView(view: PlayerView) {
+    setPlayerView(view);
+    replaceSearchParams(order, view);
+  }
+
   return (
     <div id="root" className="flex flex-col h-screen">
       <Header
         accessToken={accessToken}
         user={user}
         addWatching={addWatching}
-        playerLayout={playerLayout}
-        setPlayerLayout={setPlayerLayout}
+        playerView={playerView}
+        setPlayerView={setSearchParamsFromView}
       />
       <main className="relative flex h-full overflow-y-hidden">
         {user && (
@@ -230,12 +231,13 @@ export default function Home({ params }: { params: { page: string[] } }) {
             watching={watching}
             addWatching={addWatching}
             removeWatching={removeWatching}
+            view={playerView}
           />
         )}
         <div
           id="player-container"
           className={`flex ${playerClass(
-            playerLayout
+            playerView
           )} basis-auto grow shrink justify-around bg-black mt-[1px] mb-[2px]`}
         >
           {watching.map((e) => (
@@ -302,13 +304,13 @@ function getError(searchParams: URLSearchParams) {
   return true;
 }
 
-function playerClass(layout: PlayerLayout) {
-  switch (layout) {
-    case PlayerLayout.Vertical:
+function playerClass(view: PlayerView) {
+  switch (view) {
+    case PlayerView.Vertical:
       return 'flex-col flex-nowrap vertical';
-    case PlayerLayout.Spotlight:
+    case PlayerView.Spotlight:
       return 'flex-row flex-wrap spotlight';
-    case PlayerLayout.Grid:
+    case PlayerView.Grid:
     default:
       return 'flex-row flex-wrap';
   }

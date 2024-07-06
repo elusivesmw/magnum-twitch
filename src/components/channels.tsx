@@ -10,10 +10,11 @@ import {
   SolidHeart,
 } from './icons';
 import { getHeaders } from '@/lib/auth';
-import { replacePath } from '@/lib/route';
+import { replaceSearchParams } from '@/lib/route';
 import Image from 'next/image';
 import { FollowingTooltip } from './tooltip';
 import { SectionType } from '@/types/channel';
+import { PlayerView } from '@/types/state';
 
 const GAME_ID = 1229;
 const POLL_INTERVAL = 60 * 1000;
@@ -24,12 +25,14 @@ const Channels = ({
   watching,
   addWatching,
   removeWatching,
+  view,
 }: {
   accessToken: string | undefined;
   user: User;
   watching: string[];
   addWatching: (stream: string) => void;
   removeWatching: (stream: string) => void;
+  view: PlayerView;
 }) => {
   let [followingStreams, setFollowingStreams] = useState<
     Stream[] | undefined
@@ -43,7 +46,7 @@ const Channels = ({
     if (accessToken) {
       // remove token from url
       // NOTE: this won't preserve order, but this is an edge case so ¯\_(ツ)_/¯
-      replacePath(watching);
+      replaceSearchParams(watching, view);
     }
 
     updateFollowingStreams(accessToken, user);
@@ -54,7 +57,7 @@ const Channels = ({
     }, POLL_INTERVAL);
 
     return () => clearInterval(intervalId);
-  }, [accessToken, user, watching]);
+  }, [accessToken, user, watching, view]);
 
   const updateNotFollowingStreams = useCallback(
     (
@@ -88,7 +91,6 @@ const Channels = ({
   );
 
   useEffect(() => {
-    console.log('something changed watching');
     updateNotFollowingStreams(accessToken, followingStreams, watching);
   }, [accessToken, followingStreams, watching, updateNotFollowingStreams]);
 
