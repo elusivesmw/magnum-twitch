@@ -6,14 +6,15 @@ import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Stream, User } from '@/types/twitch';
 import { getHeaders, getOAuthHeaders } from '@/lib/auth';
-import { replacePath } from '@/lib/route';
-import { PlayerLayout } from '@/types/state';
+import { replacePath, replaceSearchParams } from '@/lib/route';
+import { PlayerLayout, getPlayerLayout } from '@/types/state';
 import Header from '@/components/header';
 import Channels from '@/components/channels';
 
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 const LS_ACCESS_TOKEN = 'ACCESS_TOKEN';
+const SP_LAYOUT = 'layout';
 const VALIDATE_INTERVAL = 60 * 60 * 1000;
 const LIVE_CHECK_INTERVAL = 60 * 1000;
 
@@ -28,11 +29,24 @@ export default function Home({ params }: { params: { page: string[] } }) {
   const [order, setOrder] = useState<string[]>([]);
   const [activeChat, setActiveChat] = useState('');
   const [playerLayout, setPlayerLayout] = useState<PlayerLayout>(
-    PlayerLayout.Grid
+    getLayoutFromSearchParams(searchParams)
   );
+
+  function getLayoutFromSearchParams(searchParams: URLSearchParams) {
+    let layout = getPlayerLayout(searchParams.get(SP_LAYOUT));
+    console.log('getLayoutFromSearchParams', layout);
+    return layout;
+  }
+
+  function setSearchParamsFromLayout(layout: PlayerLayout) {
+    console.log('setSearchParamsFromLayout', layout);
+    setPlayerLayout(layout);
+    replaceSearchParams(order, layout);
+  }
 
   // get watching list from params
   useEffect(() => {
+    console.log('xxxxxxxxxxx');
     // initial page load, open channels
     const serverPath = params.page;
     // make sure no duplicates
@@ -135,8 +149,9 @@ export default function Home({ params }: { params: { page: string[] } }) {
 
   // keep path in sync with order
   useEffect(() => {
-    replacePath(order);
-  }, [order]);
+    console.log('in sync', order, playerLayout);
+    replaceSearchParams(order, playerLayout);
+  }, [order, playerLayout]);
 
   //
   function validateToken(accessToken: string | undefined) {
@@ -220,7 +235,7 @@ export default function Home({ params }: { params: { page: string[] } }) {
         user={user}
         addWatching={addWatching}
         playerLayout={playerLayout}
-        setPlayerLayout={setPlayerLayout}
+        setPlayerLayout={setSearchParamsFromLayout}
       />
       <main className="relative flex h-full overflow-y-hidden">
         {user && (
@@ -230,6 +245,7 @@ export default function Home({ params }: { params: { page: string[] } }) {
             watching={watching}
             addWatching={addWatching}
             removeWatching={removeWatching}
+            layout={playerLayout}
           />
         )}
         <div
