@@ -13,11 +13,11 @@ const EMBED_PARENT = process.env.NEXT_PUBLIC_TWITCH_EMBED_PARENT;
 const MultiChat = ({
   channels,
   activeChat,
-  updateActiveChat,
+  setActiveChat,
 }: {
   channels: string[];
   activeChat: string;
-  updateActiveChat: (chat: string) => void;
+  setActiveChat: (chat: string) => void;
 }) => {
   const [visibleIndex, setVisibleIndex] = useState(0);
 
@@ -29,14 +29,19 @@ const MultiChat = ({
     var i = visibleIndex + 1;
     if (i > channels.length - 1) i = 0;
     setVisibleIndex(i);
-    updateActiveChat(channels[i]);
+    setActiveChat(channels[i]);
   };
 
   const prev = () => {
     var i = visibleIndex - 1;
     if (i < 0) i = channels.length - 1;
     setVisibleIndex(i);
-    updateActiveChat(channels[i]);
+    setActiveChat(channels[i]);
+  };
+
+  const dropdownSelected = (chat: string) => {
+    setVisibleIndex(channels.findIndex((e) => e == chat));
+    setActiveChat(chat);
   };
 
   let [open, setOpen] = useState<boolean>(true);
@@ -48,32 +53,7 @@ const MultiChat = ({
     <div className={`flex flex-col h-full ${open ? 'w-[350px]' : 'w-auto'}`}>
       <div className="relative flex h-[50px] flex-wrap bg-chatpanel border-b border-twborder text-twtext items-center justify-between">
         <div
-          onClick={prev}
-          className={`${
-            open ? 'block' : 'hidden'
-          } h-[20px] px-2 cursor-pointer select-none hover:bg-twbuttonbg hover:bg-opacity-[0.48]`}
-        >
-          <ArrowLeft />
-        </div>
-        <span
-          className={`${
-            open ? 'block' : 'hidden'
-          } uppercase font-bold text-sm text-center`}
-        >
-          {activeChat}
-        </span>
-        <div
-          onClick={next}
-          className={`${
-            open ? 'block' : 'hidden'
-          } h-[20px] px-2 cursor-pointer select-none hover:bg-twbuttonbg hover:bg-opacity-[0.48]`}
-        >
-          <ArrowRight />
-        </div>
-        <div
-          className={`${
-            open ? 'left-2' : 'left-[-30px]'
-          } absolute bottom-[-3em] z-10`}
+          className={`${!open ? 'absolute left-[-30px] top-4 z-10' : 'ml-2'} `}
         >
           <button
             onClick={toggleOpen}
@@ -81,6 +61,21 @@ const MultiChat = ({
           >
             {open ? <CollapseRight /> : <CollapseLeft />}
           </button>
+        </div>
+        <div className={`flex flex-col grow px-2 ${open ? 'block' : 'hidden'}`}>
+          <ChatDropdown
+            channels={channels}
+            activeChat={activeChat}
+            setActiveChat={dropdownSelected}
+          />
+        </div>
+        <div
+          onClick={next}
+          className={`${
+            open ? 'block' : 'hidden'
+          } h-[20px] px-2 cursor-pointer select-none hover:bg-twbuttonbg hover:bg-opacity-[0.48]`}
+        >
+          <ArrowRight />
         </div>
       </div>
       <div className={`${open ? 'block' : 'hidden'} flex grow h-auto`}>
@@ -104,6 +99,37 @@ const Chat = ({ channel, visible }: { channel: string; visible: boolean }) => {
       ></iframe>
     </div>
   );
+};
+
+const ChatDropdown = ({
+  channels,
+  activeChat,
+  setActiveChat,
+}: {
+  channels: string[];
+  activeChat: string;
+  setActiveChat: (chat: string) => void;
+}) => {
+  if (channels.length > 0) {
+    return (
+      <select
+        className="uppercase font-bold text-sm text-center bg-chatpanel focus:outline-0 py-4"
+        onChange={(e) => setActiveChat(e.target.value)}
+      >
+        {channels.map((e, i) => (
+          <option value={e} selected={e == activeChat} key={i}>
+            {e}
+          </option>
+        ))}
+      </select>
+    );
+  } else {
+    return (
+      <span className="uppercase font-bold text-sm text-center">
+        No Channels
+      </span>
+    );
+  }
 };
 
 export default MultiChat;

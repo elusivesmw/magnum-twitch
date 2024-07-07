@@ -255,7 +255,7 @@ export default function Home({ params }: { params: { page: string[] } }) {
         <MultiChat
           channels={order}
           activeChat={activeChat}
-          updateActiveChat={setActiveChat}
+          setActiveChat={setActiveChat}
         />
       </main>
     </div>
