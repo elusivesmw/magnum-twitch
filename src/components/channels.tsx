@@ -10,7 +10,7 @@ import {
   SolidHeart,
 } from './icons';
 import { getHeaders } from '@/lib/auth';
-import { replacePath, replaceSearchParams } from '@/lib/route';
+import { replaceSearchParams } from '@/lib/route';
 import Image from 'next/image';
 import { FollowingTooltip } from './tooltip';
 import { SectionType } from '@/types/channel';

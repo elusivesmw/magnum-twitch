@@ -11,8 +11,6 @@ import { PlayerLayout, getPlayerLayout } from '@/types/state';
 import Header from '@/components/header';
 import Channels from '@/components/channels';
 
-const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 const LS_ACCESS_TOKEN = 'ACCESS_TOKEN';
 const SP_LAYOUT = 'layout';
 const VALIDATE_INTERVAL = 60 * 60 * 1000;
@@ -22,27 +20,22 @@ export default function Home({ params }: { params: { page: string[] } }) {
   // global helpers
   const searchParams = useSearchParams();
 
-  // initial page load, open channels
-  const serverPath = params.page;
-  // make sure no duplicates
-  const uniqueWatching = Array.from(new Set(serverPath));
-  // set first chat
-  const initialChat = uniqueWatching.length > 0 ? uniqueWatching[0] : '';
+  // initial watching channels without duplicates
+  const initialWatching = Array.from(new Set(params.page));
+  const initialChat = initialWatching.length > 0 ? initialWatching[0] : '';
+  const initialLayout = getLayoutFromSearchParams(searchParams);
 
   // state
   const [accessToken, setAccessToken] = useState<string | undefined>();
   const [user, setUser] = useState<User | undefined>();
-  const [watching, setWatching] = useState<string[]>(uniqueWatching);
-  const [order, setOrder] = useState<string[]>(uniqueWatching);
+  const [watching, setWatching] = useState<string[]>(initialWatching);
+  const [order, setOrder] = useState<string[]>(initialWatching);
   const [activeChat, setActiveChat] = useState(initialChat);
-  const [playerLayout, setPlayerLayout] = useState<PlayerLayout>(
-    getLayoutFromSearchParams(searchParams)
-  );
+  const [playerLayout, setPlayerLayout] = useState<PlayerLayout>(initialLayout);
 
   // set token
   useEffect(() => {
     if (getError(searchParams)) {
-      // remove query params
       removeSearchParams(order);
     }
     let token = getToken();
