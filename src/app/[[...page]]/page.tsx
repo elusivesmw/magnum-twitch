@@ -7,12 +7,12 @@ import { useSearchParams } from 'next/navigation';
 import { Stream, User } from '@/types/twitch';
 import { getHeaders, getOAuthHeaders } from '@/lib/auth';
 import { removeSearchParams, replaceSearchParams } from '@/lib/route';
-import { PlayerLayout, getPlayerLayout } from '@/types/state';
+import { PlayerView, getPlayerView } from '@/types/state';
 import Header from '@/components/header';
 import Channels from '@/components/channels';
 
 const LS_ACCESS_TOKEN = 'ACCESS_TOKEN';
-const SP_LAYOUT = 'layout';
+const SP_VIEW = 'v';
 const VALIDATE_INTERVAL = 60 * 60 * 1000;
 const LIVE_CHECK_INTERVAL = 60 * 1000;
 
@@ -23,7 +23,7 @@ export default function Home({ params }: { params: { page: string[] } }) {
   // initial watching channels without duplicates
   const initialWatching = Array.from(new Set(params.page));
   const initialChat = initialWatching.length > 0 ? initialWatching[0] : '';
-  const initialLayout = getLayoutFromSearchParams(searchParams);
+  const initialView = getViewFromSearchParams(searchParams);
 
   // state
   const [accessToken, setAccessToken] = useState<string | undefined>();
@@ -31,7 +31,7 @@ export default function Home({ params }: { params: { page: string[] } }) {
   const [watching, setWatching] = useState<string[]>(initialWatching);
   const [order, setOrder] = useState<string[]>(initialWatching);
   const [activeChat, setActiveChat] = useState(initialChat);
-  const [playerLayout, setPlayerLayout] = useState<PlayerLayout>(initialLayout);
+  const [playerView, setPlayerView] = useState<PlayerView>(initialView);
 
   // set token
   useEffect(() => {
@@ -124,8 +124,8 @@ export default function Home({ params }: { params: { page: string[] } }) {
 
   // keep path in sync with order
   useEffect(() => {
-    replaceSearchParams(order, playerLayout);
-  }, [order, playerLayout]);
+    replaceSearchParams(order, playerView);
+  }, [order, playerView]);
 
   //
   function validateToken(accessToken: string | undefined) {
@@ -203,15 +203,15 @@ export default function Home({ params }: { params: { page: string[] } }) {
   }
 
   //
-  function getLayoutFromSearchParams(searchParams: URLSearchParams) {
-    let layout = getPlayerLayout(searchParams.get(SP_LAYOUT));
-    return layout;
+  function getViewFromSearchParams(searchParams: URLSearchParams) {
+    let view = getPlayerView(searchParams.get(SP_VIEW));
+    return view;
   }
 
   //
-  function setSearchParamsFromLayout(layout: PlayerLayout) {
-    setPlayerLayout(layout);
-    replaceSearchParams(order, layout);
+  function setSearchParamsFromView(view: PlayerView) {
+    setPlayerView(view);
+    replaceSearchParams(order, view);
   }
 
   return (
@@ -220,8 +220,8 @@ export default function Home({ params }: { params: { page: string[] } }) {
         accessToken={accessToken}
         user={user}
         addWatching={addWatching}
-        playerLayout={playerLayout}
-        setPlayerLayout={setSearchParamsFromLayout}
+        playerView={playerView}
+        setPlayerView={setSearchParamsFromView}
       />
       <main className="relative flex h-full overflow-y-hidden">
         {user && (
@@ -231,13 +231,13 @@ export default function Home({ params }: { params: { page: string[] } }) {
             watching={watching}
             addWatching={addWatching}
             removeWatching={removeWatching}
-            layout={playerLayout}
+            view={playerView}
           />
         )}
         <div
           id="player-container"
           className={`flex ${playerClass(
-            playerLayout
+            playerView
           )} basis-auto grow shrink justify-around bg-black mt-[1px] mb-[2px]`}
         >
           {watching.map((e) => (
@@ -304,13 +304,13 @@ function getError(searchParams: URLSearchParams) {
   return true;
 }
 
-function playerClass(layout: PlayerLayout) {
-  switch (layout) {
-    case PlayerLayout.Vertical:
+function playerClass(view: PlayerView) {
+  switch (view) {
+    case PlayerView.Vertical:
       return 'flex-col flex-nowrap vertical';
-    case PlayerLayout.Spotlight:
+    case PlayerView.Spotlight:
       return 'flex-row flex-wrap spotlight';
-    case PlayerLayout.Grid:
+    case PlayerView.Grid:
     default:
       return 'flex-row flex-wrap';
   }

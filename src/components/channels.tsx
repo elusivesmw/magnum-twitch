@@ -14,7 +14,7 @@ import { replaceSearchParams } from '@/lib/route';
 import Image from 'next/image';
 import { FollowingTooltip } from './tooltip';
 import { SectionType } from '@/types/channel';
-import { PlayerLayout } from '@/types/state';
+import { PlayerView } from '@/types/state';
 
 const GAME_ID = 1229;
 const POLL_INTERVAL = 60 * 1000;
@@ -25,14 +25,14 @@ const Channels = ({
   watching,
   addWatching,
   removeWatching,
-  layout,
+  view,
 }: {
   accessToken: string | undefined;
   user: User;
   watching: string[];
   addWatching: (stream: string) => void;
   removeWatching: (stream: string) => void;
-  layout: PlayerLayout;
+  view: PlayerView;
 }) => {
   let [followingStreams, setFollowingStreams] = useState<
     Stream[] | undefined
@@ -46,7 +46,7 @@ const Channels = ({
     if (accessToken) {
       // remove token from url
       // NOTE: this won't preserve order, but this is an edge case so ¯\_(ツ)_/¯
-      replaceSearchParams(watching, layout);
+      replaceSearchParams(watching, view);
     }
 
     updateFollowingStreams(accessToken, user);
@@ -57,7 +57,7 @@ const Channels = ({
     }, POLL_INTERVAL);
 
     return () => clearInterval(intervalId);
-  }, [accessToken, user, watching, layout]);
+  }, [accessToken, user, watching, view]);
 
   const updateNotFollowingStreams = useCallback(
     (
