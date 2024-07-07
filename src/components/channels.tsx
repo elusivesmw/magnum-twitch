@@ -91,7 +91,6 @@ const Channels = ({
   );
 
   useEffect(() => {
-    console.log('something changed watching');
     updateNotFollowingStreams(accessToken, followingStreams, watching);
   }, [accessToken, followingStreams, watching, updateNotFollowingStreams]);
 

@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Stream, User } from '@/types/twitch';
 import { getHeaders, getOAuthHeaders } from '@/lib/auth';
-import { replacePath, replaceSearchParams } from '@/lib/route';
+import { removeSearchParams, replaceSearchParams } from '@/lib/route';
 import { PlayerLayout, getPlayerLayout } from '@/types/state';
 import Header from '@/components/header';
 import Channels from '@/components/channels';
@@ -22,46 +22,28 @@ export default function Home({ params }: { params: { page: string[] } }) {
   // global helpers
   const searchParams = useSearchParams();
 
+  // initial page load, open channels
+  const serverPath = params.page;
+  // make sure no duplicates
+  const uniqueWatching = Array.from(new Set(serverPath));
+  // set first chat
+  const initialChat = uniqueWatching.length > 0 ? uniqueWatching[0] : '';
+
   // state
   const [accessToken, setAccessToken] = useState<string | undefined>();
   const [user, setUser] = useState<User | undefined>();
-  const [watching, setWatching] = useState<string[]>([]);
-  const [order, setOrder] = useState<string[]>([]);
-  const [activeChat, setActiveChat] = useState('');
+  const [watching, setWatching] = useState<string[]>(uniqueWatching);
+  const [order, setOrder] = useState<string[]>(uniqueWatching);
+  const [activeChat, setActiveChat] = useState(initialChat);
   const [playerLayout, setPlayerLayout] = useState<PlayerLayout>(
     getLayoutFromSearchParams(searchParams)
   );
-
-  function getLayoutFromSearchParams(searchParams: URLSearchParams) {
-    let layout = getPlayerLayout(searchParams.get(SP_LAYOUT));
-    console.log('getLayoutFromSearchParams', layout);
-    return layout;
-  }
-
-  function setSearchParamsFromLayout(layout: PlayerLayout) {
-    console.log('setSearchParamsFromLayout', layout);
-    setPlayerLayout(layout);
-    replaceSearchParams(order, layout);
-  }
-
-  // get watching list from params
-  useEffect(() => {
-    console.log('xxxxxxxxxxx');
-    // initial page load, open channels
-    const serverPath = params.page;
-    // make sure no duplicates
-    const uniqueWatching = Array.from(new Set(serverPath));
-
-    if (uniqueWatching.length == 0) return;
-    setWatching(uniqueWatching);
-    setOrder(uniqueWatching);
-  }, [params.page]);
 
   // set token
   useEffect(() => {
     if (getError(searchParams)) {
       // remove query params
-      replacePath(order);
+      removeSearchParams(order);
     }
     let token = getToken();
     if (!token) return;
@@ -149,7 +131,6 @@ export default function Home({ params }: { params: { page: string[] } }) {
 
   // keep path in sync with order
   useEffect(() => {
-    console.log('in sync', order, playerLayout);
     replaceSearchParams(order, playerLayout);
   }, [order, playerLayout]);
 
@@ -226,6 +207,18 @@ export default function Home({ params }: { params: { page: string[] } }) {
     let newOrder = [...order];
     move(newOrder, fromOrder, toOrder);
     setOrder(newOrder);
+  }
+
+  //
+  function getLayoutFromSearchParams(searchParams: URLSearchParams) {
+    let layout = getPlayerLayout(searchParams.get(SP_LAYOUT));
+    return layout;
+  }
+
+  //
+  function setSearchParamsFromLayout(layout: PlayerLayout) {
+    setPlayerLayout(layout);
+    replaceSearchParams(order, layout);
   }
 
   return (
