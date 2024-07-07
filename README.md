@@ -2,7 +2,7 @@
 
 Magnum is a Twitch client **alternative**, focusing on watching multiple streams simultaneously.
 
-Unlike other multi-Twitch platforms, Magnum works best when linked to your Twitch account. Namely, by utilizing your following list to watching additional streams with a click of a button.
+Unlike other multi-Twitch platforms, Magnum works best when linked to your Twitch account. Namely, by utilizing your following list to watch additional streams with a click of a button.
 
 ## Getting Started
 
