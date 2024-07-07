@@ -39,6 +39,11 @@ const MultiChat = ({
     updateActiveChat(channels[i]);
   };
 
+  const dropdownSelected = (chat: string) => {
+    setVisibleIndex(channels.findIndex((e) => e == chat));
+    updateActiveChat(chat);
+  };
+
   let [open, setOpen] = useState<boolean>(true);
   const toggleOpen = () => {
     setOpen(!open);
@@ -56,7 +61,11 @@ const MultiChat = ({
           <ArrowLeft />
         </div>
         <div className={`${open ? 'block' : 'hidden'}`}>
-          <ChatDropdown channels={channels} activeChat={activeChat} />
+          <ChatDropdown
+            channels={channels}
+            activeChat={activeChat}
+            updateActiveChat={dropdownSelected}
+          />
         </div>
         <div
           onClick={next}
@@ -105,13 +114,18 @@ const Chat = ({ channel, visible }: { channel: string; visible: boolean }) => {
 const ChatDropdown = ({
   channels,
   activeChat,
+  updateActiveChat,
 }: {
   channels: string[];
   activeChat: string;
+  updateActiveChat: (chat: string) => void;
 }) => {
   if (channels.length > 0) {
     return (
-      <select className="uppercase font-bold text-sm text-center bg-chatpanel">
+      <select
+        className="uppercase font-bold text-sm text-center bg-chatpanel"
+        onChange={(e) => updateActiveChat(e.target.value)}
+      >
         {channels.map((e, i) => (
           <option value={e} selected={e == activeChat} key={i}>
             {e}
