@@ -62,7 +62,7 @@ const MultiChat = ({
             {open ? <CollapseRight /> : <CollapseLeft />}
           </button>
         </div>
-        <div className={`${open ? 'block' : 'hidden'}`}>
+        <div className={`flex flex-col grow px-2 ${open ? 'block' : 'hidden'}`}>
           <ChatDropdown
             channels={channels}
             activeChat={activeChat}
@@ -113,7 +113,7 @@ const ChatDropdown = ({
   if (channels.length > 0) {
     return (
       <select
-        className="uppercase font-bold text-sm text-center bg-chatpanel"
+        className="uppercase font-bold text-sm text-center bg-chatpanel focus:outline-0 py-4"
         onChange={(e) => setActiveChat(e.target.value)}
       >
         {channels.map((e, i) => (
