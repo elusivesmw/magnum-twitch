@@ -55,13 +55,9 @@ const MultiChat = ({
         >
           <ArrowLeft />
         </div>
-        <span
-          className={`${
-            open ? 'block' : 'hidden'
-          } uppercase font-bold text-sm text-center`}
-        >
-          {activeChat}
-        </span>
+        <div className={`${open ? 'block' : 'hidden'}`}>
+          <ChatDropdown channels={channels} activeChat={activeChat} />
+        </div>
         <div
           onClick={next}
           className={`${
@@ -104,6 +100,32 @@ const Chat = ({ channel, visible }: { channel: string; visible: boolean }) => {
       ></iframe>
     </div>
   );
+};
+
+const ChatDropdown = ({
+  channels,
+  activeChat,
+}: {
+  channels: string[];
+  activeChat: string;
+}) => {
+  if (channels.length > 0) {
+    return (
+      <select className="uppercase font-bold text-sm text-center bg-chatpanel">
+        {channels.map((e, i) => (
+          <option value={e} selected={e == activeChat} key={i}>
+            {e}
+          </option>
+        ))}
+      </select>
+    );
+  } else {
+    return (
+      <span className="uppercase font-bold text-sm text-center">
+        No Channels
+      </span>
+    );
+  }
 };
 
 export default MultiChat;
