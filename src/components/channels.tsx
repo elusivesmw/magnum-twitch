@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Stream, User } from '@/types/twitch';
 import {
+  ArrowDown,
   BrokenHeart,
   CollapseLeft,
   CollapseRight,
@@ -15,6 +16,7 @@ import Image from 'next/image';
 import { FollowingTooltip } from './tooltip';
 import { SectionType } from '@/types/channel';
 import { PlayerView } from '@/types/state';
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 
 const GAME_ID = 1229;
 const POLL_INTERVAL = 60 * 1000;
@@ -154,6 +156,38 @@ const Channels = ({
           {open ? <CollapseLeft /> : <CollapseRight />}
         </button>
       </div>
+      <div className="flex basis-20 grow-0 shrink-0 items-center px-4">
+        <select className="uppercase font-bold text-sm bold bg-sidepanel focus:outline-0 py-4 w-full">
+          <option className="">Followed Channels</option>
+          <option className="">Super Mario World</option>
+        </select>
+      </div>
+
+      <Menu as="div">
+        <MenuButton className="relative flex justify-between items-center w-full p-4">
+          <span className="uppercase font-bold text-sm">Followed Channels</span>
+          <ArrowDown />
+        </MenuButton>
+        <MenuItems className="absolute left-4 z-10 rounded-lg ring-1 ring-twborder bg-sidepanel uppercase text-sm">
+          <MenuItem>
+            <a
+              href="#"
+              className="block px-2 hover:bg-blue-500 first:rounded-t-lg last:rounded-b-lg overflow-hidden"
+            >
+              Followed Channels
+            </a>
+          </MenuItem>
+          <MenuItem>
+            <a
+              href="#"
+              className="block px-2 hover:bg-blue-500 first:rounded-t-lg last:rounded-b-lg overflow-hidden"
+            >
+              Super Mario World
+            </a>
+          </MenuItem>
+        </MenuItems>
+      </Menu>
+
       <ChannelSection
         accessToken={accessToken}
         type={SectionType.Channel}
