@@ -16,7 +16,16 @@ import Image from 'next/image';
 import { FollowingTooltip } from './tooltip';
 import { SectionType } from '@/types/channel';
 import { PlayerView } from '@/types/state';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import {
+  Listbox,
+  ListboxButton,
+  ListboxOption,
+  ListboxOptions,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuItems,
+} from '@headlessui/react';
 
 const GAME_ID = 1229;
 const POLL_INTERVAL = 60 * 1000;
@@ -36,6 +45,7 @@ const Channels = ({
   removeWatching: (stream: string) => void;
   view: PlayerView;
 }) => {
+  let [visibleStreamList, setVisibleStreamList] = useState<string>('');
   let [followingStreams, setFollowingStreams] = useState<
     Stream[] | undefined
   >();
@@ -156,37 +166,46 @@ const Channels = ({
           {open ? <CollapseLeft /> : <CollapseRight />}
         </button>
       </div>
-      <div className="flex basis-20 grow-0 shrink-0 items-center px-4">
-        <select className="uppercase font-bold text-sm bold bg-sidepanel focus:outline-0 py-4 w-full">
-          <option className="">Followed Channels</option>
-          <option className="">Super Mario World</option>
-        </select>
-      </div>
 
-      <Menu as="div">
-        <MenuButton className="relative flex justify-between items-center w-full p-4">
-          <span className="uppercase font-bold text-sm">Followed Channels</span>
-          <ArrowDown />
-        </MenuButton>
-        <MenuItems className="absolute left-4 z-10 rounded-lg ring-1 ring-twborder bg-sidepanel uppercase text-sm">
-          <MenuItem>
-            <a
-              href="#"
-              className="block px-2 hover:bg-blue-500 first:rounded-t-lg last:rounded-b-lg overflow-hidden"
+      <div
+        className={`relative flex basis-20 shrink-0 grow-0 max-w-full ${
+          open ? 'justify-start' : 'justify-center'
+        }`}
+      >
+        <Listbox value={visibleStreamList} onChange={setVisibleStreamList}>
+          <ListboxButton className="flex justify-center items-center w-full p-4">
+            {open ? (
+              <div className="flex justify-between items-center w-full">
+                <span className="uppercase font-bold text-sm">
+                  Followed Channels
+                </span>
+                <ArrowDown />
+              </div>
+            ) : (
+              <div className="flex basis-8 h-8 items-center">
+                <HollowHeart />
+              </div>
+            )}
+          </ListboxButton>
+          <ListboxOptions
+            anchor="bottom"
+            className="translate-x-4 z-10 rounded-lg ring-1 ring-twborder bg-sidepanel uppercase text-sm"
+          >
+            <ListboxOption
+              value="following"
+              className="w-full block px-2 hover:bg-blue-500 first:rounded-t-lg last:rounded-b-lg cursor-pointer"
             >
-              Followed Channels
-            </a>
-          </MenuItem>
-          <MenuItem>
-            <a
-              href="#"
-              className="block px-2 hover:bg-blue-500 first:rounded-t-lg last:rounded-b-lg overflow-hidden"
+              Followed Channels really long long long
+            </ListboxOption>
+            <ListboxOption
+              value="mario"
+              className="block px-2 hover:bg-blue-500 first:rounded-t-lg last:rounded-b-lg cursor-pointer"
             >
               Super Mario World
-            </a>
-          </MenuItem>
-        </MenuItems>
-      </Menu>
+            </ListboxOption>
+          </ListboxOptions>
+        </Listbox>
+      </div>
 
       <ChannelSection
         accessToken={accessToken}
@@ -297,18 +316,6 @@ const ChannelSection = ({
   //
   return (
     <>
-      <div
-        className={`flex basis-20 shrink-0 grow-0 max-w-full text-center items-center ${
-          open ? 'justify-start' : 'justify-center'
-        } px-4`}
-      >
-        <span
-          className={`${!open ? 'hidden' : ''} uppercase font-bold text-sm`}
-        >
-          {headerText}
-        </span>
-        <div className={`${open ? 'hidden' : ''} h-8`}>{headerIcon}</div>
-      </div>
       {streams &&
         streams.map((stream, i) => {
           let user = users?.find((u) => u.id == stream.user_id);
