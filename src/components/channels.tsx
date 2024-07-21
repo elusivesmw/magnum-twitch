@@ -21,10 +21,6 @@ import {
   ListboxButton,
   ListboxOption,
   ListboxOptions,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
 } from '@headlessui/react';
 
 const GAME_ID = 1229;
@@ -52,6 +48,12 @@ const Channels = ({
   let [notFollowingStreams, setNotFollowingStreams] = useState<
     Stream[] | undefined
   >();
+
+  // TODO: implement
+  let [notVisibleStreams, setNotVisibleStreams] = useState<
+    Stream[] | undefined
+  >();
+
   let [gameStreams, setGameStreams] = useState<Stream[] | undefined>();
 
   useEffect(() => {
@@ -89,7 +91,7 @@ const Channels = ({
       let user_logins_param = 'user_login=' + notFollowing.join('&user_login=');
       const httpOptions = getHeaders(accessToken);
       fetch(
-        `https://api.twitch.tv/helix/streams?${user_logins_param}&first=100`,
+        `https://api.twitch.tv/helix/streams?${user_logins_param}`,
         httpOptions
       )
         .then((res) => res.json())
@@ -125,6 +127,11 @@ const Channels = ({
       .catch((err) => console.log(err));
   };
 
+  const updateVisibleStreamList = (e: string) => {
+    setVisibleStreamList(e);
+    console.log('here', e);
+  };
+
   const updateGameStreams = (
     accessToken: string | undefined,
     user: User | undefined
@@ -133,7 +140,7 @@ const Channels = ({
     if (!user) return;
     const httpOptions = getHeaders(accessToken);
     fetch(
-      `https://api.twitch.tv/helix/streams/?game_id=${GAME_ID}&first=100`,
+      `https://api.twitch.tv/helix/streams?game_id=${GAME_ID}&first=100`,
       httpOptions
     )
       .then((res) => res.json())
@@ -172,12 +179,12 @@ const Channels = ({
           open ? 'justify-start' : 'justify-center'
         }`}
       >
-        <Listbox value={visibleStreamList} onChange={setVisibleStreamList}>
+        <Listbox value={visibleStreamList} onChange={updateVisibleStreamList}>
           <ListboxButton className="flex justify-center items-center w-full p-4">
             {open ? (
               <div className="flex justify-between items-center w-full">
                 <span className="uppercase font-bold text-sm">
-                  Followed Channels
+                  {visibleStreamList}
                 </span>
                 <ArrowDown />
               </div>
@@ -195,7 +202,7 @@ const Channels = ({
               value="following"
               className="w-full block px-2 hover:bg-blue-500 first:rounded-t-lg last:rounded-b-lg cursor-pointer"
             >
-              Followed Channels really long long long
+              Followed Channels
             </ListboxOption>
             <ListboxOption
               value="mario"
@@ -207,22 +214,36 @@ const Channels = ({
         </Listbox>
       </div>
 
-      <ChannelSection
-        accessToken={accessToken}
-        type={SectionType.Channel}
-        headerText="Followed Channels"
-        headerIcon={<HollowHeart />}
-        open={open}
-        watching={watching}
-        streams={followingStreams}
-        addWatching={addWatching}
-        removeWatching={removeWatching}
-      />
+      {visibleStreamList == 'following' ? (
+        <ChannelSection
+          accessToken={accessToken}
+          type={SectionType.Channel}
+          headerText="Followed Channels"
+          headerIcon={<HollowHeart />}
+          open={open}
+          watching={watching}
+          streams={followingStreams}
+          addWatching={addWatching}
+          removeWatching={removeWatching}
+        />
+      ) : (
+        <ChannelSection
+          accessToken={accessToken}
+          type={SectionType.Game}
+          headerText="Super Mario World"
+          headerIcon={<SolidHeart />}
+          open={open}
+          watching={watching}
+          streams={gameStreams}
+          addWatching={addWatching}
+          removeWatching={removeWatching}
+        />
+      )}
       {notFollowingStreams && notFollowingStreams.length > 0 && (
         <ChannelSection
           accessToken={accessToken}
           type={SectionType.NotFollowing}
-          headerText="Not Followed Channels"
+          headerText="Other Channels"
           headerIcon={<BrokenHeart />}
           open={open}
           watching={watching}
@@ -231,17 +252,6 @@ const Channels = ({
           removeWatching={removeWatching}
         />
       )}
-      <ChannelSection
-        accessToken={accessToken}
-        type={SectionType.Game}
-        headerText="Super Mario World"
-        headerIcon={<SolidHeart />}
-        open={open}
-        watching={watching}
-        streams={gameStreams}
-        addWatching={addWatching}
-        removeWatching={removeWatching}
-      />
     </div>
   );
 };
@@ -316,6 +326,7 @@ const ChannelSection = ({
   //
   return (
     <>
+      <div>start</div>
       {streams &&
         streams.map((stream, i) => {
           let user = users?.find((u) => u.id == stream.user_id);
