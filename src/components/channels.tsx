@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { Stream, User } from '@/types/twitch';
+import { FollowedGame, Stream, User } from '@/types/twitch';
 import {
   ArrowDown,
   BrokenHeart,
@@ -23,7 +23,12 @@ import {
   ListboxOptions,
 } from '@headlessui/react';
 
-const GAME_ID = 1229;
+// TODO: get these values when added,
+// after adding games dynamically is implemented.
+const FOLLOWED_GAMES: FollowedGame[] = [
+  { game_id: 1229, game_title: 'Super Mario World' },
+  { game_id: 505705, game_title: 'Noita' },
+];
 const POLL_INTERVAL = 60 * 1000;
 
 const Channels = ({
@@ -45,16 +50,20 @@ const Channels = ({
   let [followingStreams, setFollowingStreams] = useState<
     Stream[] | undefined
   >();
+
   let [notFollowingStreams, setNotFollowingStreams] = useState<
     Stream[] | undefined
   >();
-
   // TODO: implement
   let [notVisibleStreams, setNotVisibleStreams] = useState<
     Stream[] | undefined
   >();
 
   let [gameStreams, setGameStreams] = useState<Stream[] | undefined>();
+
+  let [allStreams, setAllStreams] = useState<
+    Map<string, Stream[]> | undefined
+  >();
 
   useEffect(() => {
     if (accessToken) {
@@ -74,6 +83,37 @@ const Channels = ({
   }, [accessToken, user, watching, view]);
 
   const updateNotFollowingStreams = useCallback(
+    (
+      accessToken: string | undefined,
+      followingStreams: Stream[] | undefined,
+      watching: string[]
+    ) => {
+      if (!accessToken) return;
+      if (!followingStreams) return;
+      let notFollowing = watching.filter(
+        (w) => !followingStreams?.map((f) => f.user_login).includes(w)
+      );
+      if (notFollowing.length == 0) {
+        setNotFollowingStreams([]);
+        return;
+      }
+      let user_logins_param = 'user_login=' + notFollowing.join('&user_login=');
+      const httpOptions = getHeaders(accessToken);
+      fetch(
+        `https://api.twitch.tv/helix/streams?${user_logins_param}`,
+        httpOptions
+      )
+        .then((res) => res.json())
+        .then((json) => {
+          let streams = json.data as Stream[];
+          setNotFollowingStreams(streams);
+        })
+        .catch((err) => console.log(err));
+    },
+    []
+  );
+
+  const updateNotVisibleStreams = useCallback(
     (
       accessToken: string | undefined,
       followingStreams: Stream[] | undefined,
@@ -129,7 +169,7 @@ const Channels = ({
 
   const updateVisibleStreamList = (e: string) => {
     setVisibleStreamList(e);
-    console.log('here', e);
+    console.log('visible', e);
   };
 
   const updateGameStreams = (
@@ -138,9 +178,13 @@ const Channels = ({
   ) => {
     if (!accessToken) return;
     if (!user) return;
+
+    // TODO: look into when more than 100 combined streams are returned
+    let game_ids_param =
+      'game_id=' + FOLLOWED_GAMES.map((fg) => fg.game_id).join('&game_id=');
     const httpOptions = getHeaders(accessToken);
     fetch(
-      `https://api.twitch.tv/helix/streams?game_id=${GAME_ID}&first=100`,
+      `https://api.twitch.tv/helix/streams?${game_ids_param}&first=100`,
       httpOptions
     )
       .then((res) => res.json())
@@ -184,7 +228,11 @@ const Channels = ({
             {open ? (
               <div className="flex justify-between items-center w-full">
                 <span className="uppercase font-bold text-sm">
-                  {visibleStreamList}
+                  {visibleStreamList == 'following'
+                    ? 'Followed Channels'
+                    : FOLLOWED_GAMES.find(
+                        (fg) => fg.game_id.toString() == visibleStreamList
+                      )?.game_title}
                 </span>
                 <ArrowDown />
               </div>
@@ -198,18 +246,14 @@ const Channels = ({
             anchor="bottom start"
             className="translate-x-4 z-10 rounded-lg ring-1 ring-twborder bg-sidepanel uppercase text-sm"
           >
-            <ListboxOption
-              value="following"
-              className="w-full block px-2 hover:bg-blue-500 first:rounded-t-lg last:rounded-b-lg cursor-pointer"
-            >
+            <ListboxOption value="following" className="listbox-option">
               Followed Channels
             </ListboxOption>
-            <ListboxOption
-              value="mario"
-              className="block px-2 hover:bg-blue-500 first:rounded-t-lg last:rounded-b-lg cursor-pointer"
-            >
-              Super Mario World
-            </ListboxOption>
+            {FOLLOWED_GAMES.map((fg) => (
+              <ListboxOption value={fg.game_id} className="listbox-option">
+                {fg.game_title}
+              </ListboxOption>
+            ))}
           </ListboxOptions>
         </Listbox>
       </div>
@@ -217,7 +261,7 @@ const Channels = ({
       {visibleStreamList == 'following' ? (
         <ChannelSection
           accessToken={accessToken}
-          type={SectionType.Channel}
+          type={SectionType.Following}
           open={open}
           watching={watching}
           streams={followingStreams}
@@ -230,7 +274,7 @@ const Channels = ({
           type={SectionType.Game}
           open={open}
           watching={watching}
-          streams={gameStreams}
+          streams={gameStreams?.filter((gs) => gs.game_id == visibleStreamList)}
           addWatching={addWatching}
           removeWatching={removeWatching}
         />
