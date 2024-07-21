@@ -41,7 +41,7 @@ const Channels = ({
   removeWatching: (stream: string) => void;
   view: PlayerView;
 }) => {
-  let [visibleStreamList, setVisibleStreamList] = useState<string>('');
+  let [visibleStreamList, setVisibleStreamList] = useState<string>('following');
   let [followingStreams, setFollowingStreams] = useState<
     Stream[] | undefined
   >();
@@ -218,8 +218,6 @@ const Channels = ({
         <ChannelSection
           accessToken={accessToken}
           type={SectionType.Channel}
-          headerText="Followed Channels"
-          headerIcon={<HollowHeart />}
           open={open}
           watching={watching}
           streams={followingStreams}
@@ -230,8 +228,6 @@ const Channels = ({
         <ChannelSection
           accessToken={accessToken}
           type={SectionType.Game}
-          headerText="Super Mario World"
-          headerIcon={<SolidHeart />}
           open={open}
           watching={watching}
           streams={gameStreams}
@@ -239,7 +235,7 @@ const Channels = ({
           removeWatching={removeWatching}
         />
       )}
-      <hr />
+
       {notFollowingStreams && notFollowingStreams.length > 0 && (
         <ChannelSection
           accessToken={accessToken}
@@ -270,8 +266,8 @@ const ChannelSection = ({
 }: {
   accessToken: string | undefined;
   type: SectionType;
-  headerText: string;
-  headerIcon: React.ReactNode;
+  headerText?: string;
+  headerIcon?: React.ReactNode;
   open: boolean;
   watching: string[];
   streams: Stream[] | undefined;
@@ -327,6 +323,20 @@ const ChannelSection = ({
   //
   return (
     <>
+      {headerText && headerIcon && (
+        <div
+          className={`flex basis-20 shrink-0 grow-0 max-w-full text-center items-center ${
+            open ? 'justify-start' : 'justify-center'
+          } px-4`}
+        >
+          <span
+            className={`${!open ? 'hidden' : ''} uppercase font-bold text-sm`}
+          >
+            {headerText}
+          </span>
+          <div className={`${open ? 'hidden' : ''} h-8`}>{headerIcon}</div>
+        </div>
+      )}
       {streams &&
         streams.map((stream, i) => {
           let user = users?.find((u) => u.id == stream.user_id);
