@@ -195,7 +195,7 @@ const Channels = ({
             )}
           </ListboxButton>
           <ListboxOptions
-            anchor="bottom"
+            anchor="bottom start"
             className="translate-x-4 z-10 rounded-lg ring-1 ring-twborder bg-sidepanel uppercase text-sm"
           >
             <ListboxOption
@@ -239,6 +239,7 @@ const Channels = ({
           removeWatching={removeWatching}
         />
       )}
+      <hr />
       {notFollowingStreams && notFollowingStreams.length > 0 && (
         <ChannelSection
           accessToken={accessToken}
@@ -326,7 +327,6 @@ const ChannelSection = ({
   //
   return (
     <>
-      <div>start</div>
       {streams &&
         streams.map((stream, i) => {
           let user = users?.find((u) => u.id == stream.user_id);
