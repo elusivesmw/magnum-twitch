@@ -444,7 +444,7 @@ const ChannelRow = ({
 };
 
 function displayViewerCount(viewerCount: number) {
-  if (viewerCount > 1000) {
+  if (viewerCount >= 1000) {
     let rounded = Number.parseFloat((viewerCount / 1000).toFixed(1)).toString();
     return `${rounded}K`;
   }
