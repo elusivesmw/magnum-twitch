@@ -22,6 +22,7 @@ import {
   ListboxOption,
   ListboxOptions,
 } from '@headlessui/react';
+import { getUniqueBy } from '@/lib/helper';
 
 // TODO: get these values when added,
 // after adding games dynamically is implemented.
@@ -47,23 +48,16 @@ const Channels = ({
   view: PlayerView;
 }) => {
   let [visibleStreamList, setVisibleStreamList] = useState<string>('following');
-  let [followingStreams, setFollowingStreams] = useState<
-    Stream[] | undefined
-  >();
-
-  let [notFollowingStreams, setNotFollowingStreams] = useState<
-    Stream[] | undefined
-  >();
+  let [watchingStreams, setWatchingStreams] = useState<Stream[] | undefined>();
   // TODO: implement
   let [notVisibleStreams, setNotVisibleStreams] = useState<
     Stream[] | undefined
   >();
 
-  let [gameStreams, setGameStreams] = useState<Stream[] | undefined>();
-
-  let [allStreams, setAllStreams] = useState<
-    Map<string, Stream[]> | undefined
+  let [followingStreams, setFollowingStreams] = useState<
+    Stream[] | undefined
   >();
+  let [gameStreams, setGameStreams] = useState<Stream[] | undefined>();
 
   useEffect(() => {
     if (accessToken) {
@@ -82,71 +76,92 @@ const Channels = ({
     return () => clearInterval(intervalId);
   }, [accessToken, user, watching, view]);
 
-  const updateNotFollowingStreams = useCallback(
+  const updateWatchingStreams = useCallback(
     (
       accessToken: string | undefined,
+      visibleStreamList: string,
       followingStreams: Stream[] | undefined,
+      gameStreams: Stream[] | undefined,
       watching: string[]
     ) => {
       if (!accessToken) return;
       if (!followingStreams) return;
-      let notFollowing = watching.filter(
-        (w) => !followingStreams?.map((f) => f.user_login).includes(w)
-      );
-      if (notFollowing.length == 0) {
-        setNotFollowingStreams([]);
-        return;
-      }
-      let user_logins_param = 'user_login=' + notFollowing.join('&user_login=');
-      const httpOptions = getHeaders(accessToken);
-      fetch(
-        `https://api.twitch.tv/helix/streams?${user_logins_param}`,
-        httpOptions
-      )
-        .then((res) => res.json())
-        .then((json) => {
-          let streams = json.data as Stream[];
-          setNotFollowingStreams(streams);
-        })
-        .catch((err) => console.log(err));
-    },
-    []
-  );
 
-  const updateNotVisibleStreams = useCallback(
-    (
-      accessToken: string | undefined,
-      followingStreams: Stream[] | undefined,
-      watching: string[]
-    ) => {
-      if (!accessToken) return;
-      if (!followingStreams) return;
-      let notFollowing = watching.filter(
-        (w) => !followingStreams?.map((f) => f.user_login).includes(w)
+      if (followingStreams === undefined || gameStreams === undefined) return;
+      const unionStreams: Stream[] = getUniqueBy(
+        [...followingStreams, ...gameStreams],
+        'user_id'
       );
-      if (notFollowing.length == 0) {
-        setNotFollowingStreams([]);
-        return;
-      }
-      let user_logins_param = 'user_login=' + notFollowing.join('&user_login=');
+      //console.log('union', unionStreams);
+
+      // get watching streams data (what we dont have yet)
+      let notInUnionStreamNames = watching.filter(
+        (w) => !unionStreams?.map((f) => f.user_login).includes(w)
+      );
+      console.log('notInUnionStreams', notInUnionStreamNames);
+
+      let user_logins_param =
+        'user_login=' + notInUnionStreamNames.join('&user_login=');
       const httpOptions = getHeaders(accessToken);
-      fetch(
-        `https://api.twitch.tv/helix/streams?${user_logins_param}`,
-        httpOptions
-      )
-        .then((res) => res.json())
-        .then((json) => {
-          let streams = json.data as Stream[];
-          setNotFollowingStreams(streams);
-        })
-        .catch((err) => console.log(err));
+      // fetch(
+      //   `https://api.twitch.tv/helix/streams?${user_logins_param}`,
+      //   httpOptions
+      // )
+      //   .then((res) => res.json())
+      //   .then((json) => {
+      //     let streams = json.data as Stream[];
+      //     setNotFollowingStreams(streams);
+      //   })
+      //   .catch((err) => console.log(err));
+
+      // TODO: fetch the not in union streams
+      // and fill in the in union streams
+      let inUnionStreams = unionStreams.filter((stream) =>
+        watching.includes(stream.user_login)
+      );
+      console.log('inUnionStreams', inUnionStreams);
+      setWatchingStreams(inUnionStreams);
+
+      // update not visible streams
+      //
+      //
+      //
+      //
+      if (visibleStreamList == 'following') {
+        let notFollowing = inUnionStreams.filter(
+          (w) =>
+            !followingStreams?.map((f) => f.user_login).includes(w.user_login)
+        );
+        console.log('notfollowing', notFollowing);
+        setNotVisibleStreams(notFollowing);
+      } else {
+        // game id
+        let notWatchingThisGame = inUnionStreams.filter(
+          (w) => !gameStreams?.map((f) => f.game_id).includes(w.game_id)
+        );
+        console.log('notwatchingthisgame', notWatchingThisGame);
+        setNotVisibleStreams(notWatchingThisGame);
+      }
     },
     []
   );
 
   useEffect(() => {
-    updateNotFollowingStreams(accessToken, followingStreams, watching);
-  }, [accessToken, followingStreams, watching, updateNotFollowingStreams]);
+    updateWatchingStreams(
+      accessToken,
+      visibleStreamList,
+      followingStreams,
+      gameStreams,
+      watching
+    );
+  }, [
+    accessToken,
+    visibleStreamList,
+    followingStreams,
+    gameStreams,
+    watching,
+    updateWatchingStreams,
+  ]);
 
   const updateFollowingStreams = (
     accessToken: string | undefined,
@@ -249,8 +264,12 @@ const Channels = ({
             <ListboxOption value="following" className="listbox-option">
               Followed Channels
             </ListboxOption>
-            {FOLLOWED_GAMES.map((fg) => (
-              <ListboxOption value={fg.game_id} className="listbox-option">
+            {FOLLOWED_GAMES.map((fg, i) => (
+              <ListboxOption
+                key={i}
+                value={fg.game_id}
+                className="listbox-option"
+              >
                 {fg.game_title}
               </ListboxOption>
             ))}
@@ -280,7 +299,7 @@ const Channels = ({
         />
       )}
 
-      {notFollowingStreams && notFollowingStreams.length > 0 && (
+      {notVisibleStreams && notVisibleStreams.length > 0 && (
         <ChannelSection
           accessToken={accessToken}
           type={SectionType.NotFollowing}
@@ -288,7 +307,7 @@ const Channels = ({
           headerIcon={<BrokenHeart />}
           open={open}
           watching={watching}
-          streams={notFollowingStreams}
+          streams={notVisibleStreams}
           addWatching={addWatching}
           removeWatching={removeWatching}
         />
