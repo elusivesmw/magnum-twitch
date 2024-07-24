@@ -8,7 +8,6 @@ import {
   CollapseLeft,
   CollapseRight,
   HollowHeart,
-  SolidHeart,
 } from './icons';
 import { getHeaders } from '@/lib/auth';
 import { replaceSearchParams } from '@/lib/route';
@@ -22,8 +21,8 @@ import {
   ListboxOption,
   ListboxOptions,
 } from '@headlessui/react';
-import { getUniqueBy } from '@/lib/helper';
 import { watch } from 'fs';
+import { getUniqueBy } from '@/lib/helper';
 
 // TODO: get these values when added,
 // after adding games dynamically is implemented.
@@ -50,6 +49,9 @@ const Channels = ({
 }) => {
   let [visibleStreamList, setVisibleStreamList] = useState<string>('following');
   let [notVisibleStreams, setNotVisibleStreams] = useState<
+    Stream[] | undefined
+  >();
+  let [notFollowingStreams, setNotFollowingStreams] = useState<
     Stream[] | undefined
   >();
 
@@ -147,27 +149,36 @@ const Channels = ({
   };
 
   const updateVisibleStreamList = (visible: string) => {
-    setVisibleStreamList(visible);
-
-    if (visibleStreamList == 'following') {
+    if (visible == 'following') {
       if (!watchingStreams) return;
+
       let notFollowing = watchingStreams.filter(
         (w) =>
-          !followingStreams?.map((f) => f.user_login).includes(w.user_login) &&
-          !gameStreams?.map((g) => g.user_login).includes(w.user_login)
+          !followingStreams?.map((f) => f.user_login).includes(w.user_login)
       );
       setNotVisibleStreams(notFollowing);
     } else {
       if (!gameStreams) return;
-      let notWatchingThisGame = gameStreams.filter(
-        (w) => !gameStreams?.map((f) => f.game_id).includes(w.game_id)
+      if (!watchingStreams) return;
+
+      let notWatchingThisGame = watchingStreams.filter(
+        (w) => w.game_id != visible
       );
-      setNotVisibleStreams(notWatchingThisGame);
+      let notFollowingStreams = watchingStreams.filter(
+        (w) =>
+          !followingStreams?.map((f) => f.user_login).includes(w.user_login) &&
+          w.game_id != visible
+      );
+      let notThisGameOrFollowing = getUniqueBy(
+        [...notWatchingThisGame, ...notFollowingStreams],
+        'user_login'
+      );
+      setNotVisibleStreams(notThisGameOrFollowing);
     }
   };
 
   useEffect(() => {
-    setVisibleStreamList(visibleStreamList);
+    updateVisibleStreamList(visibleStreamList);
   }, [visibleStreamList]);
 
   let [open, setOpen] = useState<boolean>(true);
@@ -198,7 +209,7 @@ const Channels = ({
           open ? 'justify-start' : 'justify-center'
         }`}
       >
-        <Listbox value={visibleStreamList} onChange={updateVisibleStreamList}>
+        <Listbox value={visibleStreamList} onChange={setVisibleStreamList}>
           <ListboxButton className="flex justify-center items-center w-full p-4">
             {open ? (
               <div className="flex justify-between items-center w-full">
@@ -263,7 +274,7 @@ const Channels = ({
         <ChannelSection
           accessToken={accessToken}
           type={SectionType.NotFollowing}
-          headerText="Other Channels"
+          headerText="Other Watching"
           headerIcon={<BrokenHeart />}
           open={open}
           watching={watching}
