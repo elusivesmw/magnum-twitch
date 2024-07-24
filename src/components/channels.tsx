@@ -23,6 +23,7 @@ import {
   ListboxOptions,
 } from '@headlessui/react';
 import { getUniqueBy } from '@/lib/helper';
+import { watch } from 'fs';
 
 // TODO: get these values when added,
 // after adding games dynamically is implemented.
@@ -48,8 +49,6 @@ const Channels = ({
   view: PlayerView;
 }) => {
   let [visibleStreamList, setVisibleStreamList] = useState<string>('following');
-  let [watchingStreams, setWatchingStreams] = useState<Stream[] | undefined>();
-  // TODO: implement
   let [notVisibleStreams, setNotVisibleStreams] = useState<
     Stream[] | undefined
   >();
@@ -58,6 +57,7 @@ const Channels = ({
     Stream[] | undefined
   >();
   let [gameStreams, setGameStreams] = useState<Stream[] | undefined>();
+  let [watchingStreams, setWatchingStreams] = useState<Stream[] | undefined>();
 
   useEffect(() => {
     if (accessToken) {
@@ -68,101 +68,17 @@ const Channels = ({
 
     updateFollowingStreams(accessToken, user);
     updateGameStreams(accessToken, user);
+    updateWatchingStreams(accessToken, watching);
     const intervalId = setInterval(() => {
       updateFollowingStreams(accessToken, user);
       updateGameStreams(accessToken, user);
+      updateWatchingStreams(accessToken, watching);
     }, POLL_INTERVAL);
 
     return () => clearInterval(intervalId);
-  }, [accessToken, user, watching, view]);
+  }, [accessToken, user, watching]);
 
-  const updateWatchingStreams = useCallback(
-    (
-      accessToken: string | undefined,
-      visibleStreamList: string,
-      followingStreams: Stream[] | undefined,
-      gameStreams: Stream[] | undefined,
-      watching: string[]
-    ) => {
-      if (!accessToken) return;
-      if (!followingStreams) return;
-
-      if (followingStreams === undefined || gameStreams === undefined) return;
-      const unionStreams: Stream[] = getUniqueBy(
-        [...followingStreams, ...gameStreams],
-        'user_id'
-      );
-      //console.log('union', unionStreams);
-
-      // get watching streams data (what we dont have yet)
-      let notInUnionStreamNames = watching.filter(
-        (w) => !unionStreams?.map((f) => f.user_login).includes(w)
-      );
-      console.log('notInUnionStreams', notInUnionStreamNames);
-
-      let user_logins_param =
-        'user_login=' + notInUnionStreamNames.join('&user_login=');
-      const httpOptions = getHeaders(accessToken);
-      // fetch(
-      //   `https://api.twitch.tv/helix/streams?${user_logins_param}`,
-      //   httpOptions
-      // )
-      //   .then((res) => res.json())
-      //   .then((json) => {
-      //     let streams = json.data as Stream[];
-      //     setNotFollowingStreams(streams);
-      //   })
-      //   .catch((err) => console.log(err));
-
-      // TODO: fetch the not in union streams
-      // and fill in the in union streams
-      let inUnionStreams = unionStreams.filter((stream) =>
-        watching.includes(stream.user_login)
-      );
-      console.log('inUnionStreams', inUnionStreams);
-      setWatchingStreams(inUnionStreams);
-
-      // update not visible streams
-      //
-      //
-      //
-      //
-      if (visibleStreamList == 'following') {
-        let notFollowing = inUnionStreams.filter(
-          (w) =>
-            !followingStreams?.map((f) => f.user_login).includes(w.user_login)
-        );
-        console.log('notfollowing', notFollowing);
-        setNotVisibleStreams(notFollowing);
-      } else {
-        // game id
-        let notWatchingThisGame = inUnionStreams.filter(
-          (w) => !gameStreams?.map((f) => f.game_id).includes(w.game_id)
-        );
-        console.log('notwatchingthisgame', notWatchingThisGame);
-        setNotVisibleStreams(notWatchingThisGame);
-      }
-    },
-    []
-  );
-
-  useEffect(() => {
-    updateWatchingStreams(
-      accessToken,
-      visibleStreamList,
-      followingStreams,
-      gameStreams,
-      watching
-    );
-  }, [
-    accessToken,
-    visibleStreamList,
-    followingStreams,
-    gameStreams,
-    watching,
-    updateWatchingStreams,
-  ]);
-
+  // following channels
   const updateFollowingStreams = (
     accessToken: string | undefined,
     user: User | undefined
@@ -182,11 +98,7 @@ const Channels = ({
       .catch((err) => console.log(err));
   };
 
-  const updateVisibleStreamList = (e: string) => {
-    setVisibleStreamList(e);
-    console.log('visible', e);
-  };
-
+  // following games
   const updateGameStreams = (
     accessToken: string | undefined,
     user: User | undefined
@@ -209,6 +121,54 @@ const Channels = ({
       })
       .catch((err) => console.log(err));
   };
+
+  // watching
+  const updateWatchingStreams = (
+    accessToken: string | undefined,
+    watching: string[]
+  ) => {
+    if (!accessToken) return;
+    if (!watching) return;
+
+    // get watching streams data
+    let user_logins_param = 'user_login=' + watching.join('&user_login=');
+    const httpOptions = getHeaders(accessToken);
+    fetch(
+      `https://api.twitch.tv/helix/streams?${user_logins_param}`,
+      httpOptions
+    )
+      .then((res) => res.json())
+      .then((json) => {
+        let watchingStreams = json.data as Stream[];
+        console.log('watching streams', watchingStreams);
+        setWatchingStreams(watchingStreams);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const updateVisibleStreamList = (visible: string) => {
+    setVisibleStreamList(visible);
+
+    if (visibleStreamList == 'following') {
+      if (!watchingStreams) return;
+      let notFollowing = watchingStreams.filter(
+        (w) =>
+          !followingStreams?.map((f) => f.user_login).includes(w.user_login) &&
+          !gameStreams?.map((g) => g.user_login).includes(w.user_login)
+      );
+      setNotVisibleStreams(notFollowing);
+    } else {
+      if (!gameStreams) return;
+      let notWatchingThisGame = gameStreams.filter(
+        (w) => !gameStreams?.map((f) => f.game_id).includes(w.game_id)
+      );
+      setNotVisibleStreams(notWatchingThisGame);
+    }
+  };
+
+  useEffect(() => {
+    setVisibleStreamList(visibleStreamList);
+  }, [visibleStreamList]);
 
   let [open, setOpen] = useState<boolean>(true);
   const toggleOpen = () => {
