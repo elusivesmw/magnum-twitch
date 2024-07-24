@@ -21,7 +21,6 @@ import {
   ListboxOption,
   ListboxOptions,
 } from '@headlessui/react';
-import { watch } from 'fs';
 import { getUniqueBy } from '@/lib/helper';
 
 // TODO: get these values when added,
@@ -51,9 +50,6 @@ const Channels = ({
   let [notVisibleStreams, setNotVisibleStreams] = useState<
     Stream[] | undefined
   >();
-  let [notFollowingStreams, setNotFollowingStreams] = useState<
-    Stream[] | undefined
-  >();
 
   let [followingStreams, setFollowingStreams] = useState<
     Stream[] | undefined
@@ -78,7 +74,7 @@ const Channels = ({
     }, POLL_INTERVAL);
 
     return () => clearInterval(intervalId);
-  }, [accessToken, user, watching]);
+  }, [accessToken, user, watching, view]);
 
   // following channels
   const updateFollowingStreams = (
@@ -148,8 +144,13 @@ const Channels = ({
       .catch((err) => console.log(err));
   };
 
-  const updateVisibleStreamList = (visible: string) => {
-    if (visible == 'following') {
+  const updateVisibleStreamList = (
+    visibleStreamList: string,
+    watchingStreams: Stream[] | undefined,
+    followingStreams: Stream[] | undefined,
+    gameStreams: Stream[] | undefined
+  ) => {
+    if (visibleStreamList == 'following') {
       if (!watchingStreams) return;
 
       let notFollowing = watchingStreams.filter(
@@ -162,12 +163,12 @@ const Channels = ({
       if (!watchingStreams) return;
 
       let notWatchingThisGame = watchingStreams.filter(
-        (w) => w.game_id != visible
+        (w) => w.game_id != visibleStreamList
       );
       let notFollowingStreams = watchingStreams.filter(
         (w) =>
           !followingStreams?.map((f) => f.user_login).includes(w.user_login) &&
-          w.game_id != visible
+          w.game_id != visibleStreamList
       );
       let notThisGameOrFollowing = getUniqueBy(
         [...notWatchingThisGame, ...notFollowingStreams],
@@ -178,8 +179,13 @@ const Channels = ({
   };
 
   useEffect(() => {
-    updateVisibleStreamList(visibleStreamList);
-  }, [visibleStreamList]);
+    updateVisibleStreamList(
+      visibleStreamList,
+      watchingStreams,
+      followingStreams,
+      gameStreams
+    );
+  }, [visibleStreamList, watchingStreams, followingStreams, gameStreams]);
 
   let [open, setOpen] = useState<boolean>(true);
   const toggleOpen = () => {
