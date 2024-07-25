@@ -114,10 +114,11 @@ const ChatDropdown = ({
     return (
       <select
         className="uppercase font-bold text-sm text-center bg-chatpanel focus:outline-0 py-4"
+        defaultValue={activeChat}
         onChange={(e) => setActiveChat(e.target.value)}
       >
         {channels.map((e, i) => (
-          <option value={e} selected={e == activeChat} key={i}>
+          <option value={e} key={i}>
             {e}
           </option>
         ))}

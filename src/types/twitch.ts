@@ -28,3 +28,8 @@ export interface User {
   view_count: number;
   created_at: string;
 }
+
+export interface FollowedGame {
+  game_id: number;
+  game_title: string;
+}

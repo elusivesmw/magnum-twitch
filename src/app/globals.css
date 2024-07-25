@@ -188,3 +188,9 @@ input[type='text'] {
     @apply h-[11.11%] max-h-[11.11%] !important;
   }
 }
+
+@layer components {
+  .listbox-option {
+    @apply block px-2 hover:bg-blue-500 first:rounded-t-lg last:rounded-b-lg cursor-pointer select-none;
+  }
+}

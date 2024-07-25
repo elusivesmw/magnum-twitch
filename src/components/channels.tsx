@@ -1,8 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-import { Stream, User } from '@/types/twitch';
+import { useEffect, useState } from 'react';
+import { FollowedGame, Stream, User } from '@/types/twitch';
 import {
+  ArrowDown,
   BrokenHeart,
   CollapseLeft,
   CollapseRight,
@@ -15,8 +16,20 @@ import Image from 'next/image';
 import { FollowingTooltip } from './tooltip';
 import { SectionType } from '@/types/channel';
 import { PlayerView } from '@/types/state';
+import {
+  Listbox,
+  ListboxButton,
+  ListboxOption,
+  ListboxOptions,
+} from '@headlessui/react';
+import { getUniqueBy } from '@/lib/helper';
 
-const GAME_ID = 1229;
+// TODO: get these values when added,
+// after adding games dynamically is implemented.
+const FOLLOWED_GAMES: FollowedGame[] = [
+  { game_id: 1229, game_title: 'Super Mario World' },
+  { game_id: 505705, game_title: 'Noita' },
+];
 const POLL_INTERVAL = 60 * 1000;
 
 const Channels = ({
@@ -34,13 +47,16 @@ const Channels = ({
   removeWatching: (stream: string) => void;
   view: PlayerView;
 }) => {
+  let [visibleStreamList, setVisibleStreamList] = useState<string>('following');
+  let [notVisibleStreams, setNotVisibleStreams] = useState<
+    Stream[] | undefined
+  >();
+
   let [followingStreams, setFollowingStreams] = useState<
     Stream[] | undefined
   >();
-  let [notFollowingStreams, setNotFollowingStreams] = useState<
-    Stream[] | undefined
-  >();
   let [gameStreams, setGameStreams] = useState<Stream[] | undefined>();
+  let [watchingStreams, setWatchingStreams] = useState<Stream[] | undefined>();
 
   useEffect(() => {
     if (accessToken) {
@@ -51,49 +67,17 @@ const Channels = ({
 
     updateFollowingStreams(accessToken, user);
     updateGameStreams(accessToken, user);
+    updateWatchingStreams(accessToken, watching);
     const intervalId = setInterval(() => {
       updateFollowingStreams(accessToken, user);
       updateGameStreams(accessToken, user);
+      updateWatchingStreams(accessToken, watching);
     }, POLL_INTERVAL);
 
     return () => clearInterval(intervalId);
   }, [accessToken, user, watching, view]);
 
-  const updateNotFollowingStreams = useCallback(
-    (
-      accessToken: string | undefined,
-      followingStreams: Stream[] | undefined,
-      watching: string[]
-    ) => {
-      if (!accessToken) return;
-      if (!followingStreams) return;
-      let notFollowing = watching.filter(
-        (w) => !followingStreams?.map((f) => f.user_login).includes(w)
-      );
-      if (notFollowing.length == 0) {
-        setNotFollowingStreams([]);
-        return;
-      }
-      let user_logins_param = 'user_login=' + notFollowing.join('&user_login=');
-      const httpOptions = getHeaders(accessToken);
-      fetch(
-        `https://api.twitch.tv/helix/streams?${user_logins_param}&first=100`,
-        httpOptions
-      )
-        .then((res) => res.json())
-        .then((json) => {
-          let streams = json.data as Stream[];
-          setNotFollowingStreams(streams);
-        })
-        .catch((err) => console.log(err));
-    },
-    []
-  );
-
-  useEffect(() => {
-    updateNotFollowingStreams(accessToken, followingStreams, watching);
-  }, [accessToken, followingStreams, watching, updateNotFollowingStreams]);
-
+  // following channels
   const updateFollowingStreams = (
     accessToken: string | undefined,
     user: User | undefined
@@ -113,15 +97,21 @@ const Channels = ({
       .catch((err) => console.log(err));
   };
 
+  // following games
   const updateGameStreams = (
     accessToken: string | undefined,
     user: User | undefined
   ) => {
     if (!accessToken) return;
     if (!user) return;
+
+    // TODO: look into when more than 100 combined streams are returned
+    // possibly get each game separately (api rate limit 30 requests/min)
+    let game_ids_param =
+      'game_id=' + FOLLOWED_GAMES.map((fg) => fg.game_id).join('&game_id=');
     const httpOptions = getHeaders(accessToken);
     fetch(
-      `https://api.twitch.tv/helix/streams/?game_id=${GAME_ID}&first=100`,
+      `https://api.twitch.tv/helix/streams?${game_ids_param}&first=100`,
       httpOptions
     )
       .then((res) => res.json())
@@ -131,6 +121,72 @@ const Channels = ({
       })
       .catch((err) => console.log(err));
   };
+
+  // watching
+  const updateWatchingStreams = (
+    accessToken: string | undefined,
+    watching: string[]
+  ) => {
+    if (!accessToken) return;
+    if (!watching) return;
+
+    // get watching streams data
+    let user_logins_param = 'user_login=' + watching.join('&user_login=');
+    const httpOptions = getHeaders(accessToken);
+    fetch(
+      `https://api.twitch.tv/helix/streams?${user_logins_param}`,
+      httpOptions
+    )
+      .then((res) => res.json())
+      .then((json) => {
+        let watchingStreams = json.data as Stream[];
+        setWatchingStreams(watchingStreams);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const updateNotVisibleStreams = (
+    visibleStreamList: string,
+    watchingStreams: Stream[] | undefined,
+    followingStreams: Stream[] | undefined,
+    gameStreams: Stream[] | undefined
+  ) => {
+    if (visibleStreamList == 'following') {
+      if (!watchingStreams) return;
+
+      let notFollowing = watchingStreams.filter(
+        (w) =>
+          !followingStreams?.map((f) => f.user_login).includes(w.user_login)
+      );
+      setNotVisibleStreams(notFollowing);
+    } else {
+      if (!gameStreams) return;
+      if (!watchingStreams) return;
+
+      let notWatchingThisGame = watchingStreams.filter(
+        (w) => w.game_id != visibleStreamList
+      );
+      let notFollowingStreams = watchingStreams.filter(
+        (w) =>
+          !followingStreams?.map((f) => f.user_login).includes(w.user_login) &&
+          w.game_id != visibleStreamList
+      );
+      let notThisGameOrFollowing = getUniqueBy(
+        [...notWatchingThisGame, ...notFollowingStreams],
+        'user_login'
+      );
+      setNotVisibleStreams(notThisGameOrFollowing);
+    }
+  };
+
+  useEffect(() => {
+    updateNotVisibleStreams(
+      visibleStreamList,
+      watchingStreams,
+      followingStreams,
+      gameStreams
+    );
+  }, [visibleStreamList, watchingStreams, followingStreams, gameStreams]);
 
   let [open, setOpen] = useState<boolean>(true);
   const toggleOpen = () => {
@@ -154,41 +210,90 @@ const Channels = ({
           {open ? <CollapseLeft /> : <CollapseRight />}
         </button>
       </div>
-      <ChannelSection
-        accessToken={accessToken}
-        type={SectionType.Channel}
-        headerText="Followed Channels"
-        headerIcon={<HollowHeart />}
-        open={open}
-        watching={watching}
-        streams={followingStreams}
-        addWatching={addWatching}
-        removeWatching={removeWatching}
-      />
-      {notFollowingStreams && notFollowingStreams.length > 0 && (
+
+      <div
+        className={`relative flex basis-20 shrink-0 grow-0 max-w-full ${
+          open ? 'justify-start' : 'justify-center'
+        }`}
+      >
+        <Listbox value={visibleStreamList} onChange={setVisibleStreamList}>
+          <ListboxButton className="flex justify-center items-center w-full p-4">
+            {open ? (
+              <div className="flex justify-between items-center w-full">
+                <span className="uppercase font-bold text-sm">
+                  {visibleStreamList == 'following'
+                    ? 'Followed Channels'
+                    : FOLLOWED_GAMES.find(
+                        (fg) => fg.game_id.toString() == visibleStreamList
+                      )?.game_title}
+                </span>
+                <ArrowDown />
+              </div>
+            ) : (
+              <div className="flex basis-8 h-8 items-center">
+                {visibleStreamList == 'following' ? (
+                  <HollowHeart />
+                ) : (
+                  <SolidHeart />
+                )}
+              </div>
+            )}
+          </ListboxButton>
+          <ListboxOptions
+            anchor="bottom start"
+            className="translate-x-4 z-10 rounded-lg ring-1 ring-twborder bg-sidepanel uppercase text-sm"
+          >
+            <ListboxOption value="following" className="listbox-option">
+              Followed Channels
+            </ListboxOption>
+            {FOLLOWED_GAMES.map((fg, i) => (
+              <ListboxOption
+                key={i}
+                value={fg.game_id}
+                className="listbox-option"
+              >
+                {fg.game_title}
+              </ListboxOption>
+            ))}
+          </ListboxOptions>
+        </Listbox>
+      </div>
+
+      {visibleStreamList == 'following' ? (
         <ChannelSection
           accessToken={accessToken}
-          type={SectionType.NotFollowing}
-          headerText="Not Followed Channels"
-          headerIcon={<BrokenHeart />}
+          type={SectionType.Following}
           open={open}
           watching={watching}
-          streams={notFollowingStreams}
+          streams={followingStreams}
+          addWatching={addWatching}
+          removeWatching={removeWatching}
+        />
+      ) : (
+        <ChannelSection
+          accessToken={accessToken}
+          type={SectionType.Game}
+          open={open}
+          watching={watching}
+          streams={gameStreams?.filter((gs) => gs.game_id == visibleStreamList)}
           addWatching={addWatching}
           removeWatching={removeWatching}
         />
       )}
-      <ChannelSection
-        accessToken={accessToken}
-        type={SectionType.Game}
-        headerText="Super Mario World"
-        headerIcon={<SolidHeart />}
-        open={open}
-        watching={watching}
-        streams={gameStreams}
-        addWatching={addWatching}
-        removeWatching={removeWatching}
-      />
+
+      {notVisibleStreams && notVisibleStreams.length > 0 && (
+        <ChannelSection
+          accessToken={accessToken}
+          type={SectionType.NotFollowing}
+          headerText="Other Watching"
+          headerIcon={<BrokenHeart />}
+          open={open}
+          watching={watching}
+          streams={notVisibleStreams}
+          addWatching={addWatching}
+          removeWatching={removeWatching}
+        />
+      )}
     </div>
   );
 };
@@ -206,8 +311,8 @@ const ChannelSection = ({
 }: {
   accessToken: string | undefined;
   type: SectionType;
-  headerText: string;
-  headerIcon: React.ReactNode;
+  headerText?: string;
+  headerIcon?: React.ReactNode;
   open: boolean;
   watching: string[];
   streams: Stream[] | undefined;
@@ -263,18 +368,20 @@ const ChannelSection = ({
   //
   return (
     <>
-      <div
-        className={`flex basis-20 shrink-0 grow-0 max-w-full text-center items-center ${
-          open ? 'justify-start' : 'justify-center'
-        } px-4`}
-      >
-        <span
-          className={`${!open ? 'hidden' : ''} uppercase font-bold text-sm`}
+      {headerText && headerIcon && (
+        <div
+          className={`flex basis-20 shrink-0 grow-0 max-w-full text-center items-center ${
+            open ? 'justify-start' : 'justify-center'
+          } px-4`}
         >
-          {headerText}
-        </span>
-        <div className={`${open ? 'hidden' : ''} h-8`}>{headerIcon}</div>
-      </div>
+          <span
+            className={`${!open ? 'hidden' : ''} uppercase font-bold text-sm`}
+          >
+            {headerText}
+          </span>
+          <div className={`${open ? 'hidden' : ''} h-8`}>{headerIcon}</div>
+        </div>
+      )}
       {streams &&
         streams.map((stream, i) => {
           let user = users?.find((u) => u.id == stream.user_id);
@@ -382,7 +489,7 @@ const ChannelRow = ({
 };
 
 function displayViewerCount(viewerCount: number) {
-  if (viewerCount > 1000) {
+  if (viewerCount >= 1000) {
     let rounded = Number.parseFloat((viewerCount / 1000).toFixed(1)).toString();
     return `${rounded}K`;
   }
