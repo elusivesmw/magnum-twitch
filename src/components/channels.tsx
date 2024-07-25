@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FollowedGame, Stream, User } from '@/types/twitch';
 import {
   ArrowDown,
@@ -8,6 +8,7 @@ import {
   CollapseLeft,
   CollapseRight,
   HollowHeart,
+  SolidHeart,
 } from './icons';
 import { getHeaders } from '@/lib/auth';
 import { replaceSearchParams } from '@/lib/route';
@@ -105,6 +106,7 @@ const Channels = ({
     if (!user) return;
 
     // TODO: look into when more than 100 combined streams are returned
+    // possibly get each game separately (api rate limit 30 requests/min)
     let game_ids_param =
       'game_id=' + FOLLOWED_GAMES.map((fg) => fg.game_id).join('&game_id=');
     const httpOptions = getHeaders(accessToken);
@@ -138,13 +140,12 @@ const Channels = ({
       .then((res) => res.json())
       .then((json) => {
         let watchingStreams = json.data as Stream[];
-        console.log('watching streams', watchingStreams);
         setWatchingStreams(watchingStreams);
       })
       .catch((err) => console.log(err));
   };
 
-  const updateVisibleStreamList = (
+  const updateNotVisibleStreams = (
     visibleStreamList: string,
     watchingStreams: Stream[] | undefined,
     followingStreams: Stream[] | undefined,
@@ -179,7 +180,7 @@ const Channels = ({
   };
 
   useEffect(() => {
-    updateVisibleStreamList(
+    updateNotVisibleStreams(
       visibleStreamList,
       watchingStreams,
       followingStreams,
@@ -230,7 +231,11 @@ const Channels = ({
               </div>
             ) : (
               <div className="flex basis-8 h-8 items-center">
-                <HollowHeart />
+                {visibleStreamList == 'following' ? (
+                  <HollowHeart />
+                ) : (
+                  <SolidHeart />
+                )}
               </div>
             )}
           </ListboxButton>
