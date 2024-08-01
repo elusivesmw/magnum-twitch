@@ -38,6 +38,15 @@ export default function Home({ params }: { params: { page: string[] } }) {
     setPlayerView,
   } = context;
 
+  useEffect(() => {
+    if (!params.page) return;
+    // de-dupe
+    let initialWatching = Array.from(new Set(params.page));
+    // and set
+    setWatching(initialWatching);
+    setOrder(initialWatching);
+  }, []);
+
   //
   function addWatching(channel: string) {
     if (watching.includes(channel)) {

@@ -1,5 +1,7 @@
 'use client';
+
 import { AppContext } from '@/context/context';
+import { useRouter } from 'next/navigation';
 import { useContext } from 'react';
 
 export default function () {
@@ -7,10 +9,15 @@ export default function () {
   if (!context) {
     throw new Error('This component requires AppProvider as a parent');
   }
+
+  const router = useRouter();
   return (
-    <div>
-      settings
-      {context.user?.login}
-    </div>
+    <>
+      <div>settings</div>
+      <div>{context.user?.login}</div>
+      <button onClick={() => router.push(`/${context.order.join('/')}`)}>
+        go back
+      </button>
+    </>
   );
 }
