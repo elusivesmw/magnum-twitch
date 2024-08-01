@@ -2,7 +2,7 @@
 
 import Player from '@/components/player';
 import MultiChat from '@/components/chat';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Stream, User } from '@/types/twitch';
 import { getHeaders, getOAuthHeaders } from '@/lib/auth';
@@ -10,6 +10,7 @@ import { removeSearchParams, replaceSearchParams } from '@/lib/route';
 import { PlayerView, getPlayerView } from '@/types/state';
 import Header from '@/components/header';
 import Channels from '@/components/channels';
+import { AppContext } from '@/context/context';
 
 const LS_ACCESS_TOKEN = 'ACCESS_TOKEN';
 const SP_VIEW = 'v';
@@ -17,47 +18,50 @@ const VALIDATE_INTERVAL = 60 * 60 * 1000;
 const LIVE_CHECK_INTERVAL = 60 * 1000;
 
 export default function Home({ params }: { params: { page: string[] } }) {
-  // global helpers
-  const searchParams = useSearchParams();
+  const context = useContext(AppContext);
+  if (!context) {
+    throw new Error('This component requires AppProvider as a parent');
+  }
 
-  // initial watching channels without duplicates
-  const initialWatching = Array.from(new Set(params.page));
-  const initialChat = initialWatching.length > 0 ? initialWatching[0] : '';
-  const initialView = getViewFromSearchParams(searchParams);
+  const {
+    accessToken,
+    setAccessToken,
+    user,
+    setUser,
+    watching,
+    setWatching,
+    order,
+    setOrder,
+    activeChat,
+    setActiveChat,
+    playerView,
+    setPlayerView,
+  } = context;
 
-  // state
-  const [accessToken, setAccessToken] = useState<string | undefined>();
-  const [user, setUser] = useState<User | undefined>();
-  const [watching, setWatching] = useState<string[]>(initialWatching);
-  const [order, setOrder] = useState<string[]>(initialWatching);
-  const [activeChat, setActiveChat] = useState(initialChat);
-  const [playerView, setPlayerView] = useState<PlayerView>(initialView);
-
-  // set token
-  useEffect(() => {
-    if (getError(searchParams)) {
-      removeSearchParams(order);
+  //
+  function addWatching(channel: string) {
+    if (watching.includes(channel)) {
+      // add highlight animation
+      let channelDiv = document.getElementById(`twitch-embed-${channel}`);
+      if (!channelDiv) return;
+      channelDiv.classList.add('animate-highlight');
+      return;
     }
-    let token = getToken();
-    if (!token) return;
 
-    setAccessToken(token);
-  }, [order, searchParams]);
+    if (watching.length >= 9) {
+      // do this better :]
+      alert("That's enough, dude.");
+      return;
+    }
 
-  // set user
-  useEffect(() => {
-    updateUser(accessToken);
-  }, [accessToken]);
+    // add player
+    setWatching([...watching, channel]);
+    setOrder([...order, channel]);
 
-  // validate token every hour
-  useEffect(() => {
-    validateToken(accessToken);
-    const intervalId = setInterval(() => {
-      validateToken(accessToken);
-    }, VALIDATE_INTERVAL);
-
-    return () => clearInterval(intervalId);
-  }, [accessToken]);
+    if (watching.length < 1) {
+      setActiveChat(watching[0]);
+    }
+  }
 
   //
   const removeWatching = useCallback(
@@ -68,8 +72,25 @@ export default function Home({ params }: { params: { page: string[] } }) {
       setWatching((w) => w.filter((e) => e != channel));
       setOrder((o) => o.filter((e) => e != channel));
     },
-    [watching]
+    [watching, setWatching, setOrder]
   );
+
+  //
+  function reorderWatching(channel: string, index: number, relative: boolean) {
+    let fromOrder = order.findIndex((o) => o == channel);
+    let toOrder = relative ? fromOrder + index : index;
+    if (toOrder < 0 || toOrder > watching.length + 1) return;
+
+    // set active chat on goto first
+    if (!relative && toOrder == 0) {
+      setActiveChat(channel);
+    }
+
+    // move channel to index 0
+    let newOrder = [...order];
+    move(newOrder, fromOrder, toOrder);
+    setOrder(newOrder);
+  }
 
   //
   const reconcileStreams = useCallback(
@@ -114,106 +135,27 @@ export default function Home({ params }: { params: { page: string[] } }) {
     return () => clearInterval(intervalId);
   }, [accessToken, liveCheckStreams]);
 
-  // update active chat if removed
-  useEffect(() => {
-    let found = watching.find((e) => e == activeChat);
-    if (!found) {
-      setActiveChat(watching[0]);
-    }
-  }, [watching, activeChat]);
-
-  // keep path in sync with order
-  useEffect(() => {
-    replaceSearchParams(order, playerView);
-  }, [order, playerView]);
-
-  //
-  function validateToken(accessToken: string | undefined) {
-    if (!accessToken) return;
-    const httpOptions = getOAuthHeaders(accessToken);
-    fetch('https://id.twitch.tv/oauth2/validate', httpOptions)
-      .then((res) => {
-        if (!res.ok) {
-          // token no good, clear
-          setAccessToken(undefined);
-          return Promise.reject(res);
-        }
-        console.log('Valid token');
-      })
-      .catch((err) => console.log(err));
-  }
-
-  //
-  function updateUser(accessToken: string | undefined) {
-    if (!accessToken) return;
-    const httpOptions = getHeaders(accessToken);
-    fetch('https://api.twitch.tv/helix/users', httpOptions)
-      .then((res) => {
-        if (!res.ok) return Promise.reject(res);
-        return res.json();
-      })
-      .then((json) => {
-        let users = json.data as User[];
-        if (users.length != 1) return;
-        setUser(users[0]);
-      })
-      .catch((err) => console.log(err));
-  }
-
-  //
-  function addWatching(channel: string) {
-    if (watching.includes(channel)) {
-      // add highlight animation
-      let channelDiv = document.getElementById(`twitch-embed-${channel}`);
-      if (!channelDiv) return;
-      channelDiv.classList.add('animate-highlight');
-      return;
-    }
-
-    if (watching.length >= 9) {
-      // do this better :]
-      alert("That's enough, dude.");
-      return;
-    }
-
-    // add player
-    setWatching([...watching, channel]);
-    setOrder([...order, channel]);
-
-    if (watching.length < 1) {
-      setActiveChat(watching[0]);
-    }
-  }
-
-  //
-  function reorderWatching(channel: string, index: number, relative: boolean) {
-    let fromOrder = order.findIndex((o) => o == channel);
-    let toOrder = relative ? fromOrder + index : index;
-    if (toOrder < 0 || toOrder > watching.length + 1) return;
-
-    // set active chat on goto first
-    if (!relative && toOrder == 0) {
-      setActiveChat(channel);
-    }
-
-    // move channel to index 0
-    let newOrder = [...order];
-    move(newOrder, fromOrder, toOrder);
-    setOrder(newOrder);
-  }
-
-  //
-  function getViewFromSearchParams(searchParams: URLSearchParams) {
-    let view = getPlayerView(searchParams.get(SP_VIEW));
-    return view;
-  }
-
   //
   function setSearchParamsFromView(view: PlayerView) {
     setPlayerView(view);
     replaceSearchParams(order, view);
   }
 
+  // global helpers
+  //const searchParams = useSearchParams();
+
+  //// initial watching channels without duplicates
+  //const initialWatching = Array.from(new Set(params.page));
+  //const initialChat = initialWatching.length > 0 ? initialWatching[0] : '';
+  //const initialView = getViewFromSearchParams(searchParams);
+
+  //// state
+  //const [accessToken, setAccessToken] = useState<string | undefined>();
+  //const [user, setUser] = useState<User | undefined>();
+  //const [watching, setWatching] = useState<string[]>(initialWatching);
+  //const [order, setOrder] = useState<string[]>(initialWatching);
+  //const [activeChat, setActiveChat] = useState(initialChat);
+  //const [playerView, setPlayerView] = useState<PlayerView>(initialView);
   return (
     <div id="root" className="flex flex-col h-screen">
       <Header
