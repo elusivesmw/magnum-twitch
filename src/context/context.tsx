@@ -4,6 +4,7 @@ import {
   Dispatch,
   ReactNode,
   SetStateAction,
+  useCallback,
   useEffect,
   useState,
 } from 'react';
@@ -11,15 +12,13 @@ import { useSearchParams } from 'next/navigation';
 import { Stream, User } from '@/types/twitch';
 import { getHeaders, getOAuthHeaders } from '@/lib/auth';
 import { removeSearchParams, replaceSearchParams } from '@/lib/route';
-import { PlayerView, getPlayerView } from '@/types/state';
+import { PlayerView } from '@/types/state';
 import { createContext } from 'react';
 
 const LS_ACCESS_TOKEN = 'ACCESS_TOKEN';
-const SP_VIEW = 'v';
 const VALIDATE_INTERVAL = 60 * 60 * 1000;
 const LIVE_CHECK_INTERVAL = 60 * 1000;
 
-// TOOD: replace any types
 interface AppContextType {
   accessToken: string | undefined;
   setAccessToken: Dispatch<SetStateAction<string | undefined>>;
@@ -33,6 +32,9 @@ interface AppContextType {
   setActiveChat: Dispatch<SetStateAction<string>>;
   playerView: PlayerView;
   setPlayerView: Dispatch<SetStateAction<PlayerView>>;
+  addWatching: (channel: string) => void;
+  removeWatching: (channel: string) => void;
+  reorderWatching: (channel: string, index: number, relative: boolean) => void;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -40,12 +42,6 @@ export const AppContext = createContext<AppContextType | undefined>(undefined);
 export function AppProvider({ children }: { children: ReactNode }) {
   // global helpers
   const searchParams = useSearchParams();
-
-  // initial watching channels without duplicates
-  // TODO: pass as params
-  //const initialWatching = Array.from(new Set(params.page));
-  //const initialChat = initialWatching.length > 0 ? initialWatching[0] : '';
-  //const initialView = getViewFromSearchParams(searchParams);
 
   const initialWatching: string[] = [];
   const initialChat = '';
@@ -132,10 +128,101 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }
 
   //
-  function getViewFromSearchParams(searchParams: URLSearchParams) {
-    let view = getPlayerView(searchParams.get(SP_VIEW));
-    return view;
+  function addWatching(channel: string) {
+    if (watching.includes(channel)) {
+      // add highlight animation
+      let channelDiv = document.getElementById(`twitch-embed-${channel}`);
+      if (!channelDiv) return;
+      channelDiv.classList.add('animate-highlight');
+      return;
+    }
+
+    if (watching.length >= 9) {
+      // do this better :]
+      alert("That's enough, dude.");
+      return;
+    }
+
+    // add player
+    setWatching([...watching, channel]);
+    setOrder([...order, channel]);
+
+    if (watching.length < 1) {
+      setActiveChat(watching[0]);
+    }
   }
+
+  //
+  const removeWatching = useCallback(
+    (channel: string) => {
+      if (!watching.find((e) => e == channel)) return;
+
+      // remove player
+      setWatching((w) => w.filter((e) => e != channel));
+      setOrder((o) => o.filter((e) => e != channel));
+    },
+    [watching, setWatching, setOrder]
+  );
+
+  //
+  function reorderWatching(channel: string, index: number, relative: boolean) {
+    let fromOrder = order.findIndex((o) => o == channel);
+    let toOrder = relative ? fromOrder + index : index;
+    if (toOrder < 0 || toOrder > watching.length + 1) return;
+
+    // set active chat on goto first
+    if (!relative && toOrder == 0) {
+      setActiveChat(channel);
+    }
+
+    // move channel to index 0
+    let newOrder = [...order];
+    move(newOrder, fromOrder, toOrder);
+    setOrder(newOrder);
+  }
+
+  //
+  const reconcileStreams = useCallback(
+    (stillLive: string[]) => {
+      // remove from watching
+      for (let i = 0; i < watching.length; ++i) {
+        let w = watching[i];
+        if (!stillLive.find((e) => e == w)) {
+          removeWatching(w);
+        }
+      }
+    },
+    [removeWatching, watching]
+  );
+
+  //
+  const liveCheckStreams = useCallback(
+    (accessToken: string | undefined) => {
+      if (!accessToken) return;
+      if (watching.length == 0) return;
+
+      const httpOptions = getHeaders(accessToken);
+      let logins_param = 'user_login=' + watching.join('&user_login=');
+      fetch(`https://api.twitch.tv/helix/streams?${logins_param}`, httpOptions)
+        .then((res) => res.json())
+        .then((json) => {
+          let streams = json.data as Stream[];
+          let s = streams.map((e) => e.user_login);
+          reconcileStreams(s);
+        })
+        .catch((err) => console.log(err));
+    },
+    [watching, reconcileStreams]
+  );
+
+  // check if all streams are still live
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      liveCheckStreams(accessToken);
+    }, LIVE_CHECK_INTERVAL);
+
+    return () => clearInterval(intervalId);
+  }, [accessToken, liveCheckStreams]);
 
   return (
     <AppContext.Provider
@@ -146,6 +233,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setUser,
         watching,
         setWatching,
+        addWatching,
+        removeWatching,
+        reorderWatching,
         order,
         setOrder,
         activeChat,
@@ -199,16 +289,4 @@ function getError(searchParams: URLSearchParams) {
 
   alert(description);
   return true;
-}
-
-function playerClass(view: PlayerView) {
-  switch (view) {
-    case PlayerView.Vertical:
-      return 'flex-col flex-nowrap vertical';
-    case PlayerView.Spotlight:
-      return 'flex-row flex-wrap spotlight';
-    case PlayerView.Grid:
-    default:
-      return 'flex-row flex-wrap';
-  }
 }
