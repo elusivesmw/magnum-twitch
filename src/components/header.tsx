@@ -1,8 +1,17 @@
-import { Carousel, Grid, LogOut, Plus, Twitch } from '@/components/icons';
+import {
+  Carousel,
+  Grid,
+  LogOut,
+  Plus,
+  Settings,
+  Twitch,
+} from '@/components/icons';
 import { PlayerView } from '@/types/state';
 import { User } from '@/types/twitch';
 import Image from 'next/image';
-import { FormEvent, useState } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { FormEvent, useEffect, useState } from 'react';
 
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -35,6 +44,11 @@ export default function Header({
   const toggleUserMenu = () => {
     setUserMenuOpen(!userMenuOpen);
   };
+
+  const pathname = usePathname();
+  useEffect(() => {
+    setUserMenuOpen(false);
+  }, [pathname]);
 
   return (
     <header className="flex h-20 grow-0 shrink-0 bg-chatpanel z-20 header-shadow justify-between">
@@ -120,6 +134,21 @@ export default function Header({
                   />
                 </div>
                 <span className="pl-4 font-semibold">{user.display_name}</span>
+              </div>
+              <div
+                role="separator"
+                className="border-t border-twborder mt-4 mx-2 pb-4"
+              ></div>
+              <div>
+                <Link
+                  href="/settings"
+                  className="flex p-2 rounded-lg hover:bg-twbuttonbg hover:bg-opacity-[0.48]"
+                >
+                  <div className="pr-2 h-[20px]">
+                    <Settings className="fill-twbuttontext" />
+                  </div>
+                  <span className="">Settings</span>
+                </Link>
               </div>
               <div
                 role="separator"
