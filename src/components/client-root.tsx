@@ -7,7 +7,7 @@ import { replaceSearchParams } from '@/lib/route';
 import { PlayerView } from '@/types/state';
 import { ReactNode, useContext } from 'react';
 
-export default function Template({ children }: { children: ReactNode }) {
+export default function ClientRoot({ children }: { children: ReactNode }) {
   const context = useContext(AppContext);
   if (!context) {
     throw new Error('This component requires AppProvider as a parent');
