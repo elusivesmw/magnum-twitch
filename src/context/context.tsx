@@ -32,6 +32,8 @@ interface AppContextType {
   setActiveChat: Dispatch<SetStateAction<string>>;
   playerView: PlayerView;
   setPlayerView: Dispatch<SetStateAction<PlayerView>>;
+  updatePath: boolean;
+  setUpdatePath: Dispatch<SetStateAction<boolean>>;
   addWatching: (channel: string) => void;
   removeWatching: (channel: string) => void;
   reorderWatching: (channel: string, index: number, relative: boolean) => void;
@@ -54,6 +56,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [order, setOrder] = useState<string[]>(initialWatching);
   const [activeChat, setActiveChat] = useState(initialChat);
   const [playerView, setPlayerView] = useState<PlayerView>(initialView);
+  const [updatePath, setUpdatePath] = useState<boolean>(true);
 
   // set token
   useEffect(() => {
@@ -91,8 +94,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   // keep path in sync with order
   useEffect(() => {
+    console.log('updatePath', updatePath);
+    if (!updatePath) return;
+    console.log('here');
     replaceSearchParams(order, playerView);
-  }, [order, playerView]);
+  }, [order, playerView, updatePath]);
 
   //
   function validateToken(accessToken: string | undefined) {
@@ -242,6 +248,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setActiveChat,
         playerView,
         setPlayerView,
+        updatePath,
+        setUpdatePath,
       }}
     >
       {children}

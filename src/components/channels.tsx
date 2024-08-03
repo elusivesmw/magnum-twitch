@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { FollowedGame, Stream, User } from '@/types/twitch';
 import {
   ArrowDown,
@@ -39,6 +39,7 @@ const Channels = ({
   addWatching,
   removeWatching,
   view,
+  updatePath,
 }: {
   accessToken: string | undefined;
   user: User;
@@ -46,6 +47,7 @@ const Channels = ({
   addWatching: (stream: string) => void;
   removeWatching: (stream: string) => void;
   view: PlayerView;
+  updatePath: boolean;
 }) => {
   let [visibleStreamList, setVisibleStreamList] = useState<string>('following');
   let [notVisibleStreams, setNotVisibleStreams] = useState<
@@ -62,7 +64,9 @@ const Channels = ({
     if (accessToken) {
       // remove token from url
       // NOTE: this won't preserve order, but this is an edge case so ¯\_(ツ)_/¯
-      replaceSearchParams(watching, view);
+      if (updatePath) {
+        replaceSearchParams(watching, view);
+      }
     }
 
     updateFollowingStreams(accessToken, user);

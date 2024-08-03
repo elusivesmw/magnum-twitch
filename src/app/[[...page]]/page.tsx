@@ -22,9 +22,11 @@ export default function Home({ params }: { params: { page: string[] } }) {
     activeChat,
     setActiveChat,
     playerView,
+    setUpdatePath,
   } = context;
 
   useEffect(() => {
+    setUpdatePath(true);
     if (!params.page) return;
     // de-dupe
     let initialWatching = Array.from(new Set(params.page));

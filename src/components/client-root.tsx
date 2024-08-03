@@ -22,11 +22,13 @@ export default function ClientRoot({ children }: { children: ReactNode }) {
     order,
     playerView,
     setPlayerView,
+    updatePath,
   } = context;
 
-  //
+  // TODO: this seems like it should be elsewhere
   function setSearchParamsFromView(view: PlayerView) {
     setPlayerView(view);
+    if (!updatePath) return;
     replaceSearchParams(order, view);
   }
 
@@ -48,6 +50,7 @@ export default function ClientRoot({ children }: { children: ReactNode }) {
             addWatching={addWatching}
             removeWatching={removeWatching}
             view={playerView}
+            updatePath={updatePath}
           />
         )}
         {children}
