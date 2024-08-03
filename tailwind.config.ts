@@ -32,6 +32,8 @@ const config: Config = {
         sidepanel: 'rgb(31,31,35)',
         sidepanelhover: 'rgb(38,38,44)',
         chatpanel: 'rgb(24,24,27)',
+        faintpanel: 'rgb(25,27,28)',
+        fainttext: 'rgb(173,173,184)',
         twpurple: 'var(--twpurple)',
         twborder: 'rgba(83, 83, 95, 0.48)',
         twtext: 'var(--foreground-rgb)',

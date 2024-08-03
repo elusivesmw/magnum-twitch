@@ -281,6 +281,21 @@ export const Carousel = ({ className = '' }: { className?: string }) => {
   );
 };
 
+export const TrashCan = ({ className = '' }: { className?: string }) => {
+  return (
+    <svg
+      width="2rem"
+      height="2rem"
+      viewBox="0 0 20 20"
+      aria-label="Remove"
+      fill="currentColor"
+    >
+      <path d="M12 2H8v1H3v2h14V3h-5V2zM4 7v9a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7h-2v9H6V7H4z"></path>
+      <path d="M11 7H9v7h2V7z"></path>
+    </svg>
+  );
+};
+
 export const Settings = ({ className = '' }: { className?: string }) => {
   return (
     <svg
