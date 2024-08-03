@@ -11,13 +11,13 @@ export default function Settings() {
   }
 
   const router = useRouter();
+  let path = `/${context.order.join('/')}?v=${context.playerView}`;
+
   return (
     <div>
       <div>settings</div>
       <div>{context.user?.login}</div>
-      <button onClick={() => router.push(`/${context.order.join('/')}`)}>
-        go back
-      </button>
+      <button onClick={() => router.push(path)}>go back</button>
     </div>
   );
 }
