@@ -143,7 +143,7 @@ export default function Settings() {
                 </div>
               )}
 
-              <div>
+              <div className="my-4">
                 <div className="text-sm font-bold mb-2">Followed Games</div>
                 {followedGames.map((el, i) => {
                   return (
@@ -162,8 +162,15 @@ export default function Settings() {
                   );
                 })}
               </div>
-              <Link href={path}>go back</Link>
             </div>
+          </div>
+          <div className="">
+            <Link
+              href={path}
+              className="bg-twpurple font-bold px-4 py-2 rounded-md"
+            >
+              Back to Watching
+            </Link>
           </div>
         </div>
       </div>
