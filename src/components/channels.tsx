@@ -66,16 +66,16 @@ const Channels = ({
     }
 
     updateFollowingStreams(accessToken, user);
-    updateGameStreams(accessToken, user);
+    updateGameStreams(accessToken, user, followedGames);
     updateWatchingStreams(accessToken, watching);
     const intervalId = setInterval(() => {
       updateFollowingStreams(accessToken, user);
-      updateGameStreams(accessToken, user);
+      updateGameStreams(accessToken, user, followedGames);
       updateWatchingStreams(accessToken, watching);
     }, POLL_INTERVAL);
 
     return () => clearInterval(intervalId);
-  }, [accessToken, user, watching, view]);
+  }, [accessToken, user, watching, view, updatePath, followedGames]);
 
   // following channels
   const updateFollowingStreams = (
@@ -100,7 +100,8 @@ const Channels = ({
   // following games
   const updateGameStreams = (
     accessToken: string | undefined,
-    user: User | undefined
+    user: User | undefined,
+    followedGames: FollowedGame[]
   ) => {
     if (!accessToken) return;
     if (!user) return;

@@ -25,13 +25,9 @@ export default function Settings() {
 
   useEffect(() => {
     setUpdatePath(false);
-  }, []);
+  }, [setUpdatePath]);
 
-  function searchClickHandler() {
-    searchGames(accessToken, query);
-  }
-
-  function searchGames(accessToken: string | undefined, query: string) {
+  function searchGames() {
     if (!accessToken) return;
     if (query.length === 0) {
       setSearchResults([]);
@@ -88,8 +84,8 @@ export default function Settings() {
             </p>
             <p className="text-sm text-fainttext">
               Add games here to view live channels in the sidebar. Click
-              "Followed Channels" to select between followed channels and
-              followed games.
+              &quot;Followed Channels&quot; to select between followed channels
+              and followed games.
             </p>
           </div>
           <div className="bg-chatpanel border border-twborder rounded-md px-8 py-4 mb-16">
@@ -103,7 +99,7 @@ export default function Settings() {
                     onChange={(e) => setQuery(e.target.value)}
                   />
                   <button
-                    onClick={searchClickHandler}
+                    onClick={() => searchGames()}
                     className="bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] p-2 rounded-r-md"
                   >
                     Search

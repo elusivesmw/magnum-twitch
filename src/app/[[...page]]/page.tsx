@@ -33,7 +33,7 @@ export default function Home({ params }: { params: { page: string[] } }) {
     // and set
     setWatching(initialWatching);
     setOrder(initialWatching);
-  }, [params.page, setWatching, setOrder]);
+  }, [params.page, setWatching, setOrder, setUpdatePath]);
 
   return (
     <>
