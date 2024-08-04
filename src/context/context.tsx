@@ -9,7 +9,7 @@ import {
   useState,
 } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Stream, User } from '@/types/twitch';
+import { FollowedGame, Stream, User } from '@/types/twitch';
 import { getHeaders, getOAuthHeaders } from '@/lib/auth';
 import { removeSearchParams, replaceSearchParams } from '@/lib/route';
 import { PlayerView } from '@/types/state';
@@ -18,6 +18,7 @@ import { createContext } from 'react';
 const LS_ACCESS_TOKEN = 'ACCESS_TOKEN';
 const VALIDATE_INTERVAL = 60 * 60 * 1000;
 const LIVE_CHECK_INTERVAL = 60 * 1000;
+const LS_FOLLOWED_GAMES = 'FOLLOWED_GAMES';
 
 interface AppContextType {
   accessToken: string | undefined;
@@ -32,6 +33,8 @@ interface AppContextType {
   setActiveChat: Dispatch<SetStateAction<string>>;
   playerView: PlayerView;
   setPlayerView: Dispatch<SetStateAction<PlayerView>>;
+  followedGames: FollowedGame[];
+  setFollowedGames: Dispatch<SetStateAction<FollowedGame[]>>;
   updatePath: boolean;
   setUpdatePath: Dispatch<SetStateAction<boolean>>;
   addWatching: (channel: string) => void;
@@ -56,6 +59,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [order, setOrder] = useState<string[]>(initialWatching);
   const [activeChat, setActiveChat] = useState(initialChat);
   const [playerView, setPlayerView] = useState<PlayerView>(initialView);
+  const [followedGames, setFollowedGames] = useState<FollowedGame[]>();
   const [updatePath, setUpdatePath] = useState<boolean>(true);
 
   // set token
@@ -228,6 +232,64 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(intervalId);
   }, [accessToken, liveCheckStreams]);
 
+  useEffect(() => {
+    let games = getLsFollowedGames();
+    console.log('games', games);
+    setFollowedGames(games);
+  }, []);
+
+  const SEPARATOR = '___';
+  function getLsFollowedGames(): FollowedGame[] {
+    // try get from storage
+    let gamesStr = localStorage.getItem(LS_FOLLOWED_GAMES);
+
+    // testing
+    gamesStr =
+      '1229' +
+      SEPARATOR +
+      'Super Mario World' +
+      '\n' +
+      ' 505705' +
+      SEPARATOR +
+      'Noita';
+    // parse string
+    let followedGames: FollowedGame[] = [];
+    let rows = gamesStr.split('\n');
+    for (let r of rows) {
+      let game = r.split(SEPARATOR);
+
+      if (game.length != 2) continue;
+      let gameId = Number.parseInt(game[0]);
+      if (Number.isNaN(gameId)) continue;
+
+      let gameTitle = game[1];
+      followedGames.push({ game_id: gameId, game_title: gameTitle });
+    }
+    console.log(followedGames);
+
+    return followedGames;
+  }
+
+  function setLsFollowedGames(games: FollowedGame[] | undefined) {
+    if (!games) {
+      localStorage.removeItem(LS_FOLLOWED_GAMES);
+      return;
+    }
+
+    // to string
+    let followedGamesStr = '';
+    for (let i = 0; i < games.length; ++i) {
+      if (i > 0) {
+        followedGamesStr += '\n';
+      }
+      let g = games[i];
+      let gameStr = g.game_id + SEPARATOR + g.game_title;
+      followedGamesStr += gameStr;
+    }
+
+    // save to local storage
+    localStorage.setItem(LS_FOLLOWED_GAMES, followedGamesStr);
+  }
   return (
     <AppContext.Provider
       value={{
@@ -248,6 +310,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setPlayerView,
         updatePath,
         setUpdatePath,
+        followedGames,
+        setFollowedGames,
       }}
     >
       {children}
