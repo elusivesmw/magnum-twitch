@@ -17,6 +17,7 @@ export default function Settings() {
   const { accessToken, setUpdatePath, followedGames, setFollowedGames } =
     context;
 
+  const [query, setQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<Category[]>([]);
 
   //const router = useRouter();
@@ -27,10 +28,16 @@ export default function Settings() {
   }, []);
 
   function searchClickHandler() {
-    searchGames(accessToken, 'super');
+    searchGames(accessToken, query);
   }
+
   function searchGames(accessToken: string | undefined, query: string) {
     if (!accessToken) return;
+    if (query.length === 0) {
+      setSearchResults([]);
+      return;
+    }
+
     const httpOptions = getHeaders(accessToken);
     fetch(
       `https://api.twitch.tv/helix/search/categories?query=${query}&first=10`,
@@ -81,7 +88,11 @@ export default function Settings() {
               <div className="my-4">
                 <div className="text-sm font-bold mb-2">Search</div>
                 <div className="flex">
-                  <input type="text" className="w-full rounded-l-md" />
+                  <input
+                    type="text"
+                    className="w-full rounded-l-md"
+                    onChange={(e) => setQuery(e.target.value)}
+                  />
                   <button
                     onClick={searchClickHandler}
                     className="bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] p-2 rounded-r-md"
