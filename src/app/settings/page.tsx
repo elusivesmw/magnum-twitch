@@ -1,10 +1,10 @@
 'use client';
 
 import { AppContext } from '@/context/context';
-import { useRouter } from 'next/navigation';
 import { useContext, useEffect } from 'react';
 import { FollowedGame } from '@/types/twitch';
 import { TrashCan } from '@/components/icons';
+import Link from 'next/link';
 
 export default function Settings() {
   const context = useContext(AppContext);
@@ -14,7 +14,7 @@ export default function Settings() {
 
   const { setUpdatePath, followedGames } = context;
 
-  const router = useRouter();
+  //const router = useRouter();
   let path = `/${context.order.join('/')}?v=${context.playerView}`;
 
   useEffect(() => {
@@ -47,26 +47,24 @@ export default function Settings() {
             </p>
           </div>
           <div className="bg-chatpanel border border-twborder rounded-md px-8 py-4 mb-16">
-            <ul>
-              {followedGames.map((el, i) => {
-                return (
-                  <li
-                    key={i}
-                    className="flex justify-between items-center bg-sidepanel faintpanel rounded-lg p-8 my-4"
+            {followedGames.map((el, i) => {
+              return (
+                <div
+                  key={i}
+                  className="flex justify-between items-center bg-sidepanel faintpanel rounded-lg p-8 my-4"
+                >
+                  <div className="">{el.game_title}</div>
+                  <button
+                    className="p-2 rounded-md hover:bg-twborder"
+                    onClick={() => unfollowGame(el)}
                   >
-                    <div className="">{el.game_title}</div>
-                    <button
-                      className="p-2 rounded-md hover:bg-twborder"
-                      onClick={() => unfollowGame(el)}
-                    >
-                      <TrashCan />
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
+                    <TrashCan />
+                  </button>
+                </div>
+              );
+            })}
           </div>
-          <button onClick={() => router.push(path)}>go back</button>
+          <Link href={path}>go back</Link>
         </div>
       </div>
     </div>

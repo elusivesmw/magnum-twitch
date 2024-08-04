@@ -24,12 +24,6 @@ import {
 } from '@headlessui/react';
 import { getUniqueBy } from '@/lib/helper';
 
-// TODO: get these values when added,
-// after adding games dynamically is implemented.
-const FOLLOWED_GAMES: FollowedGame[] = [
-  { game_id: 1229, game_title: 'Super Mario World' },
-  { game_id: 505705, game_title: 'Noita' },
-];
 const POLL_INTERVAL = 60 * 1000;
 
 const Channels = ({
@@ -40,6 +34,7 @@ const Channels = ({
   removeWatching,
   view,
   updatePath,
+  followedGames,
 }: {
   accessToken: string | undefined;
   user: User;
@@ -48,6 +43,7 @@ const Channels = ({
   removeWatching: (stream: string) => void;
   view: PlayerView;
   updatePath: boolean;
+  followedGames: FollowedGame[];
 }) => {
   let [visibleStreamList, setVisibleStreamList] = useState<string>('following');
   let [notVisibleStreams, setNotVisibleStreams] = useState<
@@ -108,11 +104,12 @@ const Channels = ({
   ) => {
     if (!accessToken) return;
     if (!user) return;
+    if (followedGames.length < 1) return;
 
     // TODO: look into when more than 100 combined streams are returned
     // possibly get each game separately (api rate limit 30 requests/min)
     let game_ids_param =
-      'game_id=' + FOLLOWED_GAMES.map((fg) => fg.game_id).join('&game_id=');
+      'game_id=' + followedGames.map((fg) => fg.game_id).join('&game_id=');
     const httpOptions = getHeaders(accessToken);
     fetch(
       `https://api.twitch.tv/helix/streams?${game_ids_param}&first=100`,
@@ -227,7 +224,7 @@ const Channels = ({
                 <span className="uppercase font-bold text-sm">
                   {visibleStreamList == 'following'
                     ? 'Followed Channels'
-                    : FOLLOWED_GAMES.find(
+                    : followedGames.find(
                         (fg) => fg.game_id.toString() == visibleStreamList
                       )?.game_title}
                 </span>
@@ -250,7 +247,7 @@ const Channels = ({
             <ListboxOption value="following" className="listbox-option">
               Followed Channels
             </ListboxOption>
-            {FOLLOWED_GAMES.map((fg, i) => (
+            {followedGames.map((fg, i) => (
               <ListboxOption
                 key={i}
                 value={fg.game_id}

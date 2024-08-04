@@ -59,8 +59,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [order, setOrder] = useState<string[]>(initialWatching);
   const [activeChat, setActiveChat] = useState(initialChat);
   const [playerView, setPlayerView] = useState<PlayerView>(initialView);
-  const [followedGames, setFollowedGames] = useState<FollowedGame[]>();
-  const [updatePath, setUpdatePath] = useState<boolean>(true);
+  const [followedGames, setFollowedGames] = useState<FollowedGame[]>([]);
+  const [updatePath, setUpdatePath] = useState<boolean>(false);
 
   // set token
   useEffect(() => {
@@ -234,7 +234,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let games = getLsFollowedGames();
-    console.log('games', games);
     setFollowedGames(games);
   }, []);
 
@@ -265,7 +264,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       let gameTitle = game[1];
       followedGames.push({ game_id: gameId, game_title: gameTitle });
     }
-    console.log(followedGames);
+    console.log('testestest', followedGames);
 
     return followedGames;
   }

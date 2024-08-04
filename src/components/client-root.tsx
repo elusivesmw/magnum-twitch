@@ -23,6 +23,7 @@ export default function ClientRoot({ children }: { children: ReactNode }) {
     playerView,
     setPlayerView,
     updatePath,
+    followedGames,
   } = context;
 
   // TODO: this seems like it should be elsewhere
@@ -51,6 +52,7 @@ export default function ClientRoot({ children }: { children: ReactNode }) {
             removeWatching={removeWatching}
             view={playerView}
             updatePath={updatePath}
+            followedGames={followedGames}
           />
         )}
         {children}
