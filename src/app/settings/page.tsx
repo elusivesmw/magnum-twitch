@@ -24,12 +24,14 @@ export default function Settings() {
     { game_id: 505705, game_title: 'Noita' },
   ];
 
+  // TODO: onclick followed game, switch channels view
+
   function unfollowGame(game: FollowedGame) {
     console.log('unfollow game', game);
   }
 
   return (
-    <div className="sticky flex flex-col w-full">
+    <div className="flex flex-col w-full">
       <div className="pt-12 px-12 ">
         <h2 className="text-[3.6rem] font-bold mb-4">Settings</h2>
         <div className="border-b border-twborder"></div>
@@ -50,9 +52,12 @@ export default function Settings() {
           </div>
           <div className="bg-chatpanel border border-twborder rounded-md px-8 py-4 mb-16">
             <ul>
-              {temp.map((el) => {
+              {temp.map((el, i) => {
                 return (
-                  <li className="flex justify-between bg-sidepanel faintpanel rounded-lg p-8 my-4">
+                  <li
+                    key={i}
+                    className="flex justify-between items-center bg-sidepanel faintpanel rounded-lg p-8 my-4"
+                  >
                     <div className="">{el.game_title}</div>
                     <button
                       className="p-2 rounded-md hover:bg-twborder"
@@ -65,106 +70,6 @@ export default function Settings() {
               })}
             </ul>
           </div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
-          <div>placeholder</div>
           <button onClick={() => router.push(path)}>go back</button>
         </div>
       </div>

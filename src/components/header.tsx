@@ -14,14 +14,12 @@ export default function Header({
   addWatching,
   playerView,
   setPlayerView,
-  updatePath,
 }: {
   accessToken: string | undefined;
   user: User | undefined;
   addWatching: (channel: string) => void;
   playerView: PlayerView;
   setPlayerView: (view: PlayerView) => void;
-  updatePath: boolean;
 }) {
   const addAnyChannel = (e: FormEvent) => {
     e.preventDefault();

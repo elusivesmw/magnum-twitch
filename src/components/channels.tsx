@@ -1,6 +1,6 @@
 'use client';
 
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FollowedGame, Stream, User } from '@/types/twitch';
 import {
   ArrowDown,
@@ -132,7 +132,7 @@ const Channels = ({
     watching: string[]
   ) => {
     if (!accessToken) return;
-    if (!watching) return;
+    if (watching.length < 1) return;
 
     // get watching streams data
     let user_logins_param = 'user_login=' + watching.join('&user_login=');

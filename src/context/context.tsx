@@ -94,9 +94,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   // keep path in sync with order
   useEffect(() => {
-    console.log('updatePath', updatePath);
     if (!updatePath) return;
-    console.log('here');
     replaceSearchParams(order, playerView);
   }, [order, playerView, updatePath]);
 
