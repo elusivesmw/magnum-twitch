@@ -14,7 +14,7 @@ export default function Settings() {
     throw new Error('This component requires AppProvider as a parent');
   }
 
-  const { accessToken, setUpdatePath, followedGames, setFollowedGames } =
+  const { accessToken, setUpdatePath, followedGames, saveFollowedGames } =
     context;
 
   const [query, setQuery] = useState<string>('');
@@ -55,12 +55,21 @@ export default function Settings() {
   }
 
   // TODO: onclick followed game, switch channels view
-  function followGame(game: Category) {
-    console.log('follow game', game);
+  function followGame(cat: Category) {
+    console.log('follow game', cat);
+    let game: FollowedGame = {
+      game_id: Number.parseInt(cat.id),
+      game_title: cat.name,
+    };
+    saveFollowedGames([...followedGames, game]);
   }
 
   function unfollowGame(game: FollowedGame) {
     console.log('unfollow game', game);
+    let newFollowedGames = followedGames.filter(
+      (fg) => fg.game_id !== game.game_id
+    );
+    saveFollowedGames(newFollowedGames);
   }
 
   return (

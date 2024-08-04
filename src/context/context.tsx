@@ -19,7 +19,6 @@ import { getLsFollowedGames, setLsFollowedGames } from '@/lib/local-storage';
 const LS_ACCESS_TOKEN = 'ACCESS_TOKEN';
 const VALIDATE_INTERVAL = 60 * 60 * 1000;
 const LIVE_CHECK_INTERVAL = 60 * 1000;
-const LS_FOLLOWED_GAMES = 'FOLLOWED_GAMES';
 
 interface AppContextType {
   accessToken: string | undefined;
@@ -41,6 +40,7 @@ interface AppContextType {
   addWatching: (channel: string) => void;
   removeWatching: (channel: string) => void;
   reorderWatching: (channel: string, index: number, relative: boolean) => void;
+  saveFollowedGames: (followedGames: FollowedGame[]) => void;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -234,10 +234,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [accessToken, liveCheckStreams]);
 
   useEffect(() => {
-    setLsFollowedGames([]);
     let games = getLsFollowedGames();
     setFollowedGames(games);
   }, []);
+
+  function saveFollowedGames(followedGames: FollowedGame[]) {
+    console.log('save');
+    setLsFollowedGames(followedGames);
+    setFollowedGames(followedGames);
+  }
 
   return (
     <AppContext.Provider
@@ -261,6 +266,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setUpdatePath,
         followedGames,
         setFollowedGames,
+        saveFollowedGames,
       }}
     >
       {children}

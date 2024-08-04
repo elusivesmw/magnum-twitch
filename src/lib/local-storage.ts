@@ -27,12 +27,6 @@ export function getLsFollowedGames(): FollowedGame[] {
 }
 
 export function setLsFollowedGames(games: FollowedGame[] | undefined) {
-  // test
-  games = [
-    { game_id: 1229, game_title: 'Super Mario World' },
-    { game_id: 505705, game_title: 'Noita' },
-  ];
-
   if (!games) {
     localStorage.removeItem(LS_FOLLOWED_GAMES);
     return;
