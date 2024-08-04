@@ -6,6 +6,8 @@ import { useContext, useEffect } from 'react';
 import { FollowedGame } from '@/types/twitch';
 import { TrashCan } from '@/components/icons';
 
+const LS_FOLLOWED_GAMES = '';
+
 export default function Settings() {
   const context = useContext(AppContext);
   if (!context) {
@@ -75,4 +77,50 @@ export default function Settings() {
       </div>
     </div>
   );
+}
+
+const SEPARATOR = '___';
+function getFollowedGames(): FollowedGame[] | undefined {
+  // try get from storage
+  let gamesStr = localStorage.getItem(LS_FOLLOWED_GAMES);
+  if (!gamesStr) return undefined;
+
+  // testing
+  gamesStr = '1229' + SEPARATOR + 'Super Mario World';
+
+  // parse string
+  let followedGames: FollowedGame[] = [];
+  let rows = gamesStr.split('\n');
+  for (let r in rows) {
+    let game = r.split(SEPARATOR);
+    if (game.length != 2) continue;
+    let gameId = Number.parseInt(game[0]);
+    if (Number.isNaN(gameId)) continue;
+
+    let gameTitle = game[1];
+    followedGames.push({ game_id: gameId, game_title: gameTitle });
+  }
+
+  return followedGames;
+}
+
+function setFollowedGames(games: FollowedGame[] | undefined) {
+  if (!games) {
+    localStorage.removeItem(LS_FOLLOWED_GAMES);
+    return;
+  }
+
+  // to string
+  let followedGamesStr = '';
+  for (let i = 0; i < games.length; ++i) {
+    if (i > 0) {
+      followedGamesStr += '\n';
+    }
+    let g = games[i];
+    let gameStr = g.game_id + SEPARATOR + g.game_title;
+    followedGamesStr += gameStr;
+  }
+
+  // save to local storage
+  localStorage.setItem(LS_FOLLOWED_GAMES, followedGamesStr);
 }
