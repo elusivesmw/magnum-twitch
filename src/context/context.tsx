@@ -233,6 +233,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [accessToken, liveCheckStreams]);
 
   useEffect(() => {
+    setLsFollowedGames([]);
     let games = getLsFollowedGames();
     setFollowedGames(games);
   }, []);
@@ -241,16 +242,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   function getLsFollowedGames(): FollowedGame[] {
     // try get from storage
     let gamesStr = localStorage.getItem(LS_FOLLOWED_GAMES);
+    if (!gamesStr) return [];
 
-    // testing
-    gamesStr =
-      '1229' +
-      SEPARATOR +
-      'Super Mario World' +
-      '\n' +
-      ' 505705' +
-      SEPARATOR +
-      'Noita';
     // parse string
     let followedGames: FollowedGame[] = [];
     let rows = gamesStr.split('\n');
@@ -270,6 +263,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }
 
   function setLsFollowedGames(games: FollowedGame[] | undefined) {
+    // test
+    games = [
+      { game_id: 1229, game_title: 'Super Mario World' },
+      { game_id: 505705, game_title: 'Noita' },
+    ];
+
     if (!games) {
       localStorage.removeItem(LS_FOLLOWED_GAMES);
       return;
