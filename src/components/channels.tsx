@@ -222,14 +222,14 @@ const Channels = ({
           <ListboxButton className="flex justify-center items-center w-full p-4">
             {open ? (
               <div className="flex justify-between items-center w-full">
-                <span className="uppercase font-bold text-sm">
+                <span className="uppercase font-bold text-sm truncate">
                   {visibleStreamList == 'following'
                     ? 'Followed Channels'
                     : followedGames.find(
                         (fg) => fg.game_id.toString() == visibleStreamList
                       )?.game_title}
                 </span>
-                <ArrowDown />
+                <ArrowDown className="shrink-0" />
               </div>
             ) : (
               <div className="flex basis-8 h-8 items-center">
