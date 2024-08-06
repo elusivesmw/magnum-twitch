@@ -7,6 +7,8 @@ import { Plus, TrashCan } from '@/components/icons';
 import Link from 'next/link';
 import { getHeaders } from '@/lib/auth';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { LOGIN_LINK } from '@/lib/auth';
 
 enum Action {
   Add,
@@ -29,7 +31,6 @@ export default function Settings() {
   const [query, setQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<Category[]>([]);
 
-  //const router = useRouter();
   let path = `/${context.order.join('/')}?v=${context.playerView}`;
 
   useEffect(() => {
@@ -105,6 +106,11 @@ export default function Settings() {
         {button}
       </div>
     );
+  }
+
+  const router = useRouter();
+  if (!accessToken) {
+    router.push(LOGIN_LINK);
   }
 
   return (

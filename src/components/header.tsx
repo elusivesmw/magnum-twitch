@@ -4,9 +4,7 @@ import { User } from '@/types/twitch';
 import Link from 'next/link';
 import { FormEvent } from 'react';
 import UserMenu from './user-menu';
-
-const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+import { LOGIN_LINK } from '@/lib/auth';
 
 export default function Header({
   accessToken,
@@ -88,7 +86,7 @@ export default function Header({
         <UserMenu user={user} />
         {!accessToken && (
           <a
-            href={`https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=${TWITCH_CLIENT_ID}&redirect_uri=${BASE_URL}&scope=user:read:follows`}
+            href={LOGIN_LINK}
             className="inline-flex items-center text-sm font-semibold px-4 text-twbuttontext bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] rounded-[4px]"
           >
             Log In
