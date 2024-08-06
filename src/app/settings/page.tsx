@@ -65,7 +65,6 @@ export default function Settings() {
   }
 
   function unfollowGame(cat: Category) {
-    console.log('unfollow cat', cat);
     let newFollowedCategories = followedCategories.filter(
       (fc) => fc.id !== cat.id
     );

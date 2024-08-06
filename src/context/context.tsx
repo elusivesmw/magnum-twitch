@@ -242,7 +242,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   function saveFollowedCategories(followedCategories: Category[]) {
-    console.log('save');
     setLsFollowedCategories(followedCategories);
     setFollowedCategories(followedCategories);
   }
