@@ -119,13 +119,14 @@ export default function Settings() {
           <div className="mb-8">
             <h3 className="text-xl font-semibold">Followed Games</h3>
             <p className="text-sm text-fainttext mt-4">
-              Getting a list of followed games is not supported by the Twitch
-              API.
-            </p>
-            <p className="text-sm text-fainttext">
-              Add games here to view live channels in the sidebar. Click
+              Add categories here to view live channels in the sidebar. Click
               &quot;Followed Channels&quot; to select between followed channels
               and followed categories.
+            </p>
+            <p className="text-sm text-fainttext">
+              Getting a list of followed games is not supported by the Twitch
+              API. As a workaround, this setting gives the ability to save
+              followed categories (to this device).
             </p>
           </div>
           <div className="bg-chatpanel border border-twborder rounded-md px-8 py-4 mb-16">

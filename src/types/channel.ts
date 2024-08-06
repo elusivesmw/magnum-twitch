@@ -1,8 +1,5 @@
 export enum SectionType {
-  Following = 'following-channel',
-  NotFollowing = 'not-following-channel',
-  Game = 'following-game',
+  Following = 'followed-channel',
+  NotFollowing = 'not-followed-channel',
+  Game = 'followed-category',
 }
-
-// TODO: game -> category
-// TODO: ing -> ed
