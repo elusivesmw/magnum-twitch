@@ -29,7 +29,8 @@ export interface User {
   created_at: string;
 }
 
-export interface FollowedGame {
-  game_id: number;
-  game_title: string;
+export interface Category {
+  id: string;
+  name: string;
+  box_art_url: string;
 }

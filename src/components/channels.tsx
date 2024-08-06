@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { FollowedGame, Stream, User } from '@/types/twitch';
+import { Category, Stream, User } from '@/types/twitch';
 import {
   ArrowDown,
   BrokenHeart,
@@ -24,12 +24,6 @@ import {
 } from '@headlessui/react';
 import { getUniqueBy } from '@/lib/helper';
 
-// TODO: get these values when added,
-// after adding games dynamically is implemented.
-const FOLLOWED_GAMES: FollowedGame[] = [
-  { game_id: 1229, game_title: 'Super Mario World' },
-  { game_id: 505705, game_title: 'Noita' },
-];
 const POLL_INTERVAL = 60 * 1000;
 
 const Channels = ({
@@ -39,6 +33,8 @@ const Channels = ({
   addWatching,
   removeWatching,
   view,
+  updatePath,
+  followedCategories,
 }: {
   accessToken: string | undefined;
   user: User;
@@ -46,6 +42,8 @@ const Channels = ({
   addWatching: (stream: string) => void;
   removeWatching: (stream: string) => void;
   view: PlayerView;
+  updatePath: boolean;
+  followedCategories: Category[];
 }) => {
   let [visibleStreamList, setVisibleStreamList] = useState<string>('following');
   let [notVisibleStreams, setNotVisibleStreams] = useState<
@@ -62,20 +60,22 @@ const Channels = ({
     if (accessToken) {
       // remove token from url
       // NOTE: this won't preserve order, but this is an edge case so ¯\_(ツ)_/¯
-      replaceSearchParams(watching, view);
+      if (updatePath) {
+        replaceSearchParams(watching, view);
+      }
     }
 
     updateFollowingStreams(accessToken, user);
-    updateGameStreams(accessToken, user);
+    updateGameStreams(accessToken, user, followedCategories);
     updateWatchingStreams(accessToken, watching);
     const intervalId = setInterval(() => {
       updateFollowingStreams(accessToken, user);
-      updateGameStreams(accessToken, user);
+      updateGameStreams(accessToken, user, followedCategories);
       updateWatchingStreams(accessToken, watching);
     }, POLL_INTERVAL);
 
     return () => clearInterval(intervalId);
-  }, [accessToken, user, watching, view]);
+  }, [accessToken, user, watching, view, updatePath, followedCategories]);
 
   // following channels
   const updateFollowingStreams = (
@@ -100,15 +100,17 @@ const Channels = ({
   // following games
   const updateGameStreams = (
     accessToken: string | undefined,
-    user: User | undefined
+    user: User | undefined,
+    followedCategories: Category[]
   ) => {
     if (!accessToken) return;
     if (!user) return;
+    if (followedCategories.length < 1) return;
 
     // TODO: look into when more than 100 combined streams are returned
     // possibly get each game separately (api rate limit 30 requests/min)
     let game_ids_param =
-      'game_id=' + FOLLOWED_GAMES.map((fg) => fg.game_id).join('&game_id=');
+      'game_id=' + followedCategories.map((fc) => fc.id).join('&game_id=');
     const httpOptions = getHeaders(accessToken);
     fetch(
       `https://api.twitch.tv/helix/streams?${game_ids_param}&first=100`,
@@ -128,7 +130,7 @@ const Channels = ({
     watching: string[]
   ) => {
     if (!accessToken) return;
-    if (!watching) return;
+    if (watching.length < 1) return;
 
     // get watching streams data
     let user_logins_param = 'user_login=' + watching.join('&user_login=');
@@ -220,14 +222,14 @@ const Channels = ({
           <ListboxButton className="flex justify-center items-center w-full p-4">
             {open ? (
               <div className="flex justify-between items-center w-full">
-                <span className="uppercase font-bold text-sm">
+                <span className="uppercase font-bold text-sm truncate">
                   {visibleStreamList == 'following'
                     ? 'Followed Channels'
-                    : FOLLOWED_GAMES.find(
-                        (fg) => fg.game_id.toString() == visibleStreamList
-                      )?.game_title}
+                    : followedCategories.find(
+                        (fc) => fc.id == visibleStreamList
+                      )?.name}
                 </span>
-                <ArrowDown />
+                <ArrowDown className="w-8 h-8 shrink-0" />
               </div>
             ) : (
               <div className="flex basis-8 h-8 items-center">
@@ -246,13 +248,9 @@ const Channels = ({
             <ListboxOption value="following" className="listbox-option">
               Followed Channels
             </ListboxOption>
-            {FOLLOWED_GAMES.map((fg, i) => (
-              <ListboxOption
-                key={i}
-                value={fg.game_id}
-                className="listbox-option"
-              >
-                {fg.game_title}
+            {followedCategories.map((fc, i) => (
+              <ListboxOption key={i} value={fc.id} className="listbox-option">
+                {fc.name}
               </ListboxOption>
             ))}
           </ListboxOptions>

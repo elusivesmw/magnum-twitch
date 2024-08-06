@@ -2,8 +2,8 @@ export const Twitch = ({ className = '' }: { className?: string }) => {
   return (
     <svg
       overflow="visible"
-      width="40px"
-      height="40px"
+      width="100%"
+      height="100%"
       version="1.1"
       viewBox="0 0 40 40"
       x="0px"
@@ -71,8 +71,8 @@ export const ArrowRight = ({ className = '' }: { className?: string }) => {
 export const ArrowUp = ({ className = '' }: { className?: string }) => {
   return (
     <svg
-      width="2rem"
-      height="2rem"
+      width="100%"
+      height="100%"
       viewBox="0 0 20 20"
       fill="currentColor"
       className={className}
@@ -85,8 +85,8 @@ export const ArrowUp = ({ className = '' }: { className?: string }) => {
 export const ArrowDown = ({ className = '' }: { className?: string }) => {
   return (
     <svg
-      width="2rem"
-      height="2rem"
+      width="100%"
+      height="100%"
       viewBox="0 0 20 20"
       fill="currentColor"
       className={className}
@@ -208,6 +208,7 @@ export const Plus = ({ className = '' }: { className?: string }) => {
       width="100%"
       height="100%"
       viewBox="0 0 20 20"
+      aria-label="Add"
       fill="currentColor"
       className={className}
     >
@@ -256,8 +257,8 @@ export const Spotlight = ({ className = '' }: { className?: string }) => {
 export const Grid = ({ className = '' }: { className?: string }) => {
   return (
     <svg
-      width="2rem"
-      height="2rem"
+      width="100%"
+      height="100%"
       viewBox="0 0 20 20"
       fill="currentColor"
       className={className}
@@ -270,8 +271,8 @@ export const Grid = ({ className = '' }: { className?: string }) => {
 export const Carousel = ({ className = '' }: { className?: string }) => {
   return (
     <svg
-      width="2rem"
-      height="2rem"
+      width="100%"
+      height="100%"
       viewBox="0 0 20 20"
       fill="currentColor"
       className={className}
@@ -281,6 +282,40 @@ export const Carousel = ({ className = '' }: { className?: string }) => {
   );
 };
 
+export const TrashCan = ({ className = '' }: { className?: string }) => {
+  return (
+    <svg
+      width="100%"
+      height="100%"
+      viewBox="0 0 20 20"
+      aria-label="Remove"
+      fill="currentColor"
+      className={className}
+    >
+      <path d="M12 2H8v1H3v2h14V3h-5V2zM4 7v9a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7h-2v9H6V7H4z"></path>
+      <path d="M11 7H9v7h2V7z"></path>
+    </svg>
+  );
+};
+
+export const Settings = ({ className = '' }: { className?: string }) => {
+  return (
+    <svg
+      width="100%"
+      height="100%"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      className={className}
+    >
+      <path d="M10 8a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"></path>
+      <path
+        fillRule="evenodd"
+        d="M9 2h2a2.01 2.01 0 0 0 1.235 1.855l.53.22a2.01 2.01 0 0 0 2.185-.439l1.414 1.414a2.01 2.01 0 0 0-.439 2.185l.22.53A2.01 2.01 0 0 0 18 9v2a2.01 2.01 0 0 0-1.855 1.235l-.22.53a2.01 2.01 0 0 0 .44 2.185l-1.415 1.414a2.01 2.01 0 0 0-2.184-.439l-.531.22A2.01 2.01 0 0 0 11 18H9a2.01 2.01 0 0 0-1.235-1.854l-.53-.22a2.009 2.009 0 0 0-2.185.438L3.636 14.95a2.009 2.009 0 0 0 .438-2.184l-.22-.531A2.01 2.01 0 0 0 2 11V9c.809 0 1.545-.487 1.854-1.235l.22-.53a2.009 2.009 0 0 0-.438-2.185L5.05 3.636a2.01 2.01 0 0 0 2.185.438l.53-.22A2.01 2.01 0 0 0 9 2zm-4 8 1.464 3.536L10 15l3.535-1.464L15 10l-1.465-3.536L10 5 6.464 6.464 5 10z"
+        clipRule="evenodd"
+      ></path>
+    </svg>
+  );
+};
 export const LogOut = ({ className = '' }: { className?: string }) => {
   return (
     <svg
