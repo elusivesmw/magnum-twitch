@@ -37,7 +37,7 @@ export default function Header({
         <div className="p-2">
           <Link href="/">
             {/* temporarily use this logo to reset all players */}
-            <Twitch />
+            <Twitch className="h-16" />
           </Link>
         </div>
         <div className="flex h-full py-4 px-2">
@@ -50,7 +50,7 @@ export default function Header({
                 playerView == PlayerView.Grid ? 'text-twpurple' : ''
               }`}
             >
-              <Grid />
+              <Grid className="h-8" />
             </div>
           </button>
           <button
@@ -62,7 +62,7 @@ export default function Header({
                 playerView == PlayerView.Spotlight ? 'text-twpurple' : ''
               }`}
             >
-              <Carousel />
+              <Carousel className="h-8" />
             </div>
           </button>
         </div>

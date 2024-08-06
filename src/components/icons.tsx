@@ -2,8 +2,8 @@ export const Twitch = ({ className = '' }: { className?: string }) => {
   return (
     <svg
       overflow="visible"
-      width="40px"
-      height="40px"
+      width="100%"
+      height="100%"
       version="1.1"
       viewBox="0 0 40 40"
       x="0px"
@@ -71,8 +71,8 @@ export const ArrowRight = ({ className = '' }: { className?: string }) => {
 export const ArrowUp = ({ className = '' }: { className?: string }) => {
   return (
     <svg
-      width="2rem"
-      height="2rem"
+      width="100%"
+      height="100%"
       viewBox="0 0 20 20"
       fill="currentColor"
       className={className}
@@ -85,8 +85,8 @@ export const ArrowUp = ({ className = '' }: { className?: string }) => {
 export const ArrowDown = ({ className = '' }: { className?: string }) => {
   return (
     <svg
-      width="2rem"
-      height="2rem"
+      width="100%"
+      height="100%"
       viewBox="0 0 20 20"
       fill="currentColor"
       className={className}
@@ -208,6 +208,7 @@ export const Plus = ({ className = '' }: { className?: string }) => {
       width="100%"
       height="100%"
       viewBox="0 0 20 20"
+      aria-label="Add"
       fill="currentColor"
       className={className}
     >
@@ -256,8 +257,8 @@ export const Spotlight = ({ className = '' }: { className?: string }) => {
 export const Grid = ({ className = '' }: { className?: string }) => {
   return (
     <svg
-      width="2rem"
-      height="2rem"
+      width="100%"
+      height="100%"
       viewBox="0 0 20 20"
       fill="currentColor"
       className={className}
@@ -270,8 +271,8 @@ export const Grid = ({ className = '' }: { className?: string }) => {
 export const Carousel = ({ className = '' }: { className?: string }) => {
   return (
     <svg
-      width="2rem"
-      height="2rem"
+      width="100%"
+      height="100%"
       viewBox="0 0 20 20"
       fill="currentColor"
       className={className}
@@ -284,11 +285,12 @@ export const Carousel = ({ className = '' }: { className?: string }) => {
 export const TrashCan = ({ className = '' }: { className?: string }) => {
   return (
     <svg
-      width="2rem"
-      height="2rem"
+      width="100%"
+      height="100%"
       viewBox="0 0 20 20"
       aria-label="Remove"
       fill="currentColor"
+      className={className}
     >
       <path d="M12 2H8v1H3v2h14V3h-5V2zM4 7v9a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7h-2v9H6V7H4z"></path>
       <path d="M11 7H9v7h2V7z"></path>

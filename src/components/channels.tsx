@@ -229,7 +229,7 @@ const Channels = ({
                         (fc) => fc.id == visibleStreamList
                       )?.name}
                 </span>
-                <ArrowDown className="shrink-0" />
+                <ArrowDown className="w-8 h-8 shrink-0" />
               </div>
             ) : (
               <div className="flex basis-8 h-8 items-center">

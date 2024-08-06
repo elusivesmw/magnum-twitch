@@ -1,12 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import {
-  ArrowLeft,
-  ArrowRight,
-  CollapseLeft,
-  CollapseRight,
-} from '@/components/icons';
+import { ArrowRight, CollapseLeft, CollapseRight } from '@/components/icons';
 
 const EMBED_PARENT = process.env.NEXT_PUBLIC_TWITCH_EMBED_PARENT;
 

@@ -89,20 +89,20 @@ export default function Settings() {
           className="p-2 rounded-md hover:bg-twborder"
           onClick={() => unfollowGame(cat)}
         >
-          <TrashCan />
+          <TrashCan className="h-8" />
         </button>
       );
     }
 
     return (
-      <div className="flex justify-start items-center bg-sidepanel faintpanel rounded-lg p-8 my-4">
+      <div className="flex justify-start items-center bg-sidepanel faintpanel rounded-lg p-8 my-4 gap-8">
         <Image
           src={cat.box_art_url}
           width={52}
           height={72}
           alt={`${cat.name} box art`}
         />
-        <div className="grow p-4">{cat.name}</div>
+        <div className="grow">{cat.name}</div>
         {button}
       </div>
     );
