@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { FollowedGame, Stream, User } from '@/types/twitch';
+import { Category, Stream, User } from '@/types/twitch';
 import {
   ArrowDown,
   BrokenHeart,
@@ -34,7 +34,7 @@ const Channels = ({
   removeWatching,
   view,
   updatePath,
-  followedGames,
+  followedCategories,
 }: {
   accessToken: string | undefined;
   user: User;
@@ -43,7 +43,7 @@ const Channels = ({
   removeWatching: (stream: string) => void;
   view: PlayerView;
   updatePath: boolean;
-  followedGames: FollowedGame[];
+  followedCategories: Category[];
 }) => {
   let [visibleStreamList, setVisibleStreamList] = useState<string>('following');
   let [notVisibleStreams, setNotVisibleStreams] = useState<
@@ -66,16 +66,16 @@ const Channels = ({
     }
 
     updateFollowingStreams(accessToken, user);
-    updateGameStreams(accessToken, user, followedGames);
+    updateGameStreams(accessToken, user, followedCategories);
     updateWatchingStreams(accessToken, watching);
     const intervalId = setInterval(() => {
       updateFollowingStreams(accessToken, user);
-      updateGameStreams(accessToken, user, followedGames);
+      updateGameStreams(accessToken, user, followedCategories);
       updateWatchingStreams(accessToken, watching);
     }, POLL_INTERVAL);
 
     return () => clearInterval(intervalId);
-  }, [accessToken, user, watching, view, updatePath, followedGames]);
+  }, [accessToken, user, watching, view, updatePath, followedCategories]);
 
   // following channels
   const updateFollowingStreams = (
@@ -101,16 +101,16 @@ const Channels = ({
   const updateGameStreams = (
     accessToken: string | undefined,
     user: User | undefined,
-    followedGames: FollowedGame[]
+    followedCategories: Category[]
   ) => {
     if (!accessToken) return;
     if (!user) return;
-    if (followedGames.length < 1) return;
+    if (followedCategories.length < 1) return;
 
     // TODO: look into when more than 100 combined streams are returned
     // possibly get each game separately (api rate limit 30 requests/min)
     let game_ids_param =
-      'game_id=' + followedGames.map((fg) => fg.game_id).join('&game_id=');
+      'game_id=' + followedCategories.map((fc) => fc.id).join('&game_id=');
     const httpOptions = getHeaders(accessToken);
     fetch(
       `https://api.twitch.tv/helix/streams?${game_ids_param}&first=100`,
@@ -225,9 +225,9 @@ const Channels = ({
                 <span className="uppercase font-bold text-sm truncate">
                   {visibleStreamList == 'following'
                     ? 'Followed Channels'
-                    : followedGames.find(
-                        (fg) => fg.game_id.toString() == visibleStreamList
-                      )?.game_title}
+                    : followedCategories.find(
+                        (fc) => fc.id == visibleStreamList
+                      )?.name}
                 </span>
                 <ArrowDown className="shrink-0" />
               </div>
@@ -248,13 +248,9 @@ const Channels = ({
             <ListboxOption value="following" className="listbox-option">
               Followed Channels
             </ListboxOption>
-            {followedGames.map((fg, i) => (
-              <ListboxOption
-                key={i}
-                value={fg.game_id}
-                className="listbox-option"
-              >
-                {fg.game_title}
+            {followedCategories.map((fc, i) => (
+              <ListboxOption key={i} value={fc.id} className="listbox-option">
+                {fc.name}
               </ListboxOption>
             ))}
           </ListboxOptions>

@@ -34,9 +34,3 @@ export interface Category {
   name: string;
   box_art_url: string;
 }
-
-// TODO: rename to FollowedCategory + all local instances
-export interface FollowedGame {
-  game_id: number;
-  game_title: string;
-}

@@ -1,32 +1,32 @@
-import { FollowedGame } from '@/types/twitch';
+import { Category } from '@/types/twitch';
 
 const LS_FOLLOWED_GAMES = 'FOLLOWED_GAMES';
 const SEPARATOR = '___';
 
-export function getLsFollowedGames(): FollowedGame[] {
+export function getLsFollowedGames(): Category[] {
   // try get from storage
   let gamesStr = localStorage.getItem(LS_FOLLOWED_GAMES);
   if (!gamesStr) return [];
 
+  // TODO: parse JSON
   // parse string
-  let followedGames: FollowedGame[] = [];
+  let followedGames: Category[] = [];
   let rows = gamesStr.split('\n');
   for (let r of rows) {
     let game = r.split(SEPARATOR);
 
     if (game.length != 2) continue;
-    let gameId = Number.parseInt(game[0]);
-    if (Number.isNaN(gameId)) continue;
+    let gameId = game[0];
 
     let gameTitle = game[1];
-    followedGames.push({ game_id: gameId, game_title: gameTitle });
+    followedGames.push({ id: gameId, name: gameTitle, box_art_url: '' });
   }
   console.log('testestest', followedGames);
 
   return followedGames;
 }
 
-export function setLsFollowedGames(games: FollowedGame[] | undefined) {
+export function setLsFollowedGames(games: Category[] | undefined) {
   if (!games) {
     localStorage.removeItem(LS_FOLLOWED_GAMES);
     return;
@@ -39,7 +39,7 @@ export function setLsFollowedGames(games: FollowedGame[] | undefined) {
       followedGamesStr += '\n';
     }
     let g = games[i];
-    let gameStr = g.game_id + SEPARATOR + g.game_title;
+    let gameStr = g.id + SEPARATOR + g.name;
     followedGamesStr += gameStr;
   }
 

@@ -9,7 +9,7 @@ import {
   useState,
 } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { FollowedGame, Stream, User } from '@/types/twitch';
+import { Category, Stream, User } from '@/types/twitch';
 import { getHeaders, getOAuthHeaders } from '@/lib/auth';
 import { removeSearchParams, replaceSearchParams } from '@/lib/route';
 import { PlayerView } from '@/types/state';
@@ -33,14 +33,14 @@ interface AppContextType {
   setActiveChat: Dispatch<SetStateAction<string>>;
   playerView: PlayerView;
   setPlayerView: Dispatch<SetStateAction<PlayerView>>;
-  followedGames: FollowedGame[];
-  setFollowedGames: Dispatch<SetStateAction<FollowedGame[]>>;
+  followedCategories: Category[];
+  setFollowedCategories: Dispatch<SetStateAction<Category[]>>;
   updatePath: boolean;
   setUpdatePath: Dispatch<SetStateAction<boolean>>;
   addWatching: (channel: string) => void;
   removeWatching: (channel: string) => void;
   reorderWatching: (channel: string, index: number, relative: boolean) => void;
-  saveFollowedGames: (followedGames: FollowedGame[]) => void;
+  saveFollowedCategories: (followedCategories: Category[]) => void;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -60,7 +60,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [order, setOrder] = useState<string[]>(initialWatching);
   const [activeChat, setActiveChat] = useState(initialChat);
   const [playerView, setPlayerView] = useState<PlayerView>(initialView);
-  const [followedGames, setFollowedGames] = useState<FollowedGame[]>([]);
+  const [followedCategories, setFollowedCategories] = useState<Category[]>([]);
   const [updatePath, setUpdatePath] = useState<boolean>(false);
 
   // set token
@@ -235,13 +235,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let games = getLsFollowedGames();
-    setFollowedGames(games);
+    setFollowedCategories(games);
   }, []);
 
-  function saveFollowedGames(followedGames: FollowedGame[]) {
+  function saveFollowedCategories(followedCategories: Category[]) {
     console.log('save');
-    setLsFollowedGames(followedGames);
-    setFollowedGames(followedGames);
+    setLsFollowedGames(followedCategories);
+    setFollowedCategories(followedCategories);
   }
 
   return (
@@ -264,9 +264,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setPlayerView,
         updatePath,
         setUpdatePath,
-        followedGames,
-        setFollowedGames,
-        saveFollowedGames,
+        followedCategories: followedCategories,
+        setFollowedCategories: setFollowedCategories,
+        saveFollowedCategories: saveFollowedCategories,
       }}
     >
       {children}

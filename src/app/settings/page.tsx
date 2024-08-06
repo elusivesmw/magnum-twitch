@@ -2,7 +2,7 @@
 
 import { AppContext } from '@/context/context';
 import { useContext, useEffect, useState } from 'react';
-import { Category, FollowedGame } from '@/types/twitch';
+import { Category } from '@/types/twitch';
 import { TrashCan } from '@/components/icons';
 import Link from 'next/link';
 import { getHeaders } from '@/lib/auth';
@@ -14,8 +14,12 @@ export default function Settings() {
     throw new Error('This component requires AppProvider as a parent');
   }
 
-  const { accessToken, setUpdatePath, followedGames, saveFollowedGames } =
-    context;
+  const {
+    accessToken,
+    setUpdatePath,
+    followedCategories,
+    saveFollowedCategories,
+  } = context;
 
   const [query, setQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<Category[]>([]);
@@ -52,20 +56,15 @@ export default function Settings() {
 
   // TODO: onclick followed game, switch channels view
   function followGame(cat: Category) {
-    console.log('follow game', cat);
-    let game: FollowedGame = {
-      game_id: Number.parseInt(cat.id),
-      game_title: cat.name,
-    };
-    saveFollowedGames([...followedGames, game]);
+    saveFollowedCategories([...followedCategories, cat]);
   }
 
-  function unfollowGame(game: FollowedGame) {
-    console.log('unfollow game', game);
-    let newFollowedGames = followedGames.filter(
-      (fg) => fg.game_id !== game.game_id
+  function unfollowGame(cat: Category) {
+    console.log('unfollow cat', cat);
+    let newFollowedCategories = followedCategories.filter(
+      (fc) => fc.id !== cat.id
     );
-    saveFollowedGames(newFollowedGames);
+    saveFollowedCategories(newFollowedCategories);
   }
 
   return (
@@ -85,7 +84,7 @@ export default function Settings() {
             <p className="text-sm text-fainttext">
               Add games here to view live channels in the sidebar. Click
               &quot;Followed Channels&quot; to select between followed channels
-              and followed games.
+              and followed categories.
             </p>
           </div>
           <div className="bg-chatpanel border border-twborder rounded-md px-8 py-4 mb-16">
@@ -116,9 +115,7 @@ export default function Settings() {
                     searchResults
                       .filter(
                         (sr) =>
-                          !followedGames.find(
-                            (fg) => fg.game_id.toString() === sr.id
-                          )
+                          !followedCategories.find((fc) => fc.id === sr.id)
                       )
                       .map((el, i) => (
                         <div
@@ -144,14 +141,16 @@ export default function Settings() {
               )}
 
               <div className="my-4">
-                <div className="text-sm font-bold mb-2">Followed Games</div>
-                {followedGames.map((el, i) => {
+                <div className="text-sm font-bold mb-2">
+                  Followed Categories
+                </div>
+                {followedCategories.map((el, i) => {
                   return (
                     <div
                       key={i}
                       className="flex justify-between items-center bg-sidepanel faintpanel rounded-lg p-8 my-4"
                     >
-                      <div className="">{el.game_title}</div>
+                      <div className="">{el.name}</div>
                       <button
                         className="p-2 rounded-md hover:bg-twborder"
                         onClick={() => unfollowGame(el)}
