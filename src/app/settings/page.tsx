@@ -148,9 +148,15 @@ export default function Settings() {
                   return (
                     <div
                       key={i}
-                      className="flex justify-between items-center bg-sidepanel faintpanel rounded-lg p-8 my-4"
+                      className="flex justify-start items-center bg-sidepanel faintpanel rounded-lg p-8 my-4"
                     >
-                      <div className="">{el.name}</div>
+                      <Image
+                        src={el.box_art_url}
+                        width={52}
+                        height={72}
+                        alt={`${el.name} box art`}
+                      />
+                      <div className="grow p-4">{el.name}</div>
                       <button
                         className="p-2 rounded-md hover:bg-twborder"
                         onClick={() => unfollowGame(el)}

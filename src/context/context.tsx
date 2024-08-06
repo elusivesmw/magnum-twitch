@@ -14,7 +14,10 @@ import { getHeaders, getOAuthHeaders } from '@/lib/auth';
 import { removeSearchParams, replaceSearchParams } from '@/lib/route';
 import { PlayerView } from '@/types/state';
 import { createContext } from 'react';
-import { getLsFollowedGames, setLsFollowedGames } from '@/lib/local-storage';
+import {
+  getLsFollowedCategories,
+  setLsFollowedCategories,
+} from '@/lib/local-storage';
 
 const LS_ACCESS_TOKEN = 'ACCESS_TOKEN';
 const VALIDATE_INTERVAL = 60 * 60 * 1000;
@@ -234,13 +237,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [accessToken, liveCheckStreams]);
 
   useEffect(() => {
-    let games = getLsFollowedGames();
+    let games = getLsFollowedCategories();
     setFollowedCategories(games);
   }, []);
 
   function saveFollowedCategories(followedCategories: Category[]) {
     console.log('save');
-    setLsFollowedGames(followedCategories);
+    setLsFollowedCategories(followedCategories);
     setFollowedCategories(followedCategories);
   }
 

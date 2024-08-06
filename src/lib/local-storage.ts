@@ -1,48 +1,34 @@
 import { Category } from '@/types/twitch';
 
 const LS_FOLLOWED_GAMES = 'FOLLOWED_GAMES';
-const SEPARATOR = '___';
 
-export function getLsFollowedGames(): Category[] {
-  // try get from storage
-  let gamesStr = localStorage.getItem(LS_FOLLOWED_GAMES);
-  if (!gamesStr) return [];
-
-  // TODO: parse JSON
-  // parse string
+export function getLsFollowedCategories(): Category[] {
   let followedGames: Category[] = [];
-  let rows = gamesStr.split('\n');
-  for (let r of rows) {
-    let game = r.split(SEPARATOR);
+  try {
+    // try get from local storage
+    let gamesStr = localStorage.getItem(LS_FOLLOWED_GAMES);
+    if (!gamesStr) return [];
 
-    if (game.length != 2) continue;
-    let gameId = game[0];
-
-    let gameTitle = game[1];
-    followedGames.push({ id: gameId, name: gameTitle, box_art_url: '' });
+    // parse json string
+    followedGames = JSON.parse(gamesStr);
+  } catch {
+    console.error('Failed to retrieve categories from local storage');
   }
-  console.log('testestest', followedGames);
 
   return followedGames;
 }
 
-export function setLsFollowedGames(games: Category[] | undefined) {
-  if (!games) {
-    localStorage.removeItem(LS_FOLLOWED_GAMES);
-    return;
-  }
-
-  // to string
-  let followedGamesStr = '';
-  for (let i = 0; i < games.length; ++i) {
-    if (i > 0) {
-      followedGamesStr += '\n';
+export function setLsFollowedCategories(games: Category[] | undefined) {
+  try {
+    if (!games) {
+      localStorage.removeItem(LS_FOLLOWED_GAMES);
+      return;
     }
-    let g = games[i];
-    let gameStr = g.id + SEPARATOR + g.name;
-    followedGamesStr += gameStr;
-  }
 
-  // save to local storage
-  localStorage.setItem(LS_FOLLOWED_GAMES, followedGamesStr);
+    // to string
+    let followedGamesStr = JSON.stringify(games);
+    localStorage.setItem(LS_FOLLOWED_GAMES, followedGamesStr);
+  } catch {
+    console.error('Failed to save categories to local storage');
+  }
 }
