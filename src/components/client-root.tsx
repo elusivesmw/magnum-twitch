@@ -2,7 +2,7 @@
 
 import Channels from '@/components/channels';
 import Header from '@/components/header';
-import { AppContext } from '@/context/context';
+import { AppContext } from '@/context/app';
 import { replaceSearchParams } from '@/lib/route';
 import { PlayerView } from '@/types/state';
 import { ReactNode, useContext } from 'react';

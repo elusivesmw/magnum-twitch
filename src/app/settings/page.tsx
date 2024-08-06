@@ -1,7 +1,7 @@
 'use client';
 
-import { AppContext } from '@/context/context';
-import { ReactNode, useContext, useEffect, useState } from 'react';
+import { AppContext } from '@/context/app';
+import { useContext, useEffect, useState } from 'react';
 import { Category } from '@/types/twitch';
 import { Plus, TrashCan } from '@/components/icons';
 import Link from 'next/link';

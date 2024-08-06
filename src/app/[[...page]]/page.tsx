@@ -4,7 +4,7 @@ import Player from '@/components/player';
 import MultiChat from '@/components/chat';
 import { useContext, useEffect } from 'react';
 import { PlayerView } from '@/types/state';
-import { AppContext } from '@/context/context';
+import { AppContext } from '@/context/app';
 
 export default function Home({ params }: { params: { page: string[] } }) {
   const context = useContext(AppContext);

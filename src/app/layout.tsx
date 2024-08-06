@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { AppProvider } from '@/context/context';
+import { AppProvider } from '@/context/app';
 import { Suspense } from 'react';
 import ClientRoot from '@/components/client-root';
 
