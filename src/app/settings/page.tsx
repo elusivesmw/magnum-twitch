@@ -1,12 +1,17 @@
 'use client';
 
 import { AppContext } from '@/context/context';
-import { useContext, useEffect, useState } from 'react';
+import { ReactNode, useContext, useEffect, useState } from 'react';
 import { Category } from '@/types/twitch';
-import { TrashCan } from '@/components/icons';
+import { Plus, TrashCan } from '@/components/icons';
 import Link from 'next/link';
 import { getHeaders } from '@/lib/auth';
 import Image from 'next/image';
+
+enum Action {
+  Add,
+  Remove,
+}
 
 export default function Settings() {
   const context = useContext(AppContext);
@@ -67,6 +72,42 @@ export default function Settings() {
     saveFollowedCategories(newFollowedCategories);
   }
 
+  function CategoryRow({ cat, action }: { cat: Category; action: Action }) {
+    let button;
+    if (action === Action.Add) {
+      button = (
+        <button
+          onClick={() => followGame(cat)}
+          className="p-2 rounded-md hover:bg-twborder"
+        >
+          <Plus className="h-8" />
+        </button>
+      );
+    } else {
+      button = (
+        <button
+          className="p-2 rounded-md hover:bg-twborder"
+          onClick={() => unfollowGame(cat)}
+        >
+          <TrashCan />
+        </button>
+      );
+    }
+
+    return (
+      <div className="flex justify-start items-center bg-sidepanel faintpanel rounded-lg p-8 my-4">
+        <Image
+          src={cat.box_art_url}
+          width={52}
+          height={72}
+          alt={`${cat.name} box art`}
+        />
+        <div className="grow p-4">{cat.name}</div>
+        {button}
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col w-full">
       <div className="pt-12 px-12 ">
@@ -118,24 +159,11 @@ export default function Settings() {
                           !followedCategories.find((fc) => fc.id === sr.id)
                       )
                       .map((el, i) => (
-                        <div
+                        <CategoryRow
                           key={i}
-                          className="flex justify-start items-center bg-sidepanel faintpanel rounded-lg p-8 my-4"
-                        >
-                          <Image
-                            src={el.box_art_url}
-                            width={52}
-                            height={72}
-                            alt={`${el.name} box art`}
-                          />
-                          <div className="grow p-4">{el.name}</div>
-                          <button
-                            onClick={() => followGame(el)}
-                            className="bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] px-4 py-2 rounded-md"
-                          >
-                            Add
-                          </button>
-                        </div>
+                          cat={el}
+                          action={Action.Add}
+                        ></CategoryRow>
                       ))}
                 </div>
               )}
@@ -146,24 +174,11 @@ export default function Settings() {
                 </div>
                 {followedCategories.map((el, i) => {
                   return (
-                    <div
+                    <CategoryRow
                       key={i}
-                      className="flex justify-start items-center bg-sidepanel faintpanel rounded-lg p-8 my-4"
-                    >
-                      <Image
-                        src={el.box_art_url}
-                        width={52}
-                        height={72}
-                        alt={`${el.name} box art`}
-                      />
-                      <div className="grow p-4">{el.name}</div>
-                      <button
-                        className="p-2 rounded-md hover:bg-twborder"
-                        onClick={() => unfollowGame(el)}
-                      >
-                        <TrashCan />
-                      </button>
-                    </div>
+                      cat={el}
+                      action={Action.Remove}
+                    ></CategoryRow>
                   );
                 })}
               </div>
