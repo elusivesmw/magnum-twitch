@@ -3,8 +3,9 @@
 import Player from '@/components/player';
 import MultiChat from '@/components/chat';
 import { useContext, useEffect } from 'react';
-import { PlayerView } from '@/types/state';
+import { PlayerView, getPlayerView } from '@/types/state';
 import { AppContext } from '@/context/app';
+import { useSearchParams } from 'next/navigation';
 
 export default function Home({ params }: { params: { page: string[] } }) {
   const context = useContext(AppContext);
@@ -21,10 +22,20 @@ export default function Home({ params }: { params: { page: string[] } }) {
     setOrder,
     activeChat,
     setActiveChat,
+    setPlayerView,
     playerView,
     setUpdatePath,
   } = context;
 
+  const searchParams = useSearchParams();
+  const initialView = getViewFromSearchParams(searchParams);
+
+  // initial view
+  useEffect(() => {
+    setPlayerView(initialView);
+  }, [initialView, setPlayerView]);
+
+  // watching change
   useEffect(() => {
     setUpdatePath(true);
     if (!params.page) return;
@@ -76,8 +87,7 @@ function playerClass(view: PlayerView) {
   }
 }
 
-//
-//function getViewFromSearchParams(searchParams: URLSearchParams) {
-//  let view = getPlayerView(searchParams.get(SP_VIEW));
-//  return view;
-//}
+function getViewFromSearchParams(searchParams: URLSearchParams) {
+  let view = getPlayerView(searchParams.get('v'));
+  return view;
+}
