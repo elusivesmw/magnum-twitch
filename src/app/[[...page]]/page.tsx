@@ -2,12 +2,14 @@
 
 import Player from '@/components/player';
 import MultiChat from '@/components/chat';
-import { useContext, useEffect } from 'react';
+import { use, useContext, useEffect } from 'react';
 import { PlayerView, getPlayerView } from '@/types/state';
 import { AppContext } from '@/context/app';
 import { useSearchParams } from 'next/navigation';
 
-export default function Home({ params }: { params: { page: string[] } }) {
+type Params = Promise<{ page: string[] }>;
+
+export default function Home(props: { params: Params }) {
   const context = useContext(AppContext);
   if (!context) {
     throw new Error('This component requires AppProvider as a parent');
@@ -26,6 +28,8 @@ export default function Home({ params }: { params: { page: string[] } }) {
     playerView,
     setUpdatePath,
   } = context;
+
+  const params = use(props.params);
 
   const searchParams = useSearchParams();
   const initialView = getViewFromSearchParams(searchParams);
