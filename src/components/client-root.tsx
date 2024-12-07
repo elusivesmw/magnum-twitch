@@ -15,6 +15,7 @@ export default function ClientRoot({ children }: { children: ReactNode }) {
 
   const {
     accessToken,
+    clearAccessToken,
     user,
     watching,
     addWatching,
@@ -37,6 +38,7 @@ export default function ClientRoot({ children }: { children: ReactNode }) {
     <div id="root" className="flex flex-col h-screen">
       <Header
         accessToken={accessToken}
+        clearAccessToken={clearAccessToken}
         user={user}
         addWatching={addWatching}
         playerView={playerView}

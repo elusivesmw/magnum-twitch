@@ -1,5 +1,6 @@
 import { Category } from '@/types/twitch';
 
+const LS_ACCESS_TOKEN = 'ACCESS_TOKEN';
 const LS_FOLLOWED_GAMES = 'FOLLOWED_GAMES';
 
 export function getLsFollowedCategories(): Category[] {
@@ -31,4 +32,35 @@ export function setLsFollowedCategories(games: Category[] | undefined) {
   } catch {
     console.error('Failed to save categories to local storage');
   }
+}
+
+export function getLsToken(): string | null {
+  // get from hash
+  let hash = getHashValues();
+  let token = hash?.access_token;
+  if (token) {
+    // save token
+    localStorage.setItem(LS_ACCESS_TOKEN, token);
+    return token;
+  }
+
+  // else try get from storage
+  token = localStorage.getItem(LS_ACCESS_TOKEN);
+  return token;
+}
+
+export function clearLsToken(): void {
+  localStorage.removeItem(LS_ACCESS_TOKEN);
+}
+
+function getHashValues() {
+  let hash = document.location.hash.substring(1);
+  if (!hash) return undefined;
+  var params: any = {};
+  hash.split('&').map((hashkey) => {
+    let temp = hashkey.split('=');
+    params[temp[0]] = temp[1];
+  });
+  //console.log(params);
+  return params;
 }

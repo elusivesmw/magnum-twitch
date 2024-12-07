@@ -8,12 +8,14 @@ import { LOGIN_LINK } from '@/lib/auth';
 
 export default function Header({
   accessToken,
+  clearAccessToken,
   user,
   addWatching,
   playerView,
   setPlayerView,
 }: {
   accessToken: string | undefined;
+  clearAccessToken: () => void;
   user: User | undefined;
   addWatching: (channel: string) => void;
   playerView: PlayerView;
@@ -83,7 +85,9 @@ export default function Header({
         </form>
       </div>
       <div className="relative flex p-4">
-        <UserMenu user={user} />
+        {accessToken && (
+          <UserMenu user={user} clearAccessToken={clearAccessToken} />
+        )}
         {!accessToken && (
           <a
             href={LOGIN_LINK}

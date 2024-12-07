@@ -15,17 +15,19 @@ import { removeSearchParams, replaceSearchParams } from '@/lib/route';
 import { PlayerView } from '@/types/state';
 import { createContext } from 'react';
 import {
+  clearLsToken,
   getLsFollowedCategories,
+  getLsToken,
   setLsFollowedCategories,
 } from '@/lib/local-storage';
 
-const LS_ACCESS_TOKEN = 'ACCESS_TOKEN';
 const VALIDATE_INTERVAL = 60 * 60 * 1000;
 const LIVE_CHECK_INTERVAL = 60 * 1000;
 
 interface AppContextType {
   accessToken: string | undefined;
   setAccessToken: Dispatch<SetStateAction<string | undefined>>;
+  clearAccessToken: () => void;
   user: User | undefined;
   setUser: Dispatch<SetStateAction<User | undefined>>;
   watching: string[];
@@ -71,7 +73,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (getError(searchParams)) {
       removeSearchParams(order);
     }
-    let token = getToken();
+    let token = getLsToken();
     if (!token) return;
 
     setAccessToken(token);
@@ -106,15 +108,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
     replaceSearchParams(order, playerView);
   }, [order, playerView, updatePath]);
 
-  //
+  // validate that the token is still valid
   function validateToken(accessToken: string | undefined) {
-    if (!accessToken) return;
+    if (!accessToken) {
+      return;
+    }
     const httpOptions = getOAuthHeaders(accessToken);
     fetch('https://id.twitch.tv/oauth2/validate', httpOptions)
       .then((res) => {
         if (!res.ok) {
           // token no good, clear
-          setAccessToken(undefined);
+          clearAccessToken();
           return Promise.reject(res);
         }
         console.log('Valid token');
@@ -122,9 +126,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
       .catch((err) => console.log(err));
   }
 
-  //
+  // clear the access token from local storage and state
+  function clearAccessToken() {
+    clearLsToken();
+    setAccessToken(undefined);
+  }
+
+  // update the user from access token
   function updateUser(accessToken: string | undefined) {
-    if (!accessToken) return;
+    if (!accessToken) {
+      setUser(undefined);
+      return;
+    }
     const httpOptions = getHeaders(accessToken);
     fetch('https://api.twitch.tv/helix/users', httpOptions)
       .then((res) => {
@@ -139,7 +152,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       .catch((err) => console.log(err));
   }
 
-  //
+  // add channel to watching state
   function addWatching(channel: string) {
     if (watching.includes(channel)) {
       // add highlight animation
@@ -164,7 +177,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  //
+  // remove channel from watching state
   const removeWatching = useCallback(
     (channel: string) => {
       if (!watching.find((e) => e == channel)) return;
@@ -176,7 +189,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [watching, setWatching, setOrder]
   );
 
-  //
+  // reorder channel in order state
   function reorderWatching(channel: string, index: number, relative: boolean) {
     let fromOrder = order.findIndex((o) => o == channel);
     let toOrder = relative ? fromOrder + index : index;
@@ -193,7 +206,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setOrder(newOrder);
   }
 
-  //
+  // remove streams from watching if no longer live
   const reconcileStreams = useCallback(
     (stillLive: string[]) => {
       // remove from watching
@@ -207,7 +220,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [removeWatching, watching]
   );
 
-  //
+  // check if all streams are still live on interval
   const liveCheckStreams = useCallback(
     (accessToken: string | undefined) => {
       if (!accessToken) return;
@@ -227,7 +240,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [watching, reconcileStreams]
   );
 
-  // check if all streams are still live
+  // check if all streams are still live on interval
   useEffect(() => {
     const intervalId = setInterval(() => {
       liveCheckStreams(accessToken);
@@ -236,11 +249,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(intervalId);
   }, [accessToken, liveCheckStreams]);
 
+  // get initial followed categories
   useEffect(() => {
     let games = getLsFollowedCategories();
     setFollowedCategories(games);
   }, []);
 
+  // save followed categories to local storage and state
   function saveFollowedCategories(followedCategories: Category[]) {
     setLsFollowedCategories(followedCategories);
     setFollowedCategories(followedCategories);
@@ -251,6 +266,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       value={{
         accessToken,
         setAccessToken,
+        clearAccessToken,
         user,
         setUser,
         watching,
@@ -266,9 +282,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setPlayerView,
         updatePath,
         setUpdatePath,
-        followedCategories: followedCategories,
-        setFollowedCategories: setFollowedCategories,
-        saveFollowedCategories: saveFollowedCategories,
+        followedCategories,
+        setFollowedCategories,
+        saveFollowedCategories,
       }}
     >
       {children}
@@ -278,33 +294,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
 function move(order: string[], from: number, to: number) {
   order.splice(to, 0, order.splice(from, 1)[0]);
-}
-
-function getToken(): string | null {
-  // get from hash
-  let hash = getHashValues();
-  let token = hash?.access_token;
-  if (token) {
-    // save token
-    localStorage.setItem(LS_ACCESS_TOKEN, token);
-    return token;
-  }
-
-  // else try get from storage
-  token = localStorage.getItem(LS_ACCESS_TOKEN);
-  return token;
-}
-
-function getHashValues() {
-  let hash = document.location.hash.substring(1);
-  if (!hash) return undefined;
-  var params: any = {};
-  hash.split('&').map((hashkey) => {
-    let temp = hashkey.split('=');
-    params[temp[0]] = temp[1];
-  });
-  console.log(params);
-  return params;
 }
 
 function getError(searchParams: URLSearchParams) {
