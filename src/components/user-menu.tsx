@@ -37,7 +37,7 @@ export default function UserMenu({
           unoptimized
         />
       </MenuButton>
-      <MenuItems className="absolute top-[4.5rem] right-4 z-30 flex flex-col bg-sidepanel p-4 min-w-[200px] user-menu-shadow rounded-l-xl border-r border-twbuttontext text-sm">
+      <MenuItems className="absolute top-[4.5rem] right-4 z-30 flex flex-col bg-sidepanel p-4 min-w-[200px] user-menu-shadow rounded-xl text-sm">
         <MenuSection>
           <MenuHeading className="flex items-center p-2">
             <div className="w-[40px]">
