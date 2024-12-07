@@ -132,7 +132,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   //
   function updateUser(accessToken: string | undefined) {
-    if (!accessToken) return;
+    if (!accessToken) {
+      setUser(undefined);
+      return;
+    }
     const httpOptions = getHeaders(accessToken);
     fetch('https://api.twitch.tv/helix/users', httpOptions)
       .then((res) => {
