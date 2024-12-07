@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { LogOut, Settings } from './icons';
+import { External, LogOut, Settings } from './icons';
 import Link from 'next/link';
 import { User } from '@/types/twitch';
 
@@ -85,7 +85,7 @@ export default function UserMenu({
             className="flex p-2 rounded-lg hover:bg-twbuttonbg hover:bg-opacity-[0.48]"
           >
             <div className="pr-2 h-[20px]">
-              <LogOut className="fill-twbuttontext" />
+              <External className="fill-twbuttontext" />
             </div>
             <span className="">Disconnect</span>
           </a>

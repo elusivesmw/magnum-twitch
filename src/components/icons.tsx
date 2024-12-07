@@ -316,6 +316,22 @@ export const Settings = ({ className = '' }: { className?: string }) => {
     </svg>
   );
 };
+
+export const External = ({ className = '' }: { className?: string }) => {
+  return (
+    <svg
+      width="100%"
+      height="100%"
+      viewBox="0 0 20 20"
+      aria-label="External link"
+      fill="currentColor"
+      className={className}
+    >
+      <path d="M6 8h5.293L5 14.293l1.414 1.414 6.293-6.293V15h2V6H6v2z"></path>
+    </svg>
+  );
+};
+
 export const LogOut = ({ className = '' }: { className?: string }) => {
   return (
     <svg
