@@ -26,6 +26,7 @@ const LIVE_CHECK_INTERVAL = 60 * 1000;
 interface AppContextType {
   accessToken: string | undefined;
   setAccessToken: Dispatch<SetStateAction<string | undefined>>;
+  clearAccessToken: () => void;
   user: User | undefined;
   setUser: Dispatch<SetStateAction<User | undefined>>;
   watching: string[];
@@ -108,18 +109,25 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   //
   function validateToken(accessToken: string | undefined) {
-    if (!accessToken) return;
+    if (!accessToken) {
+      return;
+    }
     const httpOptions = getOAuthHeaders(accessToken);
     fetch('https://id.twitch.tv/oauth2/validate', httpOptions)
       .then((res) => {
         if (!res.ok) {
           // token no good, clear
-          setAccessToken(undefined);
+          clearAccessToken();
           return Promise.reject(res);
         }
         console.log('Valid token');
       })
       .catch((err) => console.log(err));
+  }
+
+  function clearAccessToken() {
+    clearToken();
+    setAccessToken(undefined);
   }
 
   //
@@ -251,6 +259,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       value={{
         accessToken,
         setAccessToken,
+        clearAccessToken,
         user,
         setUser,
         watching,
@@ -266,9 +275,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setPlayerView,
         updatePath,
         setUpdatePath,
-        followedCategories: followedCategories,
-        setFollowedCategories: setFollowedCategories,
-        saveFollowedCategories: saveFollowedCategories,
+        followedCategories,
+        setFollowedCategories,
+        saveFollowedCategories,
       }}
     >
       {children}
@@ -293,6 +302,10 @@ function getToken(): string | null {
   // else try get from storage
   token = localStorage.getItem(LS_ACCESS_TOKEN);
   return token;
+}
+
+function clearToken(): void {
+  localStorage.removeItem(LS_ACCESS_TOKEN);
 }
 
 function getHashValues() {

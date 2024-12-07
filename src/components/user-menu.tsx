@@ -1,5 +1,3 @@
-'use client';
-
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -7,7 +5,13 @@ import { LogOut, Settings } from './icons';
 import Link from 'next/link';
 import { User } from '@/types/twitch';
 
-export default function UserMenu({ user }: { user: User | undefined }) {
+export default function UserMenu({
+  user,
+  clearAccessToken,
+}: {
+  user: User | undefined;
+  clearAccessToken: () => void;
+}) {
   const [userMenuOpen, setUserMenuOpen] = useState<boolean>(false);
   const toggleUserMenu = () => {
     setUserMenuOpen(!userMenuOpen);
@@ -19,6 +23,10 @@ export default function UserMenu({ user }: { user: User | undefined }) {
   }, [pathname]);
 
   if (!user) return;
+
+  function logout() {
+    clearAccessToken();
+  }
 
   return (
     <>
@@ -79,8 +87,19 @@ export default function UserMenu({ user }: { user: User | undefined }) {
             <div className="pr-2 h-[20px]">
               <LogOut className="fill-twbuttontext" />
             </div>
-            <span className="">Log Out</span>
+            <span className="">Disconnect</span>
           </a>
+        </div>
+        <div>
+          <button
+            onClick={logout}
+            className="w-full flex p-2 rounded-lg hover:bg-twbuttonbg hover:bg-opacity-[0.48]"
+          >
+            <div className="pr-2 h-[20px]">
+              <LogOut className="fill-twbuttontext" />
+            </div>
+            <span className="">Log Out</span>
+          </button>
         </div>
       </div>
     </>
