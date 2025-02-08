@@ -5,7 +5,7 @@ import MultiChat from '@/components/chat';
 import { use, useContext, useEffect } from 'react';
 import { PlayerView, getPlayerView } from '@/types/state';
 import { AppContext } from '@/context/app';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, usePathname } from 'next/navigation';
 
 type Params = Promise<{ page: string[] }>;
 
@@ -32,6 +32,7 @@ export default function Home(props: { params: Params }) {
   const params = use(props.params);
 
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const initialView = getViewFromSearchParams(searchParams);
 
   // initial view
@@ -40,7 +41,10 @@ export default function Home(props: { params: Params }) {
   }, [initialView, setPlayerView]);
 
   // watching change
+  // NOTE: params.page has only the inital path and does not update as the path
+  // changes later. for this reason, we use pathname to detect page changes.
   useEffect(() => {
+    console.log('watching page change', params.page, pathname);
     setUpdatePath(true);
     if (!params.page) return;
     // de-dupe
@@ -49,6 +53,14 @@ export default function Home(props: { params: Params }) {
     setWatching(initialWatching);
     setOrder(initialWatching);
   }, [params.page, setWatching, setOrder, setUpdatePath]);
+
+  useEffect(() => {
+    console.log('watching pathname change', params.page, pathname);
+    if (pathname == '/') {
+      setWatching([]);
+      setOrder([]);
+    }
+  }, [pathname]);
 
   return (
     <>
