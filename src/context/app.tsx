@@ -84,16 +84,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     updateUser(accessToken);
   }, [accessToken]);
 
-  // validate token every hour
-  useEffect(() => {
-    validateToken(accessToken);
-    const intervalId = setInterval(() => {
-      validateToken(accessToken);
-    }, VALIDATE_INTERVAL);
-
-    return () => clearInterval(intervalId);
-  }, [accessToken]);
-
   // update active chat if removed
   useEffect(() => {
     let found = watching.find((e) => e == activeChat);
@@ -109,7 +99,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [order, playerView, updatePath]);
 
   // validate that the token is still valid
-  function validateToken(accessToken: string | undefined) {
+  const validateToken = useCallback((accessToken: string | undefined) => {
     if (!accessToken) {
       return;
     }
@@ -124,7 +114,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
         console.log('Valid token');
       })
       .catch((err) => console.log(err));
-  }
+  }, []);
+
+  // validate token every hour
+  useEffect(() => {
+    validateToken(accessToken);
+    const intervalId = setInterval(() => {
+      validateToken(accessToken);
+    }, VALIDATE_INTERVAL);
+
+    return () => clearInterval(intervalId);
+  }, [accessToken, validateToken]);
 
   // clear the access token from local storage and state
   function clearAccessToken() {
