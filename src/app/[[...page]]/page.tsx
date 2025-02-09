@@ -2,14 +2,12 @@
 
 import Player from '@/components/player';
 import MultiChat from '@/components/chat';
-import { use, useContext, useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import { PlayerView, getPlayerView } from '@/types/state';
 import { AppContext } from '@/context/app';
 import { useSearchParams, usePathname } from 'next/navigation';
 
-type Params = Promise<{ page: string[] }>;
-
-export default function Home(props: { params: Params }) {
+export default function Home() {
   const context = useContext(AppContext);
   if (!context) {
     throw new Error('This component requires AppProvider as a parent');
@@ -29,8 +27,6 @@ export default function Home(props: { params: Params }) {
     setUpdatePath,
   } = context;
 
-  const params = use(props.params);
-
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const initialView = getViewFromSearchParams(searchParams);
@@ -40,27 +36,17 @@ export default function Home(props: { params: Params }) {
     setPlayerView(initialView);
   }, [initialView, setPlayerView]);
 
-  // watching change
-  // NOTE: params.page has only the inital path and does not update as the path
-  // changes later. for this reason, we use pathname to detect page changes.
+  // NOTE: use pathname instead of page params, since this is client only.
   useEffect(() => {
-    console.log('watching page change', params.page, pathname);
     setUpdatePath(true);
-    if (!params.page) return;
+    // get segements from path
+    let segments = pathname.split('/').filter(Boolean);
     // de-dupe
-    let initialWatching = Array.from(new Set(params.page));
-    // and set
+    let initialWatching = Array.from(new Set(segments));
+    // and set state
     setWatching(initialWatching);
     setOrder(initialWatching);
-  }, [params.page, setWatching, setOrder, setUpdatePath]);
-
-  useEffect(() => {
-    console.log('watching pathname change', params.page, pathname);
-    if (pathname == '/') {
-      setWatching([]);
-      setOrder([]);
-    }
-  }, [pathname]);
+  }, [pathname, setWatching, setOrder, setUpdatePath]);
 
   return (
     <>
