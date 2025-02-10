@@ -18,6 +18,3 @@ More features coming soon (TM).
 - One stream is not enough
 - Two tabs is too many
 
-## Why did you build this in NextJs? X would have been so much better.
-
-You're right.
