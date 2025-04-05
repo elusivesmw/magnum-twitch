@@ -191,6 +191,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   // reorder channel in order state
   function reorderWatching(channel: string, index: number, relative: boolean) {
+    console.log('watching in reorder', watching);
     let fromOrder = order.findIndex((o) => o == channel);
     let toOrder = relative ? fromOrder + index : index;
     if (toOrder < 0 || toOrder > watching.length + 1) return;

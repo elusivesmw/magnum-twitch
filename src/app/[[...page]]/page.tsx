@@ -2,10 +2,10 @@
 
 import Player from '@/components/player';
 import MultiChat from '@/components/chat';
-import { useContext, useEffect } from 'react';
-import { PlayerView, getPlayerView } from '@/types/state';
+import { useContext } from 'react';
+import { PlayerView } from '@/types/state';
 import { AppContext } from '@/context/app';
-import { useSearchParams, usePathname } from 'next/navigation';
+import { usePathSync } from '@/hooks/path';
 
 export default function Home() {
   const context = useContext(AppContext);
@@ -27,26 +27,7 @@ export default function Home() {
     setUpdatePath,
   } = context;
 
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const initialView = getViewFromSearchParams(searchParams);
-
-  // initial view
-  useEffect(() => {
-    setPlayerView(initialView);
-  }, [initialView, setPlayerView]);
-
-  // NOTE: use pathname instead of page params, since this is client only.
-  useEffect(() => {
-    setUpdatePath(true);
-    // get segements from path
-    let segments = pathname.split('/').filter(Boolean);
-    // de-dupe
-    let initialWatching = Array.from(new Set(segments));
-    // and set state
-    setWatching(initialWatching);
-    setOrder(initialWatching);
-  }, [pathname, setWatching, setOrder, setUpdatePath]);
+  usePathSync(setWatching, order, setOrder, playerView, setPlayerView);
 
   return (
     <>
@@ -87,9 +68,4 @@ function playerClass(view: PlayerView) {
     default:
       return 'flex-row flex-wrap';
   }
-}
-
-function getViewFromSearchParams(searchParams: URLSearchParams) {
-  let view = getPlayerView(searchParams.get('v'));
-  return view;
 }

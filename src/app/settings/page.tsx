@@ -23,19 +23,16 @@ export default function Settings() {
 
   const {
     accessToken,
-    setUpdatePath,
     followedCategories,
     saveFollowedCategories,
+    order,
+    playerView,
   } = context;
+
+  let path = `/${order.join('/')}?v=${playerView}`;
 
   const [query, setQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<Category[]>([]);
-
-  let path = `/${context.order.join('/')}?v=${context.playerView}`;
-
-  useEffect(() => {
-    setUpdatePath(false);
-  }, [setUpdatePath]);
 
   function searchGames() {
     if (!accessToken) return;
