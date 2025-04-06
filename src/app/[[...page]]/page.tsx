@@ -24,10 +24,9 @@ export default function Home() {
     setActiveChat,
     setPlayerView,
     playerView,
-    setUpdatePath,
   } = context;
 
-  usePathSync(setWatching, order, setOrder, playerView, setPlayerView);
+  //usePathSync(setWatching, order, setOrder, playerView, setPlayerView);
 
   return (
     <>

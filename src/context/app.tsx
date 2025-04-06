@@ -10,24 +10,21 @@ import {
 } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Category, Stream, User } from '@/types/twitch';
-import { getHeaders, getOAuthHeaders } from '@/lib/auth';
-import { removeSearchParams, replaceSearchParams } from '@/lib/route';
+import { getHeaders } from '@/lib/auth';
+import { replaceSearchParams } from '@/lib/route';
 import { PlayerView } from '@/types/state';
 import { createContext } from 'react';
 import {
-  clearLsToken,
   getLsFollowedCategories,
-  getLsToken,
   setLsFollowedCategories,
 } from '@/lib/local-storage';
+import { useToken } from '@/hooks/token';
 
-const VALIDATE_INTERVAL = 60 * 60 * 1000;
 const LIVE_CHECK_INTERVAL = 60 * 1000;
 
 interface AppContextType {
   accessToken: string | undefined;
   setAccessToken: Dispatch<SetStateAction<string | undefined>>;
-  clearAccessToken: () => void;
   user: User | undefined;
   setUser: Dispatch<SetStateAction<User | undefined>>;
   watching: string[];
@@ -68,21 +65,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [followedCategories, setFollowedCategories] = useState<Category[]>([]);
   const [updatePath, setUpdatePath] = useState<boolean>(false);
 
-  // set token
-  useEffect(() => {
-    if (getError(searchParams)) {
-      removeSearchParams(order);
-    }
-    let token = getLsToken();
-    if (!token) return;
-
-    setAccessToken(token);
-  }, [order, searchParams]);
-
-  // set user
-  useEffect(() => {
-    updateUser(accessToken);
-  }, [accessToken]);
+  useToken(accessToken, setAccessToken, setUser);
 
   // update active chat if removed
   useEffect(() => {
@@ -92,65 +75,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [watching, activeChat]);
 
+  // NOTE: remove this?
   // keep path in sync with order
   useEffect(() => {
-    if (!updatePath) return;
     replaceSearchParams(order, playerView);
   }, [order, playerView, updatePath]);
-
-  // validate that the token is still valid
-  const validateToken = useCallback((accessToken: string | undefined) => {
-    if (!accessToken) {
-      return;
-    }
-    const httpOptions = getOAuthHeaders(accessToken);
-    fetch('https://id.twitch.tv/oauth2/validate', httpOptions)
-      .then((res) => {
-        if (!res.ok) {
-          // token no good, clear
-          clearAccessToken();
-          return Promise.reject(res);
-        }
-        console.log('Valid token');
-      })
-      .catch((err) => console.log(err));
-  }, []);
-
-  // validate token every hour
-  useEffect(() => {
-    validateToken(accessToken);
-    const intervalId = setInterval(() => {
-      validateToken(accessToken);
-    }, VALIDATE_INTERVAL);
-
-    return () => clearInterval(intervalId);
-  }, [accessToken, validateToken]);
-
-  // clear the access token from local storage and state
-  function clearAccessToken() {
-    clearLsToken();
-    setAccessToken(undefined);
-  }
-
-  // update the user from access token
-  function updateUser(accessToken: string | undefined) {
-    if (!accessToken) {
-      setUser(undefined);
-      return;
-    }
-    const httpOptions = getHeaders(accessToken);
-    fetch('https://api.twitch.tv/helix/users', httpOptions)
-      .then((res) => {
-        if (!res.ok) return Promise.reject(res);
-        return res.json();
-      })
-      .then((json) => {
-        let users = json.data as User[];
-        if (users.length != 1) return;
-        setUser(users[0]);
-      })
-      .catch((err) => console.log(err));
-  }
 
   // add channel to watching state
   function addWatching(channel: string) {
@@ -267,7 +196,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       value={{
         accessToken,
         setAccessToken,
-        clearAccessToken,
         user,
         setUser,
         watching,
@@ -295,15 +223,4 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
 function move(order: string[], from: number, to: number) {
   order.splice(to, 0, order.splice(from, 1)[0]);
-}
-
-function getError(searchParams: URLSearchParams) {
-  if (!searchParams) return false;
-  //const error = searchParams.get('error');
-  const description = searchParams.get('error_description');
-  //const state = searchParams.get('state');
-  if (!description) return false;
-
-  alert(description);
-  return true;
 }
