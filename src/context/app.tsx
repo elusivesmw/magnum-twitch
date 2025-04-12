@@ -1,44 +1,32 @@
 'use client';
 
-import {
-  Dispatch,
-  ReactNode,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+import { ReactNode, useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Category, Stream, User } from '@/types/twitch';
-import { getHeaders } from '@/lib/auth';
-import { replaceSearchParams } from '@/lib/route';
 import { PlayerView } from '@/types/state';
 import { createContext } from 'react';
 import {
   getLsFollowedCategories,
   setLsFollowedCategories,
 } from '@/lib/local-storage';
-import { useToken } from '@/hooks/token';
-
-const LIVE_CHECK_INTERVAL = 60 * 1000;
 
 interface AppContextType {
   accessToken: string | undefined;
-  setAccessToken: Dispatch<SetStateAction<string | undefined>>;
+  setAccessToken: (token: string | undefined) => void;
   user: User | undefined;
-  setUser: Dispatch<SetStateAction<User | undefined>>;
+  setUser: (user: User | undefined) => void;
   watching: string[];
-  setWatching: Dispatch<SetStateAction<string[]>>;
+  setWatching: (watching: string[]) => void;
   order: string[];
-  setOrder: Dispatch<SetStateAction<string[]>>;
+  setOrder: (order: string[]) => void;
   activeChat: string;
-  setActiveChat: Dispatch<SetStateAction<string>>;
+  setActiveChat: (chat: string) => void;
   playerView: PlayerView;
-  setPlayerView: Dispatch<SetStateAction<PlayerView>>;
+  setPlayerView: (view: PlayerView) => void;
   followedCategories: Category[];
-  setFollowedCategories: Dispatch<SetStateAction<Category[]>>;
+  setFollowedCategories: (categories: Category[]) => void;
   updatePath: boolean;
-  setUpdatePath: Dispatch<SetStateAction<boolean>>;
+  setUpdatePath: (update: boolean) => void;
   addWatching: (channel: string) => void;
   removeWatching: (channel: string) => void;
   reorderWatching: (channel: string, index: number, relative: boolean) => void;
@@ -127,52 +115,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     move(newOrder, fromOrder, toOrder);
     setOrder(newOrder);
   }
-
-  // NOTE: possible move all this into token/reconcile hook:
-  // ----------------
-  // remove streams from watching if no longer live
-  const reconcileStreams = useCallback(
-    (stillLive: string[]) => {
-      // remove from watching
-      for (let i = 0; i < watching.length; ++i) {
-        let w = watching[i];
-        if (!stillLive.find((e) => e == w)) {
-          removeWatching(w);
-        }
-      }
-    },
-    [removeWatching, watching]
-  );
-
-  // check if all streams are still live on interval
-  const liveCheckStreams = useCallback(
-    (accessToken: string | undefined) => {
-      if (!accessToken) return;
-      if (watching.length == 0) return;
-
-      const httpOptions = getHeaders(accessToken);
-      let logins_param = 'user_login=' + watching.join('&user_login=');
-      fetch(`https://api.twitch.tv/helix/streams?${logins_param}`, httpOptions)
-        .then((res) => res.json())
-        .then((json) => {
-          let streams = json.data as Stream[];
-          let s = streams.map((e) => e.user_login);
-          reconcileStreams(s);
-        })
-        .catch((err) => console.log(err));
-    },
-    [watching, reconcileStreams]
-  );
-
-  // check if all streams are still live on interval
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      liveCheckStreams(accessToken);
-    }, LIVE_CHECK_INTERVAL);
-
-    return () => clearInterval(intervalId);
-  }, [accessToken, liveCheckStreams]);
-  // ----------------
 
   // get initial followed categories
   useEffect(() => {

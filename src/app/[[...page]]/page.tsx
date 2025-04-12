@@ -5,8 +5,9 @@ import MultiChat from '@/components/chat';
 import { useContext } from 'react';
 import { PlayerView } from '@/types/state';
 import { AppContext } from '@/context/app';
-import { usePathSync } from '@/hooks/path';
+import { usePathSync } from '@/hooks/path-sync';
 import { useToken } from '@/hooks/token';
+import { useCleanupStreams } from '@/hooks/cleanup-streams';
 
 export default function Home() {
   const context = useContext(AppContext);
@@ -32,6 +33,7 @@ export default function Home() {
 
   useToken(accessToken, setAccessToken, setUser);
   usePathSync(setWatching, order, setOrder, playerView, setPlayerView);
+  useCleanupStreams(accessToken, watching, removeWatching);
 
   return (
     <>
