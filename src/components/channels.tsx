@@ -11,7 +11,6 @@ import {
   SolidHeart,
 } from './icons';
 import { getHeaders } from '@/lib/auth';
-import { replaceSearchParams } from '@/lib/route';
 import Image from 'next/image';
 import { FollowingTooltip } from './tooltip';
 import { SectionType } from '@/types/channel';
@@ -57,14 +56,6 @@ const Channels = ({
   let [watchingStreams, setWatchingStreams] = useState<Stream[] | undefined>();
 
   useEffect(() => {
-    if (accessToken) {
-      // remove token from url
-      // NOTE: this won't preserve order, but this is an edge case so ¯\_(ツ)_/¯
-      if (updatePath) {
-        replaceSearchParams(watching, view);
-      }
-    }
-
     updateFollowingStreams(accessToken, user);
     updateGameStreams(accessToken, user, followedCategories);
     updateWatchingStreams(accessToken, watching);

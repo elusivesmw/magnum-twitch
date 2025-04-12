@@ -17,23 +17,17 @@ export function useToken(
   setAccessToken: (token: string | undefined) => void,
   setUser: (user: User | undefined) => void
 ) {
-  console.log('mag useToken');
   const searchParams = useSearchParams();
-  //const isSyncing = useRef(false);
+  //const lastToken = useRef<string | undefined>(undefined);
 
   // set token
   useEffect(() => {
-    console.log('mag set token');
     if (getError(searchParams)) {
-      console.log('mag here');
       removeSearchParams([]);
     }
     let token = getLsToken();
-    console.log('mag token from ls', token);
-    if (!token) return;
-
+    if (!token || token === accessToken) return;
     setAccessToken(token);
-    console.log('mag set access token');
   }, [searchParams, setAccessToken]);
 
   // update the user from access token
@@ -94,7 +88,6 @@ export function useToken(
   // set user
   useEffect(() => {
     updateUser(accessToken);
-    console.log('mag update user');
   }, [accessToken, updateUser]);
 }
 

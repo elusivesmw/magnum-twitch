@@ -14,7 +14,6 @@ export function usePathSync(
   playerView: PlayerView,
   setPlayerView: (view: PlayerView) => void
 ) {
-  console.log('test usePathSync');
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const isSyncing = useRef(false);
@@ -22,7 +21,6 @@ export function usePathSync(
 
   // path to state
   useEffect(() => {
-    console.log('test2');
     // safegaurd
     if (isSyncing.current) return;
 
@@ -32,7 +30,6 @@ export function usePathSync(
     const view = getPlayerView(
       new URLSearchParams(window.location.search).get('v')
     );
-    console.log('test1', view);
 
     // check if path has changed
     const prevSegments = (lastPath.current ?? '').split('/').filter(Boolean);
@@ -54,12 +51,10 @@ export function usePathSync(
 
   // state to path
   useEffect(() => {
-    console.log('test3');
     if (isSyncing.current) return;
 
     const newPath = `/${order.join('/')}`;
     const newSearchParams = `?v=${playerView}`;
-    console.log('test', newSearchParams);
     const newFullPath = newPath + newSearchParams;
     const currentFullPath = window.location.pathname + window.location.search;
 
