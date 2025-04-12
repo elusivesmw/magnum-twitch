@@ -28,7 +28,7 @@ export function useToken(
     let token = getLsToken();
     if (!token || token === accessToken) return;
     setAccessToken(token);
-  }, [searchParams, setAccessToken]);
+  }, [searchParams, accessToken, setAccessToken]);
 
   // update the user from access token
   const updateUser = useCallback(

@@ -33,6 +33,13 @@ export default function Settings() {
 
   const [query, setQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<Category[]>([]);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!accessToken) {
+      router.push(LOGIN_LINK);
+    }
+  }, [accessToken, router]);
 
   function searchGames() {
     if (!accessToken) return;
@@ -103,11 +110,6 @@ export default function Settings() {
         {button}
       </div>
     );
-  }
-
-  const router = useRouter();
-  if (!accessToken) {
-    router.push(LOGIN_LINK);
   }
 
   return (

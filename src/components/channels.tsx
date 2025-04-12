@@ -32,7 +32,6 @@ const Channels = ({
   addWatching,
   removeWatching,
   view,
-  updatePath,
   followedCategories,
 }: {
   accessToken: string | undefined;
@@ -41,7 +40,6 @@ const Channels = ({
   addWatching: (stream: string) => void;
   removeWatching: (stream: string) => void;
   view: PlayerView;
-  updatePath: boolean;
   followedCategories: Category[];
 }) => {
   let [visibleStreamList, setVisibleStreamList] = useState<string>('following');
@@ -66,7 +64,7 @@ const Channels = ({
     }, POLL_INTERVAL);
 
     return () => clearInterval(intervalId);
-  }, [accessToken, user, watching, view, updatePath, followedCategories]);
+  }, [accessToken, user, watching, view, followedCategories]);
 
   // following channels
   const updateFollowingStreams = (

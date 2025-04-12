@@ -22,8 +22,6 @@ interface AppContextType {
   setPlayerView: (view: PlayerView) => void;
   followedCategories: Category[];
   setFollowedCategories: (categories: Category[]) => void;
-  updatePath: boolean;
-  setUpdatePath: (update: boolean) => void;
   addWatching: (channel: string) => void;
   removeWatching: (channel: string) => void;
   reorderWatching: (channel: string, index: number, relative: boolean) => void;
@@ -46,7 +44,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [activeChat, setActiveChat] = useState(initialChat);
   const [playerView, setPlayerView] = useState<PlayerView>(initialView);
   const [followedCategories, setFollowedCategories] = useState<Category[]>([]);
-  const [updatePath, setUpdatePath] = useState<boolean>(false);
 
   // watching helper methods based on other states
   const { addWatching, removeWatching, reorderWatching } = useWatchingManager(
@@ -79,8 +76,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setActiveChat,
         playerView,
         setPlayerView,
-        updatePath,
-        setUpdatePath,
         followedCategories,
         setFollowedCategories,
         saveFollowedCategories,

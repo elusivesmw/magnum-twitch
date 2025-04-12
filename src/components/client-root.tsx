@@ -3,8 +3,6 @@
 import Channels from '@/components/channels';
 import Header from '@/components/header';
 import { AppContext } from '@/context/app';
-import { replaceSearchParams } from '@/lib/route';
-import { PlayerView } from '@/types/state';
 import { ReactNode, useContext } from 'react';
 
 export default function ClientRoot({ children }: { children: ReactNode }) {
@@ -20,19 +18,10 @@ export default function ClientRoot({ children }: { children: ReactNode }) {
     watching,
     addWatching,
     removeWatching,
-    order,
     playerView,
     setPlayerView,
-    updatePath,
     followedCategories,
   } = context;
-
-  // TODO: this seems like it should be elsewhere
-  function setSearchParamsFromView(view: PlayerView) {
-    setPlayerView(view);
-    if (!updatePath) return;
-    replaceSearchParams(order, view);
-  }
 
   return (
     <div id="root" className="flex flex-col h-screen">
@@ -42,7 +31,7 @@ export default function ClientRoot({ children }: { children: ReactNode }) {
         user={user}
         addWatching={addWatching}
         playerView={playerView}
-        setPlayerView={setSearchParamsFromView}
+        setPlayerView={setPlayerView}
       />
       <main className="relative flex h-full overflow-y-hidden">
         {user && (
@@ -53,7 +42,6 @@ export default function ClientRoot({ children }: { children: ReactNode }) {
             addWatching={addWatching}
             removeWatching={removeWatching}
             view={playerView}
-            updatePath={updatePath}
             followedCategories={followedCategories}
           />
         )}
