@@ -6,6 +6,7 @@ import { useContext } from 'react';
 import { PlayerView } from '@/types/state';
 import { AppContext } from '@/context/app';
 import { usePathSync } from '@/hooks/path';
+import { useToken } from '@/hooks/token';
 
 export default function Home() {
   const context = useContext(AppContext);
@@ -14,6 +15,9 @@ export default function Home() {
   }
 
   const {
+    accessToken,
+    setAccessToken,
+    setUser,
     watching,
     setWatching,
     removeWatching,
@@ -26,7 +30,8 @@ export default function Home() {
     playerView,
   } = context;
 
-  //usePathSync(setWatching, order, setOrder, playerView, setPlayerView);
+  useToken(accessToken, setAccessToken, setUser);
+  usePathSync(setWatching, order, setOrder, playerView, setPlayerView);
 
   return (
     <>

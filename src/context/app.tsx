@@ -65,8 +65,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [followedCategories, setFollowedCategories] = useState<Category[]>([]);
   const [updatePath, setUpdatePath] = useState<boolean>(false);
 
-  useToken(accessToken, setAccessToken, setUser);
-
   // update active chat if removed
   useEffect(() => {
     let found = watching.find((e) => e == activeChat);
@@ -74,12 +72,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setActiveChat(watching[0]);
     }
   }, [watching, activeChat]);
-
-  // NOTE: remove this?
-  // keep path in sync with order
-  useEffect(() => {
-    replaceSearchParams(order, playerView);
-  }, [order, playerView, updatePath]);
 
   // add channel to watching state
   function addWatching(channel: string) {
@@ -136,6 +128,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setOrder(newOrder);
   }
 
+  // NOTE: possible move all this into token/reconcile hook:
+  // ----------------
   // remove streams from watching if no longer live
   const reconcileStreams = useCallback(
     (stillLive: string[]) => {
@@ -178,6 +172,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     return () => clearInterval(intervalId);
   }, [accessToken, liveCheckStreams]);
+  // ----------------
 
   // get initial followed categories
   useEffect(() => {

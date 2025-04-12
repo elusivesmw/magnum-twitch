@@ -5,7 +5,7 @@ import { clearLsToken, getLsToken } from '@/lib/local-storage';
 import { removeSearchParams } from '@/lib/route';
 import { User } from '@/types/twitch';
 import { useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useLayoutEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 
 const VALIDATE_INTERVAL = 60 * 60 * 1000;
 
@@ -17,23 +17,23 @@ export function useToken(
   setAccessToken: (token: string | undefined) => void,
   setUser: (user: User | undefined) => void
 ) {
-  console.log('test useToken');
+  console.log('mag useToken');
   const searchParams = useSearchParams();
   //const isSyncing = useRef(false);
 
   // set token
-  useLayoutEffect(() => {
-    console.log('test set token');
+  useEffect(() => {
+    console.log('mag set token');
     if (getError(searchParams)) {
-      console.log('test here');
+      console.log('mag here');
       removeSearchParams([]);
     }
     let token = getLsToken();
-    console.log('test token from ls', token);
+    console.log('mag token from ls', token);
     if (!token) return;
 
     setAccessToken(token);
-    console.log('test set access token');
+    console.log('mag set access token');
   }, [searchParams, setAccessToken]);
 
   // update the user from access token
@@ -94,7 +94,7 @@ export function useToken(
   // set user
   useEffect(() => {
     updateUser(accessToken);
-    console.log('test update user');
+    console.log('mag update user');
   }, [accessToken, updateUser]);
 }
 
