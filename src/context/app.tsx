@@ -1,14 +1,11 @@
 'use client';
 
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { Category, User } from '@/types/twitch';
 import { PlayerView } from '@/types/state';
 import { createContext } from 'react';
-import {
-  getLsFollowedCategories,
-  setLsFollowedCategories,
-} from '@/lib/local-storage';
 import { useWatchingManager } from '@/hooks/watching-manager';
+import { useCategoryManager } from '@/hooks/category-manager';
 
 interface AppContextType {
   accessToken: string | undefined;
@@ -51,6 +48,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [followedCategories, setFollowedCategories] = useState<Category[]>([]);
   const [updatePath, setUpdatePath] = useState<boolean>(false);
 
+  // watching helper methods based on other states
   const { addWatching, removeWatching, reorderWatching } = useWatchingManager(
     watching,
     setWatching,
@@ -60,17 +58,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setActiveChat
   );
 
-  // get initial followed categories
-  useEffect(() => {
-    let games = getLsFollowedCategories();
-    setFollowedCategories(games);
-  }, []);
-
-  // save followed categories to local storage and state
-  function saveFollowedCategories(followedCategories: Category[]) {
-    setLsFollowedCategories(followedCategories);
-    setFollowedCategories(followedCategories);
-  }
+  // category helper methods based on other states
+  const { saveFollowedCategories } = useCategoryManager(setFollowedCategories);
 
   return (
     <AppContext.Provider
