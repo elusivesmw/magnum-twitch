@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { getPlayerView, PlayerView } from '@/types/state';
 
@@ -16,56 +16,44 @@ export function usePathSync(
 ) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const isSyncing = useRef(false);
-  const lastPath = useRef<string | null>(null);
+  // block updates until path to state is complete
+  const hasSynced = useRef(false);
+  const [isHydrated, setIsHydrated] = useState(false);
 
-  // path to state
+  // NOTE: prevent flashing of routes
   useEffect(() => {
-    // safegaurd
-    if (isSyncing.current) return;
+    setIsHydrated(true);
+  }, []);
 
-    // get path segments and view
-    const segments = pathname.split('/').filter(Boolean);
-    const uniqueSegments = Array.from(new Set(segments));
-    const view = getPlayerView(
-      new URLSearchParams(window.location.search).get('v')
-    );
+  // initial path to state
+  useEffect(() => {
+    // don't proceed after initial path -> state
+    // unless navigating to home (clear all state)
+    if (hasSynced.current && pathname !== '/') return;
 
-    // check if path has changed
-    const prevSegments = (lastPath.current ?? '').split('/').filter(Boolean);
-    const prevSet = new Set(prevSegments);
-    // are the two sets of segments the same?
-    const sameSet =
-      uniqueSegments.length === prevSet.size &&
-      uniqueSegments.every((seg) => prevSet.has(seg));
+    const pathSegments = pathname.split('/').filter(Boolean);
+    const viewParam = searchParams.get('v');
+    const view = getPlayerView(viewParam);
 
-    // only update if the sets differ
-    if (!sameSet) {
-      setWatching(uniqueSegments);
-      setOrder(uniqueSegments);
-    }
-
+    setWatching(pathSegments);
+    setOrder(pathSegments);
     setPlayerView(view);
-    lastPath.current = pathname;
+
+    hasSynced.current = true;
   }, [pathname, searchParams, setWatching, setOrder, setPlayerView]);
 
-  // state to path
+  // sync state to path
   useEffect(() => {
-    if (isSyncing.current) return;
+    // wait til page is hydrated and path -> state has syned
+    if (!isHydrated || !hasSynced.current) return;
 
     const newPath = `/${order.join('/')}`;
-    const newSearchParams = `?v=${playerView}`;
-    const newFullPath = newPath + newSearchParams;
-    const currentFullPath = window.location.pathname + window.location.search;
+    const newQuery = `?v=${playerView}`;
+    const newUrl = newPath + newQuery;
+    const currentUrl = window.location.pathname + window.location.search;
 
-    // only update the path if something has changed
-    if (newFullPath !== currentFullPath) {
-      // disable syncing path to state
-      isSyncing.current = true;
-      window.history.replaceState({}, '', newFullPath);
-      lastPath.current = newPath;
-      // re-enable syncing path to state
-      isSyncing.current = false;
+    if (newUrl !== currentUrl) {
+      window.history.replaceState({}, '', newUrl);
     }
-  }, [order, playerView]);
+  }, [isHydrated, order, playerView]);
 }
