@@ -4,8 +4,8 @@ export function removeSearchParams(path: string[]) {
 }
 
 export function replaceSearchParams(path: string[], view: string) {
+  let newPath = `/${path.join('/')}`;
   let searchParams = `?v=${view}`;
-  let newPath = `/${path.join('/')}${searchParams}`;
-  // TODO: only update if a change happened
-  window.history.replaceState({}, '', newPath);
+  let newFullPath = newPath + searchParams;
+  window.history.replaceState({}, '', newFullPath);
 }

@@ -23,19 +23,23 @@ export default function Settings() {
 
   const {
     accessToken,
-    setUpdatePath,
     followedCategories,
     saveFollowedCategories,
+    order,
+    playerView,
   } = context;
+
+  let path = `/${order.join('/')}?v=${playerView}`;
 
   const [query, setQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<Category[]>([]);
-
-  let path = `/${context.order.join('/')}?v=${context.playerView}`;
+  const router = useRouter();
 
   useEffect(() => {
-    setUpdatePath(false);
-  }, [setUpdatePath]);
+    if (!accessToken) {
+      router.push(LOGIN_LINK);
+    }
+  }, [accessToken, router]);
 
   function searchGames() {
     if (!accessToken) return;
@@ -106,11 +110,6 @@ export default function Settings() {
         {button}
       </div>
     );
-  }
-
-  const router = useRouter();
-  if (!accessToken) {
-    router.push(LOGIN_LINK);
   }
 
   return (

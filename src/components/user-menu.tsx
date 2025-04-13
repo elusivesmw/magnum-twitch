@@ -11,18 +11,20 @@ import {
   MenuSection,
   MenuSeparator,
 } from '@headlessui/react';
+import { clearLsToken } from '@/lib/local-storage';
 
 export default function UserMenu({
   user,
-  clearAccessToken,
+  setAccessToken,
 }: {
   user: User | undefined;
-  clearAccessToken: () => void;
+  setAccessToken: (token: string | undefined) => void;
 }) {
   if (!user) return;
 
   function logout() {
-    clearAccessToken();
+    clearLsToken();
+    setAccessToken(undefined);
   }
 
   return (
