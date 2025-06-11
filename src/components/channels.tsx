@@ -186,9 +186,11 @@ const Channels = ({
 
   return (
     <div
+      id="channels-container"
       className={`flex flex-col bg-sidepanel ${
         open ? 'basis-[240px]' : 'basis-[50px]'
       } shrink-0 grow-0 overflow-y-scroll scrollbar`}
+      style={{ order: 0 }}
     >
       <div className="flex shrink-0 grow-0 max-w-full text-center items-center justify-between mt-4 pl-4 pr-2">
         <span className={`${open ? '' : 'hidden'} font-semibold text-xl`}>

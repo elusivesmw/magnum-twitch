@@ -2,6 +2,7 @@ import { Category } from '@/types/twitch';
 
 const LS_ACCESS_TOKEN = 'ACCESS_TOKEN';
 const LS_FOLLOWED_GAMES = 'FOLLOWED_GAMES';
+const LS_LAYOUT_ORDER = 'LAYOUT_ORDER';
 
 export function getLsFollowedCategories(): Category[] {
   let followedGames: Category[] = [];
@@ -63,4 +64,35 @@ function getHashValues() {
   });
   //console.log(params);
   return params;
+}
+
+export function getLsLayoutOrder(): string[] {
+  let layoutOrder: string[] = [];
+  try {
+    // try get from local storage
+    let layoutOrderStr = localStorage.getItem(LS_FOLLOWED_GAMES);
+    if (!layoutOrderStr) return [];
+
+    // parse json string
+    layoutOrder = JSON.parse(layoutOrderStr);
+  } catch {
+    console.error('Failed to retrieve layout order from local storage');
+  }
+
+  return layoutOrder;
+}
+
+export function setLsLayoutOrder(layoutOrder: string[] | undefined) {
+  try {
+    if (!layoutOrder) {
+      localStorage.removeItem(LS_LAYOUT_ORDER);
+      return;
+    }
+
+    // to string
+    let layoutOrderStr = JSON.stringify(layoutOrder);
+    localStorage.setItem(LS_LAYOUT_ORDER, layoutOrderStr);
+  } catch {
+    console.error('Failed to save layout order to local storage');
+  }
 }

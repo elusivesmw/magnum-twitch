@@ -45,7 +45,11 @@ const MultiChat = ({
   };
 
   return (
-    <div className={`flex flex-col h-full ${open ? 'w-[350px]' : 'w-auto'}`}>
+    <div
+      id="chat-container"
+      className={`flex flex-col h-full ${open ? 'w-[350px]' : 'w-auto'}`}
+      style={{ order: 2 }}
+    >
       <div className="relative flex h-[50px] flex-wrap bg-chatpanel border-b border-twborder text-twtext items-center justify-between">
         <div
           className={`${!open ? 'absolute left-[-30px] top-4 z-10' : 'ml-2'} `}

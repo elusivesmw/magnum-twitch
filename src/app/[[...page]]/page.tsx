@@ -42,6 +42,7 @@ export default function Home() {
         className={`flex ${playerClass(
           playerView
         )} basis-auto grow shrink justify-around bg-black mt-[1px] mb-[2px]`}
+        style={{ order: 1 }}
       >
         {watching.map((e) => (
           <Player
