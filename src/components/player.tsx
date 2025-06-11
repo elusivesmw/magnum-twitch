@@ -1,5 +1,4 @@
 import { CloseX, ArrowDown, ArrowUp, Spotlight, PopOut } from './icons';
-import { AnimationEvent } from 'react';
 
 const EMBED_PARENT = process.env.NEXT_PUBLIC_TWITCH_EMBED_PARENT;
 
@@ -27,8 +26,7 @@ const Player = ({
     <>
       <div
         id={`twitch-embed-${channel}`}
-        className="twitch-player relative select-none group transition-all duration-200"
-        onAnimationEnd={stopAnimation}
+        className="twitch-player relative select-none group"
         data-pos={order + 1}
         data-of={total}
         style={{ order: order }}
@@ -70,9 +68,7 @@ const Player = ({
           </div>
           <iframe
             className={`w-full h-full border-[3px] ${
-              isActiveChat && total > 1
-                ? 'border-twpurple'
-                : 'border-black animate-highlight'
+              isActiveChat && total > 1 ? 'border-twpurple' : 'border-black'
             }`}
             src={`https://player.twitch.tv/?channel=${channel}&parent=${EMBED_PARENT}`}
             height="720"
@@ -84,10 +80,5 @@ const Player = ({
     </>
   );
 };
-
-function stopAnimation(e: AnimationEvent) {
-  let target = e.target as HTMLElement;
-  target.classList.remove('animate-highlight');
-}
 
 export default Player;

@@ -25,14 +25,7 @@ export function useWatchingManager(
 
   // add channel to watching state
   function addWatching(channel: string) {
-    if (watching.includes(channel)) {
-      // add highlight animation
-      let channelDiv = document.getElementById(`twitch-embed-${channel}`);
-      if (!channelDiv) return;
-      channelDiv.classList.add('animate-highlight');
-      return;
-    }
-
+    // max
     if (watching.length >= 9) {
       // do this better :]
       alert("That's enough, dude.");

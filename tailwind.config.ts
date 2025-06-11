@@ -18,15 +18,6 @@ const config: Config = {
       tight: '1.2',
     },
     extend: {
-      animation: {
-        highlight: 'highlight 3s ease-in-out',
-      },
-      keyframes: {
-        highlight: {
-          '0%': { borderColor: 'var(--twpurple)' },
-          '100%': { borderColor: 'black' },
-        },
-      },
       colors: {
         noplayer: 'var(--background-rgb)',
         sidepanel: 'rgb(31,31,35)',
