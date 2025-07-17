@@ -8,6 +8,9 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "engines": {
+    "node": "22.x"
+  },
   "dependencies": {
     "@headlessui/react": "^2.1.2",
     "@tailwindcss/container-queries": "^0.1.1",
