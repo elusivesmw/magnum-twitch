@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import { External, LogOut, Settings } from './icons';
 import Link from 'next/link';
-import { User } from '@/types/twitch';
 import {
   Menu,
   MenuButton,
@@ -11,28 +10,20 @@ import {
   MenuSection,
   MenuSeparator,
 } from '@headlessui/react';
-import { clearLsToken } from '@/lib/local-storage';
+import { signOut, useSession } from 'next-auth/react';
 
-export default function UserMenu({
-  user,
-  setAccessToken,
-}: {
-  user: User | undefined;
-  setAccessToken: (token: string | undefined) => void;
-}) {
-  if (!user) return;
-
-  function logout() {
-    clearLsToken();
-    setAccessToken(undefined);
-  }
+export default function UserMenu() {
+  const session = useSession();
+  console.log(session.status);
+  if (session.status === 'unauthenticated') return <></>;
+  const user = session.data?.user;
 
   return (
     <Menu>
       <MenuButton className="w-[30px] cursor-pointer">
         <Image
-          src={user.profile_image_url}
-          alt={`${user.login} profile`}
+          src={user?.image ?? ''}
+          alt={`${user?.name} profile`}
           className="w-full max-w-full rounded-full object-cover"
           width={30}
           height={30}
@@ -44,15 +35,15 @@ export default function UserMenu({
           <MenuHeading className="flex items-center p-2">
             <div className="w-[40px]">
               <Image
-                src={user.profile_image_url}
-                alt={`${user.login} profile`}
+                src={user?.image as string}
+                alt={`${user?.name} profile`}
                 className="w-full max-w-full rounded-full object-cover"
                 width={40}
                 height={40}
                 unoptimized
               />
             </div>
-            <span className="pl-4 font-semibold">{user.display_name}</span>
+            <span className="pl-4 font-semibold">{user?.name}</span>
           </MenuHeading>
         </MenuSection>
         <MenuSeparator className="border-t border-twborder mt-4 mx-2 pb-4"></MenuSeparator>
@@ -85,7 +76,7 @@ export default function UserMenu({
           </MenuItem>
           <MenuItem>
             <button
-              onClick={logout}
+              onClick={() => signOut()}
               className="w-full flex p-2 rounded-lg hover:bg-twbuttonbg hover:bg-opacity-[0.48]"
             >
               <div className="pr-2 h-[20px]">
