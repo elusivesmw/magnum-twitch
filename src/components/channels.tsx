@@ -22,26 +22,25 @@ import {
   ListboxOptions,
 } from '@headlessui/react';
 import { getUniqueBy } from '@/lib/helper';
+import { useSession } from 'next-auth/react';
 
-const POLL_INTERVAL = 60 * 1000;
+const POLL_INTERVAL = 10 * 1000;
 
 const Channels = ({
-  accessToken,
-  user,
   watching,
   addWatching,
   removeWatching,
   view,
   followedCategories,
 }: {
-  accessToken: string | undefined;
-  user: User;
   watching: string[];
   addWatching: (stream: string) => void;
   removeWatching: (stream: string) => void;
   view: PlayerView;
   followedCategories: Category[];
 }) => {
+  const session = useSession();
+
   let [visibleStreamList, setVisibleStreamList] = useState<string>('following');
   let [notVisibleStreams, setNotVisibleStreams] = useState<
     Stream[] | undefined
@@ -54,28 +53,32 @@ const Channels = ({
   let [watchingStreams, setWatchingStreams] = useState<Stream[] | undefined>();
 
   useEffect(() => {
-    updateFollowingStreams(accessToken, user);
-    updateGameStreams(accessToken, user, followedCategories);
-    updateWatchingStreams(accessToken, watching);
+    console.log('--------------------------session', session.data?.accessToken);
+    updateFollowingStreams();
+    updateGameStreams(followedCategories);
+    updateWatchingStreams(watching);
     const intervalId = setInterval(() => {
-      updateFollowingStreams(accessToken, user);
-      updateGameStreams(accessToken, user, followedCategories);
-      updateWatchingStreams(accessToken, watching);
+      updateFollowingStreams();
+      updateGameStreams(followedCategories);
+      updateWatchingStreams(watching);
     }, POLL_INTERVAL);
 
     return () => clearInterval(intervalId);
-  }, [accessToken, user, watching, view, followedCategories]);
+  }, [session, watching, view, followedCategories]);
 
   // following channels
-  const updateFollowingStreams = (
-    accessToken: string | undefined,
-    user: User | undefined
-  ) => {
-    if (!accessToken) return;
-    if (!user) return;
-    const httpOptions = getHeaders(accessToken);
+  const updateFollowingStreams = () => {
+    console.log(
+      '--------------------------followed session',
+      session.data?.accessToken
+    );
+    console.log('status', session.status);
+    if (session.status !== 'authenticated') return;
+
+    console.log(session);
+    const httpOptions = getHeaders(session.data?.accessToken);
     fetch(
-      `https://api.twitch.tv/helix/streams/followed?user_id=${user.id}&first=100`,
+      `https://api.twitch.tv/helix/streams/followed?user_id=${session.data.userId}&first=100`,
       httpOptions
     )
       .then((res) => res.json())
@@ -87,20 +90,15 @@ const Channels = ({
   };
 
   // following games
-  const updateGameStreams = (
-    accessToken: string | undefined,
-    user: User | undefined,
-    followedCategories: Category[]
-  ) => {
-    if (!accessToken) return;
-    if (!user) return;
+  const updateGameStreams = (followedCategories: Category[]) => {
+    if (session.status !== 'authenticated') return;
     if (followedCategories.length < 1) return;
 
     // TODO: look into when more than 100 combined streams are returned
     // possibly get each game separately (api rate limit 30 requests/min)
     let game_ids_param =
       'game_id=' + followedCategories.map((fc) => fc.id).join('&game_id=');
-    const httpOptions = getHeaders(accessToken);
+    const httpOptions = getHeaders(session.data?.accessToken);
     fetch(
       `https://api.twitch.tv/helix/streams?${game_ids_param}&first=100`,
       httpOptions
@@ -114,16 +112,13 @@ const Channels = ({
   };
 
   // watching
-  const updateWatchingStreams = (
-    accessToken: string | undefined,
-    watching: string[]
-  ) => {
-    if (!accessToken) return;
+  const updateWatchingStreams = (watching: string[]) => {
+    if (session.status !== 'authenticated') return;
     if (watching.length < 1) return;
 
     // get watching streams data
     let user_logins_param = 'user_login=' + watching.join('&user_login=');
-    const httpOptions = getHeaders(accessToken);
+    const httpOptions = getHeaders(session.data.accessToken);
     fetch(
       `https://api.twitch.tv/helix/streams?${user_logins_param}`,
       httpOptions
@@ -248,7 +243,7 @@ const Channels = ({
 
       {visibleStreamList == 'following' ? (
         <ChannelSection
-          accessToken={accessToken}
+          accessToken={session.data?.accessToken}
           type={SectionType.Following}
           open={open}
           watching={watching}
@@ -258,7 +253,7 @@ const Channels = ({
         />
       ) : (
         <ChannelSection
-          accessToken={accessToken}
+          accessToken={session.data?.accessToken}
           type={SectionType.Game}
           open={open}
           watching={watching}
@@ -270,7 +265,7 @@ const Channels = ({
 
       {notVisibleStreams && notVisibleStreams.length > 0 && (
         <ChannelSection
-          accessToken={accessToken}
+          accessToken={session.data?.accessToken}
           type={SectionType.NotFollowing}
           headerText="Other Watching"
           headerIcon={<BrokenHeart />}

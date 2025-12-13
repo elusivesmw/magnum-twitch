@@ -1,4 +1,5 @@
-import { getHeaders } from '@/lib/auth';
+'use client';
+
 import { Stream } from '@/types/twitch';
 import { useSession } from 'next-auth/react';
 import { useCallback, useEffect } from 'react';
@@ -34,9 +35,8 @@ export function useCleanupStreams(
       if (!accessToken) return;
       if (watching.length == 0) return;
 
-      const httpOptions = getHeaders(accessToken);
       let logins_param = 'user_login=' + watching.join('&user_login=');
-      fetch(`https://api.twitch.tv/helix/streams?${logins_param}`, httpOptions)
+      fetch(`https://api.twitch.tv/helix/streams?${logins_param}`)
         .then((res) => res.json())
         .then((json) => {
           let streams = json.data as Stream[];
@@ -51,7 +51,7 @@ export function useCleanupStreams(
   // check if all streams are still live on interval
   useEffect(() => {
     const intervalId = setInterval(() => {
-      liveCheckStreams();
+      liveCheckStreams(session.data?.accessToken);
     }, LIVE_CHECK_INTERVAL);
 
     return () => clearInterval(intervalId);

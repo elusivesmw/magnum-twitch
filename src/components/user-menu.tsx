@@ -14,8 +14,8 @@ import { signOut, useSession } from 'next-auth/react';
 
 export default function UserMenu() {
   const session = useSession();
-  console.log(session.status);
   if (session.status === 'unauthenticated') return <></>;
+
   const user = session.data?.user;
 
   return (

@@ -6,7 +6,6 @@ import { FormEvent } from 'react';
 import Login from './login';
 
 export default function Header({
-  user,
   addWatching,
   playerView,
   setPlayerView,
