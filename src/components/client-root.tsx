@@ -12,7 +12,7 @@ export default function ClientRoot({ children }: { children: ReactNode }) {
     throw new Error('This component requires AppProvider as a parent');
   }
 
-  const session = useSession();
+  const { data: session } = useSession();
 
   const {
     watching,
@@ -31,7 +31,7 @@ export default function ClientRoot({ children }: { children: ReactNode }) {
         setPlayerView={setPlayerView}
       />
       <main className="relative flex h-full overflow-y-hidden">
-        {session.data?.user && (
+        {session && (
           <Channels
             watching={watching}
             addWatching={addWatching}
