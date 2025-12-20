@@ -1,6 +1,5 @@
 import { Carousel, Grid, Plus, Twitch } from '@/components/icons';
 import { PlayerView } from '@/types/state';
-import { User } from '@/types/twitch';
 import Link from 'next/link';
 import { FormEvent } from 'react';
 import Login from './login';
@@ -10,7 +9,6 @@ export default function Header({
   playerView,
   setPlayerView,
 }: {
-  user: User | undefined;
   addWatching: (channel: string) => void;
   playerView: PlayerView;
   setPlayerView: (view: PlayerView) => void;
