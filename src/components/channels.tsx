@@ -53,76 +53,74 @@ const Channels = ({
   let [watchingStreams, setWatchingStreams] = useState<Stream[] | undefined>();
 
   useEffect(() => {
+    if (!session) return;
+    const httpOptions = getHeaders(session.accessToken);
+
+    // following channels
+    const updateFollowingStreams = () => {
+      fetch(
+        `https://api.twitch.tv/helix/streams/followed?user_id=${session.userId}&first=100`,
+        httpOptions
+      )
+        .then((res) => res.json())
+        .then((json) => {
+          let streams = json.data as Stream[];
+          setFollowingStreams(streams);
+        })
+        .catch((err) => console.log(err));
+    };
+
+    // following games
+    const updateGameStreams = (followedCategories: Category[]) => {
+      if (followedCategories.length < 1) return;
+
+      // TODO: look into when more than 100 combined streams are returned
+      // possibly get each game separately (api rate limit 30 requests/min)
+      let game_ids_param =
+        'game_id=' + followedCategories.map((fc) => fc.id).join('&game_id=');
+      fetch(
+        `https://api.twitch.tv/helix/streams?${game_ids_param}&first=100`,
+        httpOptions
+      )
+        .then((res) => res.json())
+        .then((json) => {
+          let streams = json.data as Stream[];
+          setGameStreams(streams);
+        })
+        .catch((err) => console.log(err));
+    };
+
+    // watching
+    const updateWatchingStreams = (watching: string[]) => {
+      if (watching.length < 1) return;
+
+      // get watching streams data
+      let user_logins_param = 'user_login=' + watching.join('&user_login=');
+      fetch(
+        `https://api.twitch.tv/helix/streams?${user_logins_param}`,
+        httpOptions
+      )
+        .then((res) => res.json())
+        .then((json) => {
+          let watchingStreams = json.data as Stream[];
+          setWatchingStreams(watchingStreams);
+        })
+        .catch((err) => console.log(err));
+    };
+
+    // initial fetch
     updateFollowingStreams();
     updateGameStreams(followedCategories);
     updateWatchingStreams(watching);
+
+    // setup polling
     const intervalId = setInterval(() => {
       updateFollowingStreams();
       updateGameStreams(followedCategories);
       updateWatchingStreams(watching);
     }, POLL_INTERVAL);
-
     return () => clearInterval(intervalId);
-  }, [session, watching, view, followedCategories]);
-
-  // following channels
-  const updateFollowingStreams = () => {
-    if (!session) return;
-
-    const httpOptions = getHeaders(session.accessToken);
-    fetch(
-      `https://api.twitch.tv/helix/streams/followed?user_id=${session.userId}&first=100`,
-      httpOptions
-    )
-      .then((res) => res.json())
-      .then((json) => {
-        let streams = json.data as Stream[];
-        setFollowingStreams(streams);
-      })
-      .catch((err) => console.log(err));
-  };
-
-  // following games
-  const updateGameStreams = (followedCategories: Category[]) => {
-    if (!session) return;
-    if (followedCategories.length < 1) return;
-
-    // TODO: look into when more than 100 combined streams are returned
-    // possibly get each game separately (api rate limit 30 requests/min)
-    let game_ids_param =
-      'game_id=' + followedCategories.map((fc) => fc.id).join('&game_id=');
-    const httpOptions = getHeaders(session.accessToken);
-    fetch(
-      `https://api.twitch.tv/helix/streams?${game_ids_param}&first=100`,
-      httpOptions
-    )
-      .then((res) => res.json())
-      .then((json) => {
-        let streams = json.data as Stream[];
-        setGameStreams(streams);
-      })
-      .catch((err) => console.log(err));
-  };
-
-  // watching
-  const updateWatchingStreams = (watching: string[]) => {
-    if (!session) return;
-    if (watching.length < 1) return;
-
-    // get watching streams data
-    let user_logins_param = 'user_login=' + watching.join('&user_login=');
-    const httpOptions = getHeaders(session.accessToken);
-    fetch(
-      `https://api.twitch.tv/helix/streams?${user_logins_param}`,
-      httpOptions
-    )
-      .then((res) => res.json())
-      .then((json) => {
-        let watchingStreams = json.data as Stream[];
-        setWatchingStreams(watchingStreams);
-      })
-      .catch((err) => console.log(err));
-  };
+  }, [session, followedCategories, watching]);
 
   const updateNotVisibleStreams = (
     visibleStreamList: string,

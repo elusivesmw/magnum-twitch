@@ -3,7 +3,7 @@ import { Stream } from '@/types/twitch';
 import { useSession } from 'next-auth/react';
 import { useCallback, useEffect } from 'react';
 
-const LIVE_CHECK_INTERVAL = 60 * 1000;
+const LIVE_CHECK_INTERVAL = 10 * 1000;
 
 /**
  * Hook to remove channel from watching when it goes offline.
@@ -43,7 +43,7 @@ export function useCleanupStreams(
         removeDeadStreams(s);
       })
       .catch((err) => console.error(err));
-  }, [watching, removeDeadStreams]);
+  }, [session, watching, removeDeadStreams]);
 
   // check if all streams are still live on interval
   useEffect(() => {
