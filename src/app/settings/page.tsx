@@ -50,7 +50,7 @@ export default function Settings() {
         let games = json.data as Category[];
         setSearchResults(games);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.error(err));
   }
 
   // TODO: onclick followed game, switch channels view

@@ -20,7 +20,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   callbacks: {
     async jwt({ token, account, user }) {
       if (account && user) {
-        console.debug(token);
         token.accessToken = account.access_token;
         token.refreshToken = account.refresh_token;
         token.idToken = account.id_token;
@@ -29,8 +28,8 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         return token;
       }
 
-      const now = Math.floor(Date.now() / 1000);
-      console.log('expiresIn', (token.expiresAt as number) - now);
+      //const now = Math.floor(Date.now() / 1000);
+      //console.log('expiresIn', (token.expiresAt as number) - now);
       if (Date.now() < (token.expiresAt as number) * 1000) {
         return token;
       }
@@ -47,24 +46,18 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 });
 
 async function refreshAccessToken(token: JWT): Promise<JWT> {
-  console.log('refreshAccessToken');
-  console.log('jwt', token);
-  const body = new URLSearchParams({
-    grant_type: 'refresh_token',
-    client_id: TWITCH_CLIENT_ID,
-    client_secret: TWITCH_CLIENT_SECRET,
-    refresh_token: token.refreshToken ?? 'cocksucker',
-  });
-  console.log('body', body);
-
   try {
     const response = await fetch('https://id.twitch.tv/oauth2/token', {
       method: 'POST',
-      body: body,
+      body: new URLSearchParams({
+        grant_type: 'refresh_token',
+        client_id: TWITCH_CLIENT_ID,
+        client_secret: TWITCH_CLIENT_SECRET,
+        refresh_token: token.refreshToken ?? '',
+      }),
     });
 
     const refreshedTokens = await response.json();
-    console.log(refreshedTokens);
 
     if (!response.ok) {
       throw refreshedTokens;

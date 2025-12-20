@@ -14,7 +14,6 @@ import { getHeaders } from '@/lib/auth';
 import Image from 'next/image';
 import { FollowingTooltip } from './tooltip';
 import { SectionType } from '@/types/channel';
-import { PlayerView } from '@/types/state';
 import {
   Listbox,
   ListboxButton,
@@ -30,13 +29,11 @@ const Channels = ({
   watching,
   addWatching,
   removeWatching,
-  view,
   followedCategories,
 }: {
   watching: string[];
   addWatching: (stream: string) => void;
   removeWatching: (stream: string) => void;
-  view: PlayerView;
   followedCategories: Category[];
 }) => {
   const { data: session } = useSession();
@@ -67,7 +64,7 @@ const Channels = ({
           let streams = json.data as Stream[];
           setFollowingStreams(streams);
         })
-        .catch((err) => console.log(err));
+        .catch((err) => console.error(err));
     };
 
     // following games
@@ -87,7 +84,7 @@ const Channels = ({
           let streams = json.data as Stream[];
           setGameStreams(streams);
         })
-        .catch((err) => console.log(err));
+        .catch((err) => console.error(err));
     };
 
     // watching
@@ -105,7 +102,7 @@ const Channels = ({
           let watchingStreams = json.data as Stream[];
           setWatchingStreams(watchingStreams);
         })
-        .catch((err) => console.log(err));
+        .catch((err) => console.error(err));
     };
 
     // initial fetch
@@ -316,7 +313,7 @@ const ChannelSection = ({
         let users = json.data as User[];
         setUsers(users);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.error(err));
   };
 
   let [showModal, setShowModal] = useState<boolean>(false);

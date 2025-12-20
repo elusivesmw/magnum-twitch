@@ -36,7 +36,6 @@ export default function ClientRoot({ children }: { children: ReactNode }) {
             watching={watching}
             addWatching={addWatching}
             removeWatching={removeWatching}
-            view={playerView}
             followedCategories={followedCategories}
           />
         )}

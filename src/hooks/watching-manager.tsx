@@ -55,7 +55,7 @@ export function useWatchingManager(
 
   // reorder channel in order state
   function reorderWatching(channel: string, index: number, relative: boolean) {
-    console.log('watching in reorder', watching);
+    //console.log('watching in reorder', watching);
     let fromOrder = order.findIndex((o) => o == channel);
     let toOrder = relative ? fromOrder + index : index;
     if (toOrder < 0 || toOrder > watching.length + 1) return;
