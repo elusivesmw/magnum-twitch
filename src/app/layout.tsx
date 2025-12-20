@@ -4,6 +4,7 @@ import './globals.css';
 import { AppProvider } from '@/context/app';
 import { Suspense } from 'react';
 import ClientRoot from '@/components/client-root';
+import { SessionProvider } from '@/components/session-provider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -21,9 +22,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Suspense>
-          <AppProvider>
-            <ClientRoot>{children}</ClientRoot>
-          </AppProvider>
+          <SessionProvider>
+            <AppProvider>
+              <ClientRoot>{children}</ClientRoot>
+            </AppProvider>
+          </SessionProvider>
         </Suspense>
       </body>
     </html>

@@ -6,7 +6,6 @@ import { useContext } from 'react';
 import { PlayerView } from '@/types/state';
 import { AppContext } from '@/context/app';
 import { usePathSync } from '@/hooks/path-sync';
-import { useToken } from '@/hooks/token';
 import { useCleanupStreams } from '@/hooks/cleanup-streams';
 
 export default function Home() {
@@ -16,9 +15,6 @@ export default function Home() {
   }
 
   const {
-    accessToken,
-    setAccessToken,
-    setUser,
     watching,
     setWatching,
     removeWatching,
@@ -31,9 +27,8 @@ export default function Home() {
     playerView,
   } = context;
 
-  useToken(accessToken, setAccessToken, setUser);
   usePathSync(setWatching, order, setOrder, playerView, setPlayerView);
-  useCleanupStreams(accessToken, watching, removeWatching);
+  useCleanupStreams(watching, removeWatching);
 
   return (
     <>

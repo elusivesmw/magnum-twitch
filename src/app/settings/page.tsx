@@ -1,14 +1,13 @@
 'use client';
 
 import { AppContext } from '@/context/app';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import { Category } from '@/types/twitch';
 import { Plus, TrashCan } from '@/components/icons';
 import Link from 'next/link';
-import { getHeaders } from '@/lib/auth';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { LOGIN_LINK } from '@/lib/auth';
+import { useSession } from 'next-auth/react';
+import { getHeaders } from '@/lib/auth';
 
 enum Action {
   Add,
@@ -21,34 +20,24 @@ export default function Settings() {
     throw new Error('This component requires AppProvider as a parent');
   }
 
-  const {
-    accessToken,
-    followedCategories,
-    saveFollowedCategories,
-    order,
-    playerView,
-  } = context;
+  const { data: session } = useSession();
+
+  const { followedCategories, saveFollowedCategories, order, playerView } =
+    context;
 
   let path = `/${order.join('/')}?v=${playerView}`;
 
   const [query, setQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<Category[]>([]);
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!accessToken) {
-      router.push(LOGIN_LINK);
-    }
-  }, [accessToken, router]);
 
   function searchGames() {
-    if (!accessToken) return;
+    if (!session) return;
     if (query.length === 0) {
       setSearchResults([]);
       return;
     }
 
-    const httpOptions = getHeaders(accessToken);
+    const httpOptions = getHeaders(session.accessToken);
     fetch(
       `https://api.twitch.tv/helix/search/categories?query=${query}&first=10`,
       httpOptions
@@ -61,7 +50,7 @@ export default function Settings() {
         let games = json.data as Category[];
         setSearchResults(games);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.error(err));
   }
 
   // TODO: onclick followed game, switch channels view

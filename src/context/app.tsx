@@ -8,10 +8,6 @@ import { useWatchingManager } from '@/hooks/watching-manager';
 import { useCategoryManager } from '@/hooks/category-manager';
 
 interface AppContextType {
-  accessToken: string | undefined;
-  setAccessToken: (token: string | undefined) => void;
-  user: User | undefined;
-  setUser: (user: User | undefined) => void;
   watching: string[];
   setWatching: (watching: string[]) => void;
   order: string[];
@@ -37,8 +33,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const initialView = PlayerView.Grid;
 
   // state
-  const [accessToken, setAccessToken] = useState<string | undefined>();
-  const [user, setUser] = useState<User | undefined>();
   const [watching, setWatching] = useState<string[]>(initialWatching);
   const [order, setOrder] = useState<string[]>(initialWatching);
   const [activeChat, setActiveChat] = useState(initialChat);
@@ -61,10 +55,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <AppContext.Provider
       value={{
-        accessToken,
-        setAccessToken,
-        user,
-        setUser,
         watching,
         setWatching,
         addWatching,

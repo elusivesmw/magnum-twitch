@@ -3,6 +3,7 @@
 import Channels from '@/components/channels';
 import Header from '@/components/header';
 import { AppContext } from '@/context/app';
+import { useSession } from 'next-auth/react';
 import { ReactNode, useContext } from 'react';
 
 export default function ClientRoot({ children }: { children: ReactNode }) {
@@ -11,10 +12,9 @@ export default function ClientRoot({ children }: { children: ReactNode }) {
     throw new Error('This component requires AppProvider as a parent');
   }
 
+  const { data: session } = useSession();
+
   const {
-    accessToken,
-    setAccessToken,
-    user,
     watching,
     addWatching,
     removeWatching,
@@ -26,22 +26,16 @@ export default function ClientRoot({ children }: { children: ReactNode }) {
   return (
     <div id="root" className="flex flex-col h-screen">
       <Header
-        accessToken={accessToken}
-        setAccessToken={setAccessToken}
-        user={user}
         addWatching={addWatching}
         playerView={playerView}
         setPlayerView={setPlayerView}
       />
       <main className="relative flex h-full overflow-y-hidden">
-        {user && (
+        {session && (
           <Channels
-            accessToken={accessToken}
-            user={user}
             watching={watching}
             addWatching={addWatching}
             removeWatching={removeWatching}
-            view={playerView}
             followedCategories={followedCategories}
           />
         )}

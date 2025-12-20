@@ -1,22 +1,14 @@
 import { Carousel, Grid, Plus, Twitch } from '@/components/icons';
 import { PlayerView } from '@/types/state';
-import { User } from '@/types/twitch';
 import Link from 'next/link';
 import { FormEvent } from 'react';
-import UserMenu from './user-menu';
-import { LOGIN_LINK } from '@/lib/auth';
+import Login from './login';
 
 export default function Header({
-  accessToken,
-  setAccessToken,
-  user,
   addWatching,
   playerView,
   setPlayerView,
 }: {
-  accessToken: string | undefined;
-  setAccessToken: (token: string | undefined) => void;
-  user: User | undefined;
   addWatching: (channel: string) => void;
   playerView: PlayerView;
   setPlayerView: (view: PlayerView) => void;
@@ -84,19 +76,7 @@ export default function Header({
           </button>
         </form>
       </div>
-      <div className="relative flex p-4">
-        {accessToken && (
-          <UserMenu user={user} setAccessToken={setAccessToken} />
-        )}
-        {!accessToken && (
-          <a
-            href={LOGIN_LINK}
-            className="inline-flex items-center text-sm font-semibold px-4 text-twbuttontext bg-twbuttonbg bg-opacity-[0.38] hover:bg-opacity-[0.48] rounded-[4px]"
-          >
-            Log In
-          </a>
-        )}
-      </div>
+      <Login />
     </header>
   );
 }

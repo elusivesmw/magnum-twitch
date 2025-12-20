@@ -14,7 +14,6 @@ import { getHeaders } from '@/lib/auth';
 import Image from 'next/image';
 import { FollowingTooltip } from './tooltip';
 import { SectionType } from '@/types/channel';
-import { PlayerView } from '@/types/state';
 import {
   Listbox,
   ListboxButton,
@@ -22,26 +21,23 @@ import {
   ListboxOptions,
 } from '@headlessui/react';
 import { getUniqueBy } from '@/lib/helper';
+import { useSession } from 'next-auth/react';
 
 const POLL_INTERVAL = 60 * 1000;
 
 const Channels = ({
-  accessToken,
-  user,
   watching,
   addWatching,
   removeWatching,
-  view,
   followedCategories,
 }: {
-  accessToken: string | undefined;
-  user: User;
   watching: string[];
   addWatching: (stream: string) => void;
   removeWatching: (stream: string) => void;
-  view: PlayerView;
   followedCategories: Category[];
 }) => {
+  const { data: session } = useSession();
+
   let [visibleStreamList, setVisibleStreamList] = useState<string>('following');
   let [notVisibleStreams, setNotVisibleStreams] = useState<
     Stream[] | undefined
@@ -54,87 +50,74 @@ const Channels = ({
   let [watchingStreams, setWatchingStreams] = useState<Stream[] | undefined>();
 
   useEffect(() => {
-    updateFollowingStreams(accessToken, user);
-    updateGameStreams(accessToken, user, followedCategories);
-    updateWatchingStreams(accessToken, watching);
+    if (!session) return;
+    const httpOptions = getHeaders(session.accessToken);
+
+    // following channels
+    const updateFollowingStreams = () => {
+      fetch(
+        `https://api.twitch.tv/helix/streams/followed?user_id=${session.userId}&first=100`,
+        httpOptions
+      )
+        .then((res) => res.json())
+        .then((json) => {
+          let streams = json.data as Stream[];
+          setFollowingStreams(streams);
+        })
+        .catch((err) => console.error(err));
+    };
+
+    // following games
+    const updateGameStreams = (followedCategories: Category[]) => {
+      if (followedCategories.length < 1) return;
+
+      // TODO: look into when more than 100 combined streams are returned
+      // possibly get each game separately (api rate limit 30 requests/min)
+      let game_ids_param =
+        'game_id=' + followedCategories.map((fc) => fc.id).join('&game_id=');
+      fetch(
+        `https://api.twitch.tv/helix/streams?${game_ids_param}&first=100`,
+        httpOptions
+      )
+        .then((res) => res.json())
+        .then((json) => {
+          let streams = json.data as Stream[];
+          setGameStreams(streams);
+        })
+        .catch((err) => console.error(err));
+    };
+
+    // watching
+    const updateWatchingStreams = (watching: string[]) => {
+      if (watching.length < 1) return;
+
+      // get watching streams data
+      let user_logins_param = 'user_login=' + watching.join('&user_login=');
+      fetch(
+        `https://api.twitch.tv/helix/streams?${user_logins_param}`,
+        httpOptions
+      )
+        .then((res) => res.json())
+        .then((json) => {
+          let watchingStreams = json.data as Stream[];
+          setWatchingStreams(watchingStreams);
+        })
+        .catch((err) => console.error(err));
+    };
+
+    // initial fetch
+    updateFollowingStreams();
+    updateGameStreams(followedCategories);
+    updateWatchingStreams(watching);
+
+    // setup polling
     const intervalId = setInterval(() => {
-      updateFollowingStreams(accessToken, user);
-      updateGameStreams(accessToken, user, followedCategories);
-      updateWatchingStreams(accessToken, watching);
+      updateFollowingStreams();
+      updateGameStreams(followedCategories);
+      updateWatchingStreams(watching);
     }, POLL_INTERVAL);
-
     return () => clearInterval(intervalId);
-  }, [accessToken, user, watching, view, followedCategories]);
-
-  // following channels
-  const updateFollowingStreams = (
-    accessToken: string | undefined,
-    user: User | undefined
-  ) => {
-    if (!accessToken) return;
-    if (!user) return;
-    const httpOptions = getHeaders(accessToken);
-    fetch(
-      `https://api.twitch.tv/helix/streams/followed?user_id=${user.id}&first=100`,
-      httpOptions
-    )
-      .then((res) => res.json())
-      .then((json) => {
-        let streams = json.data as Stream[];
-        setFollowingStreams(streams);
-      })
-      .catch((err) => console.log(err));
-  };
-
-  // following games
-  const updateGameStreams = (
-    accessToken: string | undefined,
-    user: User | undefined,
-    followedCategories: Category[]
-  ) => {
-    if (!accessToken) return;
-    if (!user) return;
-    if (followedCategories.length < 1) return;
-
-    // TODO: look into when more than 100 combined streams are returned
-    // possibly get each game separately (api rate limit 30 requests/min)
-    let game_ids_param =
-      'game_id=' + followedCategories.map((fc) => fc.id).join('&game_id=');
-    const httpOptions = getHeaders(accessToken);
-    fetch(
-      `https://api.twitch.tv/helix/streams?${game_ids_param}&first=100`,
-      httpOptions
-    )
-      .then((res) => res.json())
-      .then((json) => {
-        let streams = json.data as Stream[];
-        setGameStreams(streams);
-      })
-      .catch((err) => console.log(err));
-  };
-
-  // watching
-  const updateWatchingStreams = (
-    accessToken: string | undefined,
-    watching: string[]
-  ) => {
-    if (!accessToken) return;
-    if (watching.length < 1) return;
-
-    // get watching streams data
-    let user_logins_param = 'user_login=' + watching.join('&user_login=');
-    const httpOptions = getHeaders(accessToken);
-    fetch(
-      `https://api.twitch.tv/helix/streams?${user_logins_param}`,
-      httpOptions
-    )
-      .then((res) => res.json())
-      .then((json) => {
-        let watchingStreams = json.data as Stream[];
-        setWatchingStreams(watchingStreams);
-      })
-      .catch((err) => console.log(err));
-  };
+  }, [session, followedCategories, watching]);
 
   const updateNotVisibleStreams = (
     visibleStreamList: string,
@@ -248,7 +231,7 @@ const Channels = ({
 
       {visibleStreamList == 'following' ? (
         <ChannelSection
-          accessToken={accessToken}
+          accessToken={session?.accessToken}
           type={SectionType.Following}
           open={open}
           watching={watching}
@@ -258,7 +241,7 @@ const Channels = ({
         />
       ) : (
         <ChannelSection
-          accessToken={accessToken}
+          accessToken={session?.accessToken}
           type={SectionType.Game}
           open={open}
           watching={watching}
@@ -270,7 +253,7 @@ const Channels = ({
 
       {notVisibleStreams && notVisibleStreams.length > 0 && (
         <ChannelSection
-          accessToken={accessToken}
+          accessToken={session?.accessToken}
           type={SectionType.NotFollowing}
           headerText="Other Watching"
           headerIcon={<BrokenHeart />}
@@ -330,7 +313,7 @@ const ChannelSection = ({
         let users = json.data as User[];
         setUsers(users);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.error(err));
   };
 
   let [showModal, setShowModal] = useState<boolean>(false);
