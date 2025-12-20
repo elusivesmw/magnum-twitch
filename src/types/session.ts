@@ -6,11 +6,15 @@ declare module 'next-auth' {
     accessToken?: string;
     idToken?: string;
     userId?: string;
+    error?: string;
   }
 
   export interface JWT extends DefaultJWT {
     accessToken?: string;
     idToken?: string;
+    refreshToken?: string;
+    expiresAt?: number;
     userId?: string;
+    error?: string;
   }
 }

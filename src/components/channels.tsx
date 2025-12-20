@@ -24,7 +24,7 @@ import {
 import { getUniqueBy } from '@/lib/helper';
 import { useSession } from 'next-auth/react';
 
-const POLL_INTERVAL = 10 * 1000;
+const POLL_INTERVAL = 60 * 1000;
 
 const Channels = ({
   watching,
@@ -53,7 +53,6 @@ const Channels = ({
   let [watchingStreams, setWatchingStreams] = useState<Stream[] | undefined>();
 
   useEffect(() => {
-    console.log('--------------------------session', session.data?.accessToken);
     updateFollowingStreams();
     updateGameStreams(followedCategories);
     updateWatchingStreams(watching);
@@ -68,14 +67,10 @@ const Channels = ({
 
   // following channels
   const updateFollowingStreams = () => {
-    console.log(
-      '--------------------------followed session',
-      session.data?.accessToken
-    );
     console.log('status', session.status);
     if (session.status !== 'authenticated') return;
-
     console.log(session);
+
     const httpOptions = getHeaders(session.data?.accessToken);
     fetch(
       `https://api.twitch.tv/helix/streams/followed?user_id=${session.data.userId}&first=100`,

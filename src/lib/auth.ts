@@ -1,7 +1,6 @@
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
 
 export function getHeaders(accessToken?: string): Object {
-  console.log('------client id', TWITCH_CLIENT_ID);
   const httpOptions: Object = {
     headers: {
       Authorization: `Bearer ${accessToken}`,

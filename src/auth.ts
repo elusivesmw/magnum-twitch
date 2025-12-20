@@ -1,8 +1,8 @@
-import NextAuth from 'next-auth';
+import NextAuth, { JWT } from 'next-auth';
 import TwitchProvider from 'next-auth/providers/twitch';
 
-const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
-const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET;
+const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID ?? '';
+const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET ?? '';
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   debug: true,
@@ -18,14 +18,24 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, account }) {
-      if (account) {
+    async jwt({ token, account, user }) {
+      if (account && user) {
+        console.debug(token);
         token.accessToken = account.access_token;
         token.refreshToken = account.refresh_token;
         token.idToken = account.id_token;
         token.userId = account.providerAccountId;
+        token.expiresAt = account.expires_at;
+        return token;
       }
-      return token;
+
+      const now = Math.floor(Date.now() / 1000);
+      console.log('expiresIn', (token.expiresAt as number) - now);
+      if (Date.now() < (token.expiresAt as number) * 1000) {
+        return token;
+      }
+
+      return refreshAccessToken(token);
     },
     async session({ session, token }) {
       session.accessToken = token.accessToken as string;
@@ -35,3 +45,45 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     },
   },
 });
+
+async function refreshAccessToken(token: JWT): Promise<JWT> {
+  console.log('refreshAccessToken');
+  console.log('jwt', token);
+  const body = new URLSearchParams({
+    grant_type: 'refresh_token',
+    client_id: TWITCH_CLIENT_ID,
+    client_secret: TWITCH_CLIENT_SECRET,
+    refresh_token: token.refreshToken ?? 'cocksucker',
+  });
+  console.log('body', body);
+
+  try {
+    const response = await fetch('https://id.twitch.tv/oauth2/token', {
+      method: 'POST',
+      body: body,
+    });
+
+    const refreshedTokens = await response.json();
+    console.log(refreshedTokens);
+
+    if (!response.ok) {
+      throw refreshedTokens;
+    }
+
+    return {
+      ...token,
+      accessToken: refreshedTokens.access_token,
+      refreshToken: refreshedTokens.refresh_token,
+      expiresAt: Math.floor(Date.now() / 1000) + refreshedTokens.expires_in,
+    };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error('Failed to refresh access token', error.message);
+    }
+
+    return {
+      ...token,
+      error: 'RefreshAccessTokenError',
+    };
+  }
+}
