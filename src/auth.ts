@@ -5,7 +5,7 @@ const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID ?? '';
 const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET ?? '';
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
-  debug: true,
+  debug: process.env.NODE_ENV !== 'production',
   providers: [
     TwitchProvider({
       clientId: TWITCH_CLIENT_ID,
