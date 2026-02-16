@@ -4,11 +4,11 @@ import UserMenu from './user-menu';
 import { useSession, signIn } from 'next-auth/react';
 
 export default function Login() {
-  const { data: session } = useSession();
+  const session = useSession();
 
   return (
     <div className="relative flex p-4">
-      {session ? (
+      {session.status === 'authenticated' ? (
         <UserMenu />
       ) : (
         <button

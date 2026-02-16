@@ -2,17 +2,13 @@
 
 import Player from '@/components/player';
 import MultiChat from '@/components/chat';
-import { useContext } from 'react';
 import { PlayerView } from '@/types/state';
-import { AppContext } from '@/context/app';
 import { usePathSync } from '@/hooks/path-sync';
 import { useCleanupStreams } from '@/hooks/cleanup-streams';
+import { useRequiredContext } from '@/hooks/required-context';
 
 export default function Home() {
-  const context = useContext(AppContext);
-  if (!context) {
-    throw new Error('This component requires AppProvider as a parent');
-  }
+  const context = useRequiredContext();
 
   const {
     watching,

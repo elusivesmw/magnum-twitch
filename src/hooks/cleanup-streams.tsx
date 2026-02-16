@@ -17,6 +17,8 @@ export function useCleanupStreams(
   // remove streams from watching if no longer live
   const removeDeadStreams = useCallback(
     (stillLive: string[]) => {
+      if (!session) return;
+
       // remove from watching
       for (let i = 0; i < watching.length; ++i) {
         let w = watching[i];
@@ -25,13 +27,12 @@ export function useCleanupStreams(
         }
       }
     },
-    [removeWatching, watching]
+    [session, removeWatching, watching]
   );
 
   // check if all streams are still live on interval
   const liveCheckStreams = useCallback(async () => {
-    if (watching.length == 0) return;
-    if (!session) return;
+    if (!session || watching.length == 0) return;
 
     const httpOptions = getHeaders(session.accessToken);
     let logins_param = 'user_login=' + watching.join('&user_login=');
@@ -39,6 +40,8 @@ export function useCleanupStreams(
       .then((res) => res.json())
       .then((json) => {
         let streams = json.data as Stream[];
+        if (!streams) return;
+
         let s = streams.map((e) => e.user_login);
         removeDeadStreams(s);
       })
@@ -52,5 +55,5 @@ export function useCleanupStreams(
     }, LIVE_CHECK_INTERVAL);
 
     return () => clearInterval(intervalId);
-  }, [liveCheckStreams]);
+  }, [session, liveCheckStreams]);
 }
